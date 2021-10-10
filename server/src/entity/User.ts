@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
-
+import { IsEmail, Length } from 'class-validator';
 @Entity("users")
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
@@ -8,11 +8,13 @@ export class User extends BaseEntity {
   @Column({
     length: 60,
   })
+  @Length(3, 60)
   name: string;
 
   @Column({
     unique: true,
   })
+  @IsEmail()
   email: string;
 
   @Column()

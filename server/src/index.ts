@@ -2,8 +2,9 @@ import "reflect-metadata";
 import "./config";
 
 import { createConnection } from "typeorm";
-import express from "express";
+import express, { Errback, NextFunction, Request, Response } from "express";
 import cors from 'cors';
+import apiRouter from "./routes";
 
 const app = express();
 
@@ -19,9 +20,13 @@ createConnection()
     app.use(cors(corsOptions));
     app.use(express.json());
 
-    app.use((error, req, res, next) => {
-      console.log("error", error, error.message, error.name);
-      res.status(500).json({
+    app.use("/api", apiRouter);
+  
+    app.use((err, req: Request, res: Response, next: NextFunction) => {
+      const status = err.status || 500;
+      const { message = 'Something went wrong', error = { message } } = err;
+
+      res.status(status).json({
         error,
       });
     });
