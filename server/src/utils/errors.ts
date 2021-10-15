@@ -1,6 +1,12 @@
 import { ValidationError } from "class-validator";
 import { ValidationErrorName } from "./constants";
 
+export const createValidationErrorObject = (property: string, errorMessage: string) => ({
+  property,
+  constraints: {
+    error: errorMessage,
+  }
+});
 
 export const createValidationError = (errors: ValidationError[]) => {
     const error = {};
@@ -13,3 +19,12 @@ export const createValidationError = (errors: ValidationError[]) => {
       error,
     };
 } 
+
+export class CustomError extends Error {
+  public status: number;
+  constructor(message: string, code: number) {
+    super(message);
+    this.message = message;
+    this.status = code;
+  }
+}

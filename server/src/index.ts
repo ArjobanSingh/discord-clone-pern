@@ -15,6 +15,15 @@ const corsOptions = {
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
+interface CustomError {
+  status?: number;
+  message?: string;
+  name?: string;
+  error?: {
+    [x: string]: string;
+  };
+}
+
 createConnection()
   .then(async (connection) => {
     app.use(cors(corsOptions));
@@ -22,11 +31,11 @@ createConnection()
 
     app.use("/api", apiRouter);
   
-    app.use((err, req: Request, res: Response, next: NextFunction) => {
+    app.use((err: CustomError, req: Request, res: Response, next: NextFunction) => {
       const status = err.status || 500;
       const { message = 'Something went wrong', error = { message } } = err;
 
-      res.status(status).json({
+      return res.status(status).json({
         error,
       });
     });
