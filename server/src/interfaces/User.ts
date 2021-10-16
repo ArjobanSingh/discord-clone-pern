@@ -1,4 +1,4 @@
-interface User {
+interface UserType {
     id: string,
     email: string;
     name: string;
@@ -6,4 +6,4 @@ interface User {
     status?: string;
 }
 
-export default User;
+export default UserType;

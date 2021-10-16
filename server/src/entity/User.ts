@@ -1,10 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
+import {
+  Entity, PrimaryGeneratedColumn, Column, BaseEntity,
+} from 'typeorm';
 import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 import bcrypt from 'bcrypt';
-import { CustomError } from "../utils/errors";
-@Entity("users")
-export class User extends BaseEntity {
-  @PrimaryGeneratedColumn("uuid")
+import { CustomError } from '../utils/errors';
+
+@Entity('users')
+export default class User extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({
