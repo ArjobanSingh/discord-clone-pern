@@ -1,12 +1,13 @@
 import { validate } from 'class-validator';
 import { NextFunction, Request, Response } from 'express';
+import bcrypt from 'bcrypt';
 import User from '../entity/User';
 import { createValidationError, createValidationErrorObject, CustomError } from '../utils/errors';
 import {
   createAccessToken,
-  createRefreshToken,
+  createLoginData,
   createUserObject,
-  decodeJWT,
+  getSlicedTokenForRedis,
 } from '../utils/helperFunctions';
 import redisClient from '../redisConfig';
 import CustomRequest from '../interfaces/CustomRequest';
@@ -34,19 +35,10 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     await user.save();
 
-    const accessToken = createAccessToken(user.id);
-    const refreshToken = createRefreshToken(user.id);
-
-    const { exp } = decodeJWT(refreshToken);
-
-    // save refresh token in redis for this user,
-    // so that it can be expired on logout
-    redisClient.hset(user.id, refreshToken, exp);
-    await redisClient.expireat(user.id, exp);
+    const { accessToken, refreshToken } = await createLoginData(user.id);
 
     res.status(201).json({ user: createUserObject(user), accessToken, refreshToken });
   } catch (err) {
-    console.log('err', err.code, err.name);
     if (err.name === 'QueryFailedError' && err.code === '23505') {
       next(new CustomError('User with same email already exists', 400));
       return;
@@ -55,7 +47,44 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
-export const login = () => {};
+export const login = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, password } = req.body;
+
+    const errors = [];
+    if (!email?.trim().length) {
+      errors.push(createValidationErrorObject('email', 'Please provide email'));
+    }
+    if (!password?.trim().length) {
+      errors.push(createValidationErrorObject('password', 'Password cannot be empty'));
+    }
+
+    if (errors.length) {
+      next(createValidationError(errors));
+      return;
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      next(new CustomError('No user found', 401));
+      return;
+    }
+
+    const result = await bcrypt.compare(password, user.password);
+
+    if (!result) {
+      next(new CustomError('Invalid credentials', 401));
+      return;
+    }
+    const { accessToken, refreshToken } = await createLoginData(user.id);
+
+    // TODO: add logic for lot of login redis sessions
+
+    res.json({ user: createUserObject(user), accessToken, refreshToken });
+  } catch (err) {
+    next(err);
+  }
+};
 export const logout = () => {};
 
 export const refreshToken = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -71,7 +100,6 @@ export const refreshToken = async (req: CustomRequest, res: Response, next: Next
     const accessToken = createAccessToken(userId);
     res.json({ accessToken, refreshToken: refresh });
   } catch (err) {
-    console.log('err', err);
     next(err);
   }
 };

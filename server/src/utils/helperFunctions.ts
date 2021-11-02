@@ -1,4 +1,6 @@
+import LoginDataType from '../interfaces/LoginData';
 import UserType from '../interfaces/User';
+import redisClient from '../redisConfig';
 
 const jwt = require('jsonwebtoken');
 
@@ -45,10 +47,29 @@ const verfifyToken = async (token: string, isAccessToken = true): Promise<any> =
 
 const decodeJWT = (token: string) => jwt.decode(token);
 
+const getSlicedTokenForRedis = (token: string) => token.slice(-43);
+
+const createLoginData = async (userId: string): Promise<LoginDataType> => {
+  const accessToken = createAccessToken(userId);
+  const refreshToken = createRefreshToken(userId);
+
+  const { exp } = decodeJWT(refreshToken);
+
+  const tokenField = refreshToken;
+  // save refresh token in redis for this user,
+  // so that it can be expired on logout
+  redisClient.hset(userId, tokenField, exp);
+  await redisClient.expireat(userId, exp);
+
+  return { accessToken, refreshToken };
+};
+
 export {
   createUserObject,
   createAccessToken,
   createRefreshToken,
   verfifyToken,
   decodeJWT,
+  createLoginData,
+  getSlicedTokenForRedis,
 };

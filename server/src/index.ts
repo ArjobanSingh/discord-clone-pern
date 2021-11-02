@@ -32,6 +32,7 @@ createConnection()
     app.use('/api', apiRouter);
 
     app.use((err: CustomError, req: Request, res: Response, next: NextFunction) => {
+      console.log('Main error', err);
       const status = err.status || 500;
       const { message = 'Something went wrong', error = { message } } = err;
 
