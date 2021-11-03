@@ -6,7 +6,6 @@ import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import apiRouter from './routes';
 
-const { hrtime } = require('process');
 
 const app = express();
 

@@ -2,6 +2,7 @@ import LoginDataType from '../interfaces/LoginData';
 import UserType from '../interfaces/User';
 import redisClient from '../redisConfig';
 
+const { hrtime } = require('process');
 const jwt = require('jsonwebtoken');
 
 const {
@@ -35,7 +36,7 @@ const createAccessToken = (userId: string) => (
   jwt.sign({ userId }, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRATION })
 );
 const createRefreshToken = (userId: string) => (
-  jwt.sign({ userId, creationInMilliseconds: Date.now().toString() },
+  jwt.sign({ userId, uniqueCreationId: hrtime.bigint().toString() },
     REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRATION })
 );
 
@@ -52,11 +53,11 @@ const createLoginData = async (userId: string): Promise<LoginDataType> => {
   const accessToken = createAccessToken(userId);
   const refreshToken = createRefreshToken(userId);
 
-  const { exp, creationInMilliseconds } = decodeJWT(refreshToken);
+  const { exp, uniqueCreationId } = decodeJWT(refreshToken);
 
   // save refresh token's creation time of milliseconds in redis for this user, as it will unique
   // and we would not need to store whole refresh token in redis
-  redisClient.hset(userId, creationInMilliseconds, exp);
+  redisClient.hset(userId, uniqueCreationId, exp);
   await redisClient.expireat(userId, exp);
 
   return { accessToken, refreshToken };
