@@ -10,15 +10,16 @@ const isValidRefreshToken = async (req: CustomRequest, res: Response, next: Next
   if (!refreshToken) return next(new CustomError('Not authorized', 401));
 
   try {
-    const { userId } = await verfifyToken(refreshToken, false);
+    const { userId, creationInMilliseconds } = await verfifyToken(refreshToken, false);
     req.userId = userId;
+    req.creationInMilliseconds = creationInMilliseconds;
     next();
   } catch (err) {
     const isTokenExpired = err.name === 'TokenExpiredError';
     if (isTokenExpired) {
       // delete expired token from valid tokens
-      const { userId } = decodeJWT(refreshToken);
-      await redisClient.hdel(userId, refreshToken);
+      const { userId, creationInMilliseconds } = decodeJWT(refreshToken);
+      await redisClient.hdel(userId, creationInMilliseconds);
     }
     const errorMessage = isTokenExpired
       ? 'Session expired, Please log in again'

@@ -35,7 +35,8 @@ const createAccessToken = (userId: string) => (
   jwt.sign({ userId }, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRATION })
 );
 const createRefreshToken = (userId: string) => (
-  jwt.sign({ userId }, REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRATION })
+  jwt.sign({ userId, creationInMilliseconds: Date.now().toString() },
+    REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRATION })
 );
 
 const verfifyToken = async (token: string, isAccessToken = true): Promise<any> => {
@@ -47,18 +48,15 @@ const verfifyToken = async (token: string, isAccessToken = true): Promise<any> =
 
 const decodeJWT = (token: string) => jwt.decode(token);
 
-const getSlicedTokenForRedis = (token: string) => token.slice(-43);
-
 const createLoginData = async (userId: string): Promise<LoginDataType> => {
   const accessToken = createAccessToken(userId);
   const refreshToken = createRefreshToken(userId);
 
-  const { exp } = decodeJWT(refreshToken);
+  const { exp, creationInMilliseconds } = decodeJWT(refreshToken);
 
-  const tokenField = refreshToken;
-  // save refresh token in redis for this user,
-  // so that it can be expired on logout
-  redisClient.hset(userId, tokenField, exp);
+  // save refresh token's creation time of milliseconds in redis for this user, as it will unique
+  // and we would not need to store whole refresh token in redis
+  redisClient.hset(userId, creationInMilliseconds, exp);
   await redisClient.expireat(userId, exp);
 
   return { accessToken, refreshToken };
@@ -71,5 +69,4 @@ export {
   verfifyToken,
   decodeJWT,
   createLoginData,
-  getSlicedTokenForRedis,
 };

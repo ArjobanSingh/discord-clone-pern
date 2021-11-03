@@ -9,7 +9,7 @@ const isAuthenticated = async (req: CustomRequest, res: Response, next: NextFunc
   if (!bearerAccessToken) {
     return next(new CustomError('Not authorized', 401));
   }
-  const [, accessToken] = bearerAccessToken.split('bearer');
+  const [, accessToken] = bearerAccessToken.split(' ');
   if (!accessToken) return next(new CustomError('Not authorized', 401));
 
   try {
