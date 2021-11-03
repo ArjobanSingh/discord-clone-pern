@@ -1,8 +1,8 @@
+import { nanoid } from 'nanoid';
 import LoginDataType from '../interfaces/LoginData';
 import UserType from '../interfaces/User';
 import redisClient from '../redisConfig';
 
-const { hrtime } = require('process');
 const jwt = require('jsonwebtoken');
 
 const {
@@ -36,7 +36,7 @@ const createAccessToken = (userId: string) => (
   jwt.sign({ userId }, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRATION })
 );
 const createRefreshToken = (userId: string) => (
-  jwt.sign({ userId, uniqueCreationId: hrtime.bigint().toString() },
+  jwt.sign({ userId, uniqueCreationId: nanoid(17) },
     REFRESH_TOKEN_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRATION })
 );
 
