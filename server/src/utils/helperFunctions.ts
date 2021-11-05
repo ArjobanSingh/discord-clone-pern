@@ -43,7 +43,7 @@ const createRefreshToken = (userId: string) => (
 const verfifyToken = async (token: string, isAccessToken = true): Promise<any> => {
   const secret = isAccessToken ? ACCESS_TOKEN_SECRET : REFRESH_TOKEN_SECRET;
   const payload = await verifyWithPromise(token, secret);
-  console.log('payload', payload);
+  console.log('isAccessToken', isAccessToken, 'payload', payload);
   return payload;
 };
 
