@@ -24,5 +24,6 @@ module.exports = {
     'react/jsx-uses-react': 0,
     'import/prefer-default-export': 'warn',
     quotes: 'warn',
+    'no-unused-vars': 'warn',
   },
 };
