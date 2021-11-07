@@ -25,5 +25,6 @@ module.exports = {
     'import/prefer-default-export': 'warn',
     quotes: 'warn',
     'no-unused-vars': 'warn',
+    'react/jsx-props-no-spreading': 0,
   },
 };

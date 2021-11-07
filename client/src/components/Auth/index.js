@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import StyledImage from '../../common/StyledImage';
 import { MAIN_BACKGROUND } from '../../constants/images';
@@ -33,19 +33,25 @@ const Auth = (props) => {
         zIndex="10"
         justifyContent="center"
         alignItems="center"
+        minHeight="580px"
       >
         <Grid
           item
-          xs={12}
-          sm={10}
-          md={8}
-          lg={6}
           height={{ xs: '100%', sm: 'auto' }}
+          width={{ xs: '100%', sm: '500px' }}
           backgroundColor="background.paper"
-          padding={(theme) => theme.spacing(2)}
+          padding={(theme) => theme.spacing(3)}
           borderRadius={1.25}
         >
-          <Component switchScreen={switchScreen} />
+          <Box
+            marginTop={{ xs: '100px', sm: '0' }}
+            width="100%"
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+          >
+            <Component switchScreen={switchScreen} />
+          </Box>
         </Grid>
       </Grid>
     </>

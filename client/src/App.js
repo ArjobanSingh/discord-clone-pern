@@ -15,26 +15,44 @@ const Container = styled('div')(({ theme }) => `
   overflow: hidden;
 `);
 
+const InnerWrapper = styled('div')`
+  height: 100%;
+  overflow: auto;
+`;
+
 const Child = () => {
   const { toggleColorMode } = useContext(ColorModeContext);
 
-  return <Button color="primary" variant="contained" onClick={toggleColorMode}>toggle theme</Button>;
+  return (
+    <Button
+      sx={{
+        position: 'fixed', top: '10', right: '10', zIndex: '20',
+      }}
+      color="primary"
+      variant="contained"
+      onClick={toggleColorMode}
+    >
+      toggle theme
+    </Button>
+  );
 };
 
 function App() {
   return (
     <CustomThemeProvider>
       <Container>
-        {/* <Child /> */}
-        <Suspense fallback={<div>Loader...</div>}>
-          <Routes>
-            <Route
-              path="/login"
-              element={<Auth />}
-            />
-            <Route path="/" element={<Navigate replace to="/login" />} />
-          </Routes>
-        </Suspense>
+        <Child />
+        <InnerWrapper>
+          <Suspense fallback={<div>Loader...</div>}>
+            <Routes>
+              <Route
+                path="/login"
+                element={<Auth />}
+              />
+              <Route path="/" element={<Navigate replace to="/login" />} />
+            </Routes>
+          </Suspense>
+        </InnerWrapper>
       </Container>
     </CustomThemeProvider>
   );
