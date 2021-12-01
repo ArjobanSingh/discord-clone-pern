@@ -38,21 +38,28 @@ instance.interceptors.response.use((res) => res, async (err) => {
   const originalConfig = err.config;
 
   if (err.response) {
-    if (err.response.status === 401 && !originalConfig.retry) {
-      // to prevent infinte refresh token api request,
-      // in case this refresh token api also return 401
-      originalConfig.retry = true;
-      try {
-        const res = await refreshTokenApi();
-        console.log('response for refresh token', res);
-        const { accessToken } = res.data;
-        updateAccessToken(accessToken);
-        instance.defaults.headers.common['access-token'] = accessToken;
-      } catch (refreshError) {
-        if (refreshError.response?.status === 401) {
+    if (err.response.status === 401) {
+      if (originalConfig.retry) {
+        // we have already retried the api to get refresh token
+        // it also failed
+        // TODO: so log, user out
+      } else {
+        // to prevent infinte refresh token api request,
+        // in case this refresh token api also return 401
+        originalConfig.retry = true;
+        try {
+          const res = await refreshTokenApi();
+          console.log('response for refresh token', res);
+          const { accessToken } = res.data;
+          updateAccessToken(accessToken);
+          instance.defaults.headers.common['access-token'] = accessToken;
+          return instance(originalConfig);
+        } catch (refreshError) {
+          if (refreshError.response?.status === 401) {
           // handle logout
+          }
+          return Promise.reject(refreshError);
         }
-        return Promise.reject(refreshError);
       }
     }
   }
