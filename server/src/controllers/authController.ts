@@ -65,7 +65,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
     const user = await User.findOne({ email });
     if (!user) {
-      next(new CustomError('No user found', 401));
+      next(new CustomError('No user found', 404));
       return;
     }
 
@@ -77,7 +77,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
     const { accessToken, refreshToken } = await createLoginData(user.id);
 
-    // TODO: add logic for lot of login redis sessions
+    // TODO: add logic for a lot of login redis sessions
 
     res.json({ user: createUserObject(user), accessToken, refreshToken });
   } catch (err) {

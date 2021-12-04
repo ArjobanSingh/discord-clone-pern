@@ -11,9 +11,9 @@ export default (state = initialState, action) => {
     case AUTH_SIGN_IN_REQUESTED:
       return { ...initialState, isLoading: true, error: null };
     case AUTH_SIGN_IN_SUCCESS:
-      return { isAuthenticated: true, isLoading: true, error: null };
+      return { isAuthenticated: true, isLoading: false, error: null };
     case AUTH_SIGN_IN_FAILED:
-      return { isAuthenticated: false, isLoading: true, error: action.payload.error };
+      return { isAuthenticated: false, isLoading: false, error: action.payload.error };
     default:
       return state;
   }

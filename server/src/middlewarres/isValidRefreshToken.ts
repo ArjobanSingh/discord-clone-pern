@@ -7,7 +7,10 @@ import { decodeJWT, verfifyToken } from '../utils/helperFunctions';
 const isValidRefreshToken = async (req: CustomRequest, res: Response, next: NextFunction) => {
   const refreshToken = req.header('refresh-token');
 
-  if (!refreshToken) return next(new CustomError('Not authorized', 401));
+  if (!refreshToken) {
+    next(new CustomError('Not authorized', 401));
+    return;
+  }
 
   try {
     const { userId, uniqueCreationId } = await verfifyToken(refreshToken, false);

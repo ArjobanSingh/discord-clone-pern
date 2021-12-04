@@ -6,7 +6,6 @@ import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import apiRouter from './routes';
 
-
 const app = express();
 
 const PORT = process.env.PORT || 5000;
@@ -30,7 +29,7 @@ createConnection()
     app.use(cors(corsOptions));
     app.use(express.json());
 
-    // app.use(() => { 
+    // app.use(() => {
     //   const timeInMicroseconds = hrtime.bigint();
     //   console.log(timeInMicroseconds, Date.now(), new Date());
     // })

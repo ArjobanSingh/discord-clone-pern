@@ -4,7 +4,6 @@ import {
 import './App.css';
 import { styled } from '@mui/material/styles';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import { Button } from '@mui/material';
 import CustomThemeProvider, { ColorModeContext } from './providers/CustomThemeProvider';
 import Auth from './components/Auth';
@@ -25,7 +24,6 @@ const InnerWrapper = styled('div')`
 
 const Child = () => {
   const { toggleColorMode } = useContext(ColorModeContext);
-  const dispatch = useDispatch();
 
   return (
     <>
@@ -38,40 +36,6 @@ const Child = () => {
         onClick={toggleColorMode}
       >
         toggle theme
-      </Button>
-
-      <Button
-        sx={{
-          position: 'fixed', top: '10', left: '210px', zIndex: '20',
-        }}
-        color="primary"
-        variant="contained"
-        onClick={() => dispatch({ type: 'AUTH_SIGN_IN_REQUESTED' })}
-      >
-        login test
-      </Button>
-
-      <Button
-        sx={{
-          position: 'fixed', top: '10', left: '410px', zIndex: '20',
-        }}
-        color="primary"
-        variant="contained"
-        onClick={() => dispatch({ type: 'AUTH_SIGN_OUT_SUCCESS' })}
-
-      >
-        logout test
-      </Button>
-
-      <Button
-        sx={{
-          position: 'fixed', top: '10', left: '610px', zIndex: '20',
-        }}
-        color="primary"
-        variant="contained"
-        onClick={() => dispatch({ type: 'TEST_ACTION' })}
-      >
-        timeout saga
       </Button>
     </>
   );

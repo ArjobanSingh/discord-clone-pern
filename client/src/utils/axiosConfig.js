@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:5000/api/';
+const BASE_URL = 'http://localhost:5000/api';
 
 const getAuthTokens = () => {
   const accessToken = localStorage.getItem('access-token');
@@ -37,7 +37,7 @@ instance.interceptors.request.use((config) => {
 instance.interceptors.response.use((res) => res, async (err) => {
   const originalConfig = err.config;
 
-  if (err.response) {
+  if (originalConfig.url !== '/auth/login' && err.response) {
     if (err.response.status === 401) {
       if (originalConfig.retry) {
         // we have already retried the api to get refresh token

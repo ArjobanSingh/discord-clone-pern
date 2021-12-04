@@ -29,18 +29,18 @@ const StyledLabel = styled(InputLabel)`
 `;
 
 const StyledTextfield = ({
-  id, label, error, ...rest
+  id, label, isError, errorMessage, ...rest
 }) => (
   <>
     <StyledLabel htmlFor={id}>
       <Typography
         variant="body2"
-        color={error ? 'error.light' : 'text.secondary'}
+        color={isError ? 'error.light' : 'text.secondary'}
         component="span"
       >
         {label}
       </Typography>
-      {!!error && (
+      {!!errorMessage && (
       <Typography
         variant="caption"
         color="error.light"
@@ -48,22 +48,24 @@ const StyledTextfield = ({
         fontWeight="600"
       >
         <ErrorDash>-</ErrorDash>
-        {error}
+        {errorMessage}
       </Typography>
       )}
     </StyledLabel>
-    <Input id={id} {...rest} error={!!error} />
+    <Input id={id} {...rest} error={isError ? 'error' : ''} />
   </>
 );
 
 StyledTextfield.propTypes = {
   id: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
-  error: PropTypes.string,
+  isError: PropTypes.bool,
+  errorMessage: PropTypes.string,
 };
 
 StyledTextfield.defaultProps = {
-  error: null,
+  isError: false,
+  errorMessage: null,
 };
 
 export default StyledTextfield;

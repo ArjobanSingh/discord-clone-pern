@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import StyledImage from '../../common/StyledImage';
@@ -9,6 +10,8 @@ import Login from './Login';
 import Signup from './Signup';
 
 const Auth = (props) => {
+  const { isLoading, error } = useSelector((state) => state.auth);
+
   const [currentScreen, setCurrentScreen] = useState(LOGIN_SCREEN);
 
   const switchScreen = () => {
@@ -50,7 +53,11 @@ const Auth = (props) => {
             flexDirection="column"
             alignItems="center"
           >
-            <Component switchScreen={switchScreen} />
+            <Component
+              isLoading={isLoading}
+              error={error}
+              switchScreen={switchScreen}
+            />
           </Box>
         </Grid>
       </Grid>

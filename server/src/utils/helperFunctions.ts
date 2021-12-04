@@ -55,7 +55,7 @@ const createLoginData = async (userId: string): Promise<LoginDataType> => {
 
   const { exp, uniqueCreationId } = decodeJWT(refreshToken);
 
-  // save refresh token's creation time of milliseconds in redis for this user, as it will unique
+  // save refresh token's uniqueCreationId in redis for this user, as it will unique
   // and we would not need to store whole refresh token in redis
   redisClient.hset(userId, uniqueCreationId, exp);
   await redisClient.expireat(userId, exp);

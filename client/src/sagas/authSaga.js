@@ -1,15 +1,34 @@
 /* eslint-disable require-yield */
 import {
-  takeEvery, all, call, cancelled,
+  takeLatest, all, call, cancelled, put,
 } from 'redux-saga/effects';
 import { AUTH_SIGN_IN_REQUESTED, AUTH_SIGN_OUT_SUCCESS } from '../constants/auth';
+import { signInFailed, signInSuccess } from '../redux/actions/auth';
+import { setUser } from '../redux/actions/user';
+import { AuthApi } from '../utils/apiEndpoints';
 import axiosInstance from '../utils/axiosConfig';
 
-const returnResponse = () => new Promise((r) => setTimeout(r, 2000));
+const setTokens = (accessToken, refreshToken) => {
+  localStorage.setItem('access-token', `Bearer ${accessToken}`);
+  localStorage.setItem('refresh-token', refreshToken);
+};
 
 function* loginUser(actionData) {
-  console.log('Sign in reqeuested');
-  // Todo
+  const { payload } = actionData;
+  try {
+    const response = yield call(axiosInstance.post, AuthApi.Login, payload);
+    console.log({ response });
+    const { accessToken, refreshToken, user } = response.data;
+    setTokens(accessToken, refreshToken);
+    yield put(signInSuccess());
+    yield put(setUser(user));
+  } catch (err) {
+    console.log('Login error', err.response, err.message);
+    if (err.response?.data) {
+      const { error } = err.response.data;
+      yield put(signInFailed(error));
+    } else yield put(signInFailed({ message: err.message }));
+  }
 }
 
 function* logoutUser(actionData) {
@@ -18,9 +37,7 @@ function* logoutUser(actionData) {
 
 function* longTask() {
   try {
-    console.log('timeout started');
-    yield call(returnResponse);
-    console.log('timeout completed');
+    //
   } catch (err) {
     //
   } finally {
@@ -32,8 +49,7 @@ function* longTask() {
 
 export default function* authSaga() {
   yield all([
-    takeEvery(AUTH_SIGN_IN_REQUESTED, loginUser),
-    takeEvery(AUTH_SIGN_OUT_SUCCESS, logoutUser),
-    takeEvery('TEST_ACTION', longTask),
+    takeLatest(AUTH_SIGN_IN_REQUESTED, loginUser),
+    takeLatest(AUTH_SIGN_OUT_SUCCESS, logoutUser),
   ]);
 }

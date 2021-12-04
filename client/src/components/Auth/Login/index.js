@@ -1,18 +1,28 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import StyledTextfield from '../../../common/StyledTextfield';
 import { Anchor, InputWrapper } from '../styles';
 import { isEmailValid, isEmpty, isEmptyString } from '../../../utils/validators';
+import { signInRequested } from '../../../redux/actions/auth';
+import DotLoader from '../../../common/DotLoader';
+import useDidUpdate from '../../../customHooks/useDidUpdate';
+import Error from '../../../common/Error';
 
 const Login = (props) => {
-  const { switchScreen } = props;
+  const { switchScreen, isLoading, error: apiErrors } = props;
+  const dispatch = useDispatch();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
+
+  useDidUpdate(() => {
+    if (!isEmpty(apiErrors)) setErrors(apiErrors);
+  }, [apiErrors]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -29,7 +39,7 @@ const Login = (props) => {
     }
 
     setErrors({});
-    // todo api
+    dispatch(signInRequested({ email, password }));
   };
 
   const openRegistration = (e) => {
@@ -73,7 +83,8 @@ const Login = (props) => {
             value={email}
             required
             onChange={({ target: { value } }) => setEmail(value)}
-            error={errors.email}
+            isError={!!errors.email || !!errors.message}
+            errorMessage={errors.email}
           />
         </InputWrapper>
 
@@ -85,12 +96,16 @@ const Login = (props) => {
             value={password}
             required
             onChange={({ target: { value } }) => setPassword(value)}
-            error={errors.password}
+            isError={!!errors.password || !!errors.message}
+            errorMessage={errors.password}
           />
         </InputWrapper>
 
+        {!!errors.message && <Error>{errors.message}</Error>}
+
         <Button type="submit" color="primary" variant="contained">
-          Login
+          <Typography variant="body2" visibility={isLoading ? 'hidden' : ''}>Login</Typography>
+          {isLoading && <DotLoader />}
         </Button>
       </Box>
       <Typography
@@ -111,6 +126,12 @@ const Login = (props) => {
 
 Login.propTypes = {
   switchScreen: PropTypes.func.isRequired,
+  isLoading: PropTypes.bool.isRequired,
+  error: PropTypes.objectOf(PropTypes.string),
+};
+
+Login.defaultProps = {
+  error: null,
 };
 
 export default Login;
