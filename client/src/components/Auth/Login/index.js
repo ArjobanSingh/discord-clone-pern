@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
 import Typography from '@mui/material/Typography';
@@ -9,18 +8,14 @@ import { Anchor, InputWrapper } from '../styles';
 import { isEmailValid, isEmpty, isEmptyString } from '../../../utils/validators';
 import { signInRequested } from '../../../redux/actions/auth';
 import DotLoader from '../../../common/DotLoader';
-import useDidUpdate from '../../../customHooks/useDidUpdate';
 import Error from '../../../common/Error';
+import useAuthState from '../../../customHooks/useAuthState';
 
 const Login = (props) => {
-  const { switchScreen, isLoading, error: apiErrors } = props;
+  const { switchScreen } = props;
   const dispatch = useDispatch();
 
-  const [errors, setErrors] = useState({});
-
-  useDidUpdate(() => {
-    if (!isEmpty(apiErrors)) setErrors(apiErrors);
-  }, [apiErrors]);
+  const { isLoading, errors, setErrors } = useAuthState((state) => state.auth.login);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -86,7 +81,6 @@ const Login = (props) => {
             id="login email"
             type="email"
             name="email"
-            required
             isError={!!errors.email || !!errors.message}
             errorMessage={errors.email}
             autoComplete="email"
@@ -99,7 +93,6 @@ const Login = (props) => {
             id="login password"
             type="password"
             name="password"
-            required
             isError={!!errors.password || !!errors.message}
             errorMessage={errors.password}
             autoComplete="current-password"
@@ -131,12 +124,6 @@ const Login = (props) => {
 
 Login.propTypes = {
   switchScreen: PropTypes.func.isRequired,
-  isLoading: PropTypes.bool.isRequired,
-  error: PropTypes.objectOf(PropTypes.string),
-};
-
-Login.defaultProps = {
-  error: null,
 };
 
 export default Login;

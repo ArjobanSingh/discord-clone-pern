@@ -8,7 +8,6 @@ export function signInRequested(payload) {
 }
 
 export function signInSuccess() {
-  // maybe some paylaod in future, like user details
   return {
     type: C.AUTH_SIGN_IN_SUCCESS,
   };
@@ -17,6 +16,28 @@ export function signInSuccess() {
 export function signInFailed(error) {
   return {
     type: C.AUTH_SIGN_IN_FAILED,
+    payload: {
+      error,
+    },
+  };
+}
+
+export function registrationRequested(payload) {
+  return {
+    type: C.AUTH_REGISTER_REQUESTED,
+    payload,
+  };
+}
+
+export function registrationSuccess() {
+  return {
+    type: C.AUTH_REGISTER_SUCCESS,
+  };
+}
+
+export function registrationFailed(error) {
+  return {
+    type: C.AUTH_REGISTER_FAILED,
     payload: {
       error,
     },

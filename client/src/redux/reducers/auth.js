@@ -1,20 +1,44 @@
-import { AUTH_SIGN_IN_FAILED, AUTH_SIGN_IN_REQUESTED, AUTH_SIGN_IN_SUCCESS } from '../../constants/auth';
+import { combineReducers } from 'redux';
+import * as C from '../../constants/auth';
 
-const initialState = {
-  isAuthenticated: !!localStorage.getItem('access-token'),
-  isLoading: false,
-  error: null,
-};
-
-export default (state = initialState, action) => {
+const registerReducer = (state = { isLoading: false, error: null }, action) => {
   switch (action.type) {
-    case AUTH_SIGN_IN_REQUESTED:
-      return { ...initialState, isLoading: true, error: null };
-    case AUTH_SIGN_IN_SUCCESS:
-      return { isAuthenticated: true, isLoading: false, error: null };
-    case AUTH_SIGN_IN_FAILED:
-      return { isAuthenticated: false, isLoading: false, error: action.payload.error };
+    case C.AUTH_REGISTER_REQUESTED:
+      return { isLoading: true, error: null };
+    case C.AUTH_REGISTER_SUCCESS:
+      return { isLoading: false, error: null };
+    case C.AUTH_REGISTER_FAILED:
+      return { isLoading: false, error: action.payload.error };
     default:
       return state;
   }
 };
+
+const loginReducer = (state = { isLoading: false, error: null }, action) => {
+  switch (action.type) {
+    case C.AUTH_SIGN_IN_REQUESTED:
+      return { isLoading: true, error: null };
+    case C.AUTH_SIGN_IN_SUCCESS:
+      return { isLoading: false, error: null };
+    case C.AUTH_SIGN_IN_FAILED:
+      return { isLoading: false, error: action.payload.error };
+    default:
+      return state;
+  }
+};
+
+const mainReducer = (state = { isAuthenticated: !!localStorage.getItem('access-token') }, action) => {
+  switch (action.type) {
+    case C.AUTH_SIGN_IN_SUCCESS:
+    case C.AUTH_REGISTER_SUCCESS:
+      return { isAuthenticated: true };
+    default:
+      return state;
+  }
+};
+
+export default combineReducers({
+  main: mainReducer,
+  login: loginReducer,
+  register: registerReducer,
+});

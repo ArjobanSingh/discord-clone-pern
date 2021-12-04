@@ -12,7 +12,7 @@ import Signup from './Signup';
 import useDidUpdate from '../../customHooks/useDidUpdate';
 
 const Auth = (props) => {
-  const { isLoading, error, isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated } = useSelector((state) => state.auth.main);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -64,8 +64,6 @@ const Auth = (props) => {
             alignItems="center"
           >
             <Component
-              isLoading={isLoading}
-              error={error}
               switchScreen={switchScreen}
             />
           </Box>

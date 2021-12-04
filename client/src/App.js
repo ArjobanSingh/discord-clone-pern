@@ -3,7 +3,7 @@ import {
 } from 'react';
 import './App.css';
 import { styled } from '@mui/material/styles';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import CustomThemeProvider, { ColorModeContext } from './providers/CustomThemeProvider';
 import Auth from './components/Auth';
@@ -63,7 +63,7 @@ function App() {
                   </RequireAuth>
                 )}
               />
-              {/* <Route path="/" element={<Navigate replace to="/login" />} /> */}
+              <Route path="*" element={<Navigate replace to="/" />} />
             </Routes>
           </Suspense>
         </InnerWrapper>
