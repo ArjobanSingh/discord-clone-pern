@@ -5,10 +5,13 @@ import './App.css';
 import { styled } from '@mui/material/styles';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Button } from '@mui/material';
+import { useDispatch } from 'react-redux';
 import CustomThemeProvider, { ColorModeContext } from './providers/CustomThemeProvider';
 import Auth from './components/Auth';
 import RequireAuth from './containers/RequireAuth';
 import Channels from './components/Channels';
+import { logoutRequested } from './redux/actions/auth';
+import useIsAuthenticated from './customHooks/useIsAuthenticated';
 
 // const Auth = lazy(() => import('./components/Auth'));
 
@@ -25,7 +28,9 @@ const InnerWrapper = styled('div')`
 `;
 
 const Child = () => {
+  const isAuthenticated = useIsAuthenticated();
   const { toggleColorMode } = useContext(ColorModeContext);
+  const dispatch = useDispatch();
 
   return (
     <>
@@ -39,6 +44,19 @@ const Child = () => {
       >
         toggle theme
       </Button>
+
+      {isAuthenticated && (
+        <Button
+          sx={{
+            position: 'fixed', top: '10', left: '210px', zIndex: '20',
+          }}
+          color="primary"
+          variant="contained"
+          onClick={() => { dispatch(logoutRequested()); }}
+        >
+          Logout
+        </Button>
+      )}
     </>
   );
 };

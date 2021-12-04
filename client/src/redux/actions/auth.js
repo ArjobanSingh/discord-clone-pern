@@ -43,3 +43,15 @@ export function registrationFailed(error) {
     },
   };
 }
+
+export function logoutRequested() {
+  return {
+    type: C.AUTH_SIGN_OUT_REQUESTED,
+  };
+}
+
+export function logoutSuccess() {
+  return {
+    type: C.AUTH_SIGN_OUT_SUCCESS,
+  };
+}

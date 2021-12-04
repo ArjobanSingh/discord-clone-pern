@@ -32,6 +32,8 @@ const mainReducer = (state = { isAuthenticated: !!localStorage.getItem('access-t
     case C.AUTH_SIGN_IN_SUCCESS:
     case C.AUTH_REGISTER_SUCCESS:
       return { isAuthenticated: true };
+    case C.AUTH_SIGN_OUT_SUCCESS:
+      return { isAuthenticated: false };
     default:
       return state;
   }

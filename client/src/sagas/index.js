@@ -13,7 +13,7 @@ export default function* main() {
 
     // wait for the user to sign out
     yield take(AUTH_SIGN_OUT_SUCCESS);
-    // user logged out successfully. cancel the background task
+    // user logged out successfully. cancel all the background tasks
     yield cancel(watchers);
   }
 }

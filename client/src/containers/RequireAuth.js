@@ -1,9 +1,9 @@
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
 import { useLocation, Navigate } from 'react-router-dom';
+import useIsAuthenticated from '../customHooks/useIsAuthenticated';
 
 const RequireAuth = ({ children }) => {
-  const isAuthenticated = useSelector((state) => state.auth.main.isAuthenticated);
+  const isAuthenticated = useIsAuthenticated();
   const location = useLocation();
 
   if (!isAuthenticated) {
