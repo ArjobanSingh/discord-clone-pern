@@ -5,15 +5,31 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import StyledTextfield from '../../../common/StyledTextfield';
 import { Anchor, InputWrapper } from '../styles';
+import { isEmailValid, isEmpty, isEmptyString } from '../../../utils/validators';
 
 const Login = (props) => {
   const { switchScreen } = props;
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState({});
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const newErrors = {};
+
+    if (isEmptyString(email)) newErrors.email = 'This field is required';
+    else if (!isEmailValid(email)) newErrors.email = 'Please enter a valid email';
+
+    if (isEmptyString(password)) newErrors.password = 'This field is required';
+
+    if (!isEmpty(newErrors)) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setErrors({});
+    // todo api
   };
 
   const openRegistration = (e) => {
@@ -55,7 +71,9 @@ const Login = (props) => {
             id="login email"
             type="email"
             value={email}
+            required
             onChange={({ target: { value } }) => setEmail(value)}
+            error={errors.email}
           />
         </InputWrapper>
 
@@ -65,7 +83,9 @@ const Login = (props) => {
             id="login password"
             type="password"
             value={password}
+            required
             onChange={({ target: { value } }) => setPassword(value)}
+            error={errors.password}
           />
         </InputWrapper>
 

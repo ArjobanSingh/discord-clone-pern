@@ -3,6 +3,7 @@ import {
   takeEvery, all, call, cancelled,
 } from 'redux-saga/effects';
 import { AUTH_SIGN_IN_REQUESTED, AUTH_SIGN_OUT_SUCCESS } from '../constants/auth';
+import axiosInstance from '../utils/axiosConfig';
 
 const returnResponse = () => new Promise((r) => setTimeout(r, 2000));
 

@@ -16,6 +16,10 @@ export const LIGHT_THEME_OPTIONS = {
     secondary: {
       main: '#f50057',
     },
+    background: {
+      default: '#fdfdfd',
+      paper: '#fdfdfd',
+    },
   },
   typography: {
     fontWeightBold: 600,
