@@ -16,8 +16,6 @@ const Login = (props) => {
   const { switchScreen, isLoading, error: apiErrors } = props;
   const dispatch = useDispatch();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
 
   useDidUpdate(() => {
@@ -26,6 +24,13 @@ const Login = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // for this use case, controlled input in not required
+    // as email and password are only needed in this function only
+    // so using FormData to get email and password
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get('email');
+    const password = formData.get('password');
+
     const newErrors = {};
 
     if (isEmptyString(email)) newErrors.email = 'This field is required';
@@ -80,11 +85,11 @@ const Login = (props) => {
             label="EMAIL"
             id="login email"
             type="email"
-            value={email}
+            name="email"
             required
-            onChange={({ target: { value } }) => setEmail(value)}
             isError={!!errors.email || !!errors.message}
             errorMessage={errors.email}
+            autoComplete="email"
           />
         </InputWrapper>
 
@@ -93,11 +98,11 @@ const Login = (props) => {
             label="PASSWORD"
             id="login password"
             type="password"
-            value={password}
+            name="password"
             required
-            onChange={({ target: { value } }) => setPassword(value)}
             isError={!!errors.password || !!errors.message}
             errorMessage={errors.password}
+            autoComplete="current-password"
           />
         </InputWrapper>
 

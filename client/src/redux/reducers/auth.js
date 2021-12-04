@@ -1,7 +1,7 @@
 import { AUTH_SIGN_IN_FAILED, AUTH_SIGN_IN_REQUESTED, AUTH_SIGN_IN_SUCCESS } from '../../constants/auth';
 
 const initialState = {
-  isAuthenticated: false,
+  isAuthenticated: !!localStorage.getItem('access-token'),
   isLoading: false,
   error: null,
 };

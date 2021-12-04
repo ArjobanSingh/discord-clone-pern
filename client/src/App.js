@@ -3,10 +3,12 @@ import {
 } from 'react';
 import './App.css';
 import { styled } from '@mui/material/styles';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { Button } from '@mui/material';
 import CustomThemeProvider, { ColorModeContext } from './providers/CustomThemeProvider';
 import Auth from './components/Auth';
+import RequireAuth from './containers/RequireAuth';
+import Channels from './components/Channels';
 
 // const Auth = lazy(() => import('./components/Auth'));
 
@@ -53,7 +55,15 @@ function App() {
                 path="/login"
                 element={<Auth />}
               />
-              <Route path="/" element={<Navigate replace to="/login" />} />
+              <Route
+                path="/"
+                element={(
+                  <RequireAuth>
+                    <Channels />
+                  </RequireAuth>
+                )}
+              />
+              {/* <Route path="/" element={<Navigate replace to="/login" />} /> */}
             </Routes>
           </Suspense>
         </InnerWrapper>
