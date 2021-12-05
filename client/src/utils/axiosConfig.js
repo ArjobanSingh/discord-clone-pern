@@ -1,19 +1,30 @@
 /* eslint-disable no-param-reassign */
 import axios from 'axios';
+import { AuthApi } from './apiEndpoints';
 
 const BASE_URL = 'http://localhost:5000/api';
 
-const getAuthTokens = () => {
+export const getAuthTokens = () => {
   const accessToken = localStorage.getItem('access-token');
   const refreshToken = localStorage.getItem('refresh-token');
   return [accessToken, refreshToken];
 };
 
-const updateAccessToken = (newToken) => {
-  localStorage.setItem('access-token', newToken);
+const updateAccessToken = (accessToken) => {
+  localStorage.setItem('access-token', `Bearer ${accessToken}`);
 };
 
-const refreshTokenApi = async () => ({});
+export const setTokens = (accessToken, refreshToken) => {
+  updateAccessToken(accessToken);
+  localStorage.setItem('refresh-token', refreshToken);
+};
+
+export const removeTokens = () => {
+  localStorage.removeItem('access-token');
+  localStorage.removeItem('refresh-token');
+};
+
+const ignoreUrlsForRefreshToken = ['/auth/login', '/auth/logout', '/auth/refresh-token'];
 
 const instance = axios.create({
   baseURL: BASE_URL,
@@ -24,45 +35,35 @@ const instance = axios.create({
 
 instance.interceptors.request.use((config) => {
   const [accessToken, refreshToken] = getAuthTokens();
-  if (accessToken) {
-    config.headers['access-token'] = accessToken;
-  }
+  if (accessToken) config.headers['access-token'] = accessToken;
+  if (refreshToken) config.headers['refresh-token'] = refreshToken;
 
-  if (refreshToken) {
-    config.headers['refresh-token'] = refreshToken;
-  }
   return config;
 }, (error) => Promise.reject(error));
 
 instance.interceptors.response.use((res) => res, async (err) => {
   const originalConfig = err.config;
 
-  if (originalConfig.url !== '/auth/login' && err.response) {
-    if (err.response.status === 401) {
-      if (originalConfig.retry) {
-        // we have already retried the api to get refresh token
-        // it also failed
-        // TODO: so log, user out
-      } else {
-        // to prevent infinte refresh token api request,
-        // in case this refresh token api also return 401
+  if (!ignoreUrlsForRefreshToken.includes(originalConfig.url) && err.response) {
+    if (err.response.status === 401 || err.status === 401) {
+      // To prevent infinite api fetch, in case backend api is returning 401 continuously
+      if (!originalConfig.retry) {
+        // No need to wrap with try/catch, as error in this case will be handled by
+        // reponse error handler
         originalConfig.retry = true;
-        try {
-          const res = await refreshTokenApi();
-          console.log('response for refresh token', res);
-          const { accessToken } = res.data;
-          updateAccessToken(accessToken);
-          instance.defaults.headers.common['access-token'] = accessToken;
-          return instance(originalConfig);
-        } catch (refreshError) {
-          if (refreshError.response?.status === 401) {
-          // handle logout
-          }
-          return Promise.reject(refreshError);
-        }
+        const res = await instance.post(AuthApi.REFRESH);
+        const { accessToken } = res.data;
+        updateAccessToken(accessToken);
+        instance.defaults.headers.common['access-token'] = accessToken;
+        return instance(originalConfig);
       }
     }
   }
+
+  if ((err.response?.status === 401 || err.status === 401)) removeTokens();
+
+  // in case api continuously responds with 401 or ignoredUrl's respond with 401
+  // or any other error case should should be rejected from here to be handled in sagas
   return Promise.reject(err);
 });
 

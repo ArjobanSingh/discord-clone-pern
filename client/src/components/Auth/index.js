@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -10,9 +9,10 @@ import { LOGIN_SCREEN, SIGNUP_SCREEN } from '../../constants/auth';
 import Login from './Login';
 import Signup from './Signup';
 import useDidUpdate from '../../customHooks/useDidUpdate';
+import useIsAuthenticated from '../../customHooks/useIsAuthenticated';
 
 const Auth = (props) => {
-  const { isAuthenticated } = useSelector((state) => state.auth.main);
+  const isAuthenticated = useIsAuthenticated();
   const location = useLocation();
   const navigate = useNavigate();
 

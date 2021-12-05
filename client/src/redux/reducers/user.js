@@ -1,9 +1,13 @@
-import { SET_USER } from '../../constants/user';
+import * as C from '../../constants/user';
 
-export default (state = {}, action) => {
+export default (state = { isLoading: false, error: null, user: null }, action) => {
   switch (action.type) {
-    case SET_USER:
-      return action.payload;
+    case C.USER_REQUESTED:
+      return { isLoading: true, error: null, user: null };
+    case C.USER_FAILED:
+      return { isLoading: false, error: action.payload.error, user: null };
+    case C.USER_SUCCESS:
+      return { isLoading: false, error: null, user: action.payload.user };
     default:
       return state;
   }
