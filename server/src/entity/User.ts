@@ -1,9 +1,11 @@
+/* eslint-disable camelcase */
 import {
-  Entity, PrimaryGeneratedColumn, Column, BaseEntity,
+  Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany,
 } from 'typeorm';
 import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 import bcrypt from 'bcrypt';
 import { CustomError } from '../utils/errors';
+import Server from './Server';
 
 @Entity('users')
 export default class User extends BaseEntity {
@@ -37,6 +39,9 @@ export default class User extends BaseEntity {
     nullable: true,
   })
   profile_picture: string;
+
+  @OneToMany((type) => Server, (server) => server.owner)
+  owned_servers: Server[]
 
   async hashPassword() {
     try {
