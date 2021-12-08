@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import {
-  Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany,
+  Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, CreateDateColumn, UpdateDateColumn,
 } from 'typeorm';
 import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 import bcrypt from 'bcrypt';
@@ -48,6 +48,12 @@ export default class User extends BaseEntity {
   // all servers, where this user is a member
   @OneToMany((type) => ServerMember, (serverMember) => serverMember.user)
   serverMembers: ServerMember[]
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   async hashPassword() {
     try {

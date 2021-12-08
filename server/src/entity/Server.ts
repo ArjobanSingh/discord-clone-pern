@@ -1,6 +1,6 @@
 import { IsNotEmpty, Length } from 'class-validator';
 import {
-  BaseEntity, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn,
+  BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import User from './User';
 import ServerMember from './ServerMember';
@@ -21,4 +21,10 @@ export default class Server extends BaseEntity {
 
     @OneToMany((type) => ServerMember, (serverMember) => serverMember.server)
     serverMembers: ServerMember[]
+
+    @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 }

@@ -1,5 +1,5 @@
 import {
-  BaseEntity, Column, Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn,
+  BaseEntity, Column, Entity, ManyToOne, PrimaryColumn,
 } from 'typeorm';
 import Server from './Server';
 import User from './User';
