@@ -6,6 +6,7 @@ import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 import bcrypt from 'bcrypt';
 import { CustomError } from '../utils/errors';
 import Server from './Server';
+import ServerMember from './ServerMember';
 
 @Entity('users')
 export default class User extends BaseEntity {
@@ -40,8 +41,13 @@ export default class User extends BaseEntity {
   })
   profile_picture: string;
 
+  // all those servers, whose owner is this user
   @OneToMany((type) => Server, (server) => server.owner)
   owned_servers: Server[]
+
+  // all servers, where this user is a member
+  @OneToMany((type) => ServerMember, (serverMember) => serverMember.user)
+  serverMembers: ServerMember[]
 
   async hashPassword() {
     try {
