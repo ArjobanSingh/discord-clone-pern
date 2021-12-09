@@ -23,8 +23,8 @@ export default class Server extends BaseEntity {
     serverMembers: ServerMember[]
 
     @CreateDateColumn()
-  createdAt: Date;
+    createdAt: Date;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+    @UpdateDateColumn()
+    updatedAt: Date;
 }
