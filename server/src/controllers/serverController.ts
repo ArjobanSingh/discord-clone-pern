@@ -34,7 +34,6 @@ export const createServer = async (req: CustomRequest, res: Response, next: Next
       await transactionEntityManager.save(serverMember);
     });
     const { owner, ...otherSeverProps } = newServer;
-    console.log({ newServer, otherSeverProps });
 
     res.status(201).json(addServerMembers(otherSeverProps, [user]));
   } catch (err) {

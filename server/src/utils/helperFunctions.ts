@@ -14,17 +14,20 @@ const {
   REFRESH_TOKEN_EXPIRATION,
 } = process.env;
 
-const createUserObject = (user: UserType): ServerMemberType => {
+const createUserObject = (user: UserType, servers: ServerType[] | undefined = undefined): ServerMemberType => {
   const {
     email, name, status, profile_picture: profilePicture, id,
   } = user;
-  return {
+  const obj: ServerMemberType = {
     id,
     email,
     name,
     status,
     profilePicture,
   };
+
+  if (servers) obj.servers = servers;
+  return obj;
 };
 
 const verifyWithPromise = (token: string, secret: string) => new Promise((resolve, reject) => {

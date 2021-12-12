@@ -1,3 +1,5 @@
+import ServerType from './ServerType';
+
 interface ServerMemberType {
   id: string,
   email: string;
@@ -5,6 +7,7 @@ interface ServerMemberType {
   profilePicture?: string;
   status?: string;
   isAdmin?: boolean;
+  servers?: ServerType[];
 }
 
 export default ServerMemberType;
