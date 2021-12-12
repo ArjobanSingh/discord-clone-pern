@@ -25,6 +25,11 @@ export default class Server extends BaseEntity {
     @OneToMany((type) => ServerMember, (serverMember) => serverMember.server)
     serverMembers: ServerMember[]
 
+    @Column({
+      default: 0,
+    })
+    channelCount: number;
+
     @CreateDateColumn()
     createdAt: Date;
 
