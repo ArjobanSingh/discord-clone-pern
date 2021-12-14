@@ -75,3 +75,48 @@ export const joinServer = async (req: CustomRequest, res: Response, next: NextFu
     next(err);
   }
 };
+
+// TODO: make this paginated
+export const getAllServers = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const servers = await Server.find();
+    res.json(servers);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getServerDetails = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { serverId } = req.params;
+
+    if (!serverId) {
+      next(new CustomError('No server found', 404));
+      return;
+    }
+
+    // get server details and with all users which are part of this as members
+    const [server] = await getConnection().query(`
+      SELECT s.*,
+      json_agg(json_build_object(
+        'userName', u.name, 'userId', u.id, 'profilePicture', u."profilePicture", 'isAdmin', sm."isAdmin"
+      )) as members
+      FROM server "s"
+      INNER JOIN server_member "sm" ON  s.id = sm."serverId"
+      INNER JOIN users "u" ON u.id = sm."userId"
+      WHERE s.id = '${serverId}'
+      group by s.id
+      limit 1;
+    `);
+
+    if (!server) {
+      next(new CustomError('No server found', 404));
+      return;
+    }
+    res.json(server);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteServer = async (req: CustomRequest, res: Response, next: NextFunction) => {};
