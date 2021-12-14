@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import {
   Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany, CreateDateColumn, UpdateDateColumn,
 } from 'typeorm';
@@ -39,11 +38,11 @@ export default class User extends BaseEntity {
   @Column({
     nullable: true,
   })
-  profile_picture: string;
+  profilePicture: string;
 
   // all those servers, whose owner is this user
   @OneToMany((type) => Server, (server) => server.owner)
-  owned_servers: Server[]
+  ownedServers: Server[]
 
   // all servers, where this user is a member
   @OneToMany((type) => ServerMember, (serverMember) => serverMember.user)

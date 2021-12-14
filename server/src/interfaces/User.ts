@@ -2,8 +2,9 @@ interface UserType {
     id: string,
     email: string;
     name: string;
-    profile_picture?: string;
+    profilePicture?: string;
     status?: string;
+    password?: string;
 }
 
 export default UserType;

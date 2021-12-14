@@ -70,7 +70,7 @@ export const joinServer = async (req: CustomRequest, res: Response, next: NextFu
 
     await serverMember.save();
 
-    res.status(201).json({ ok: true });
+    res.status(204).json();
   } catch (err) {
     next(err);
   }

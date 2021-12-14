@@ -10,6 +10,7 @@ import {
 } from '../utils/helperFunctions';
 import redisClient from '../redisConfig';
 import CustomRequest from '../interfaces/CustomRequest';
+import { getUserData } from '../utils/typeormHelpers';
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -36,7 +37,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     const { accessToken, refreshToken } = await createLoginData(user.id);
 
-    res.status(201).json({ user: createUserObject(user), accessToken, refreshToken });
+    res.status(201).json({ user: createUserObject(user, []), accessToken, refreshToken });
   } catch (err) {
     if (err.name === 'QueryFailedError' && err.code === '23505') {
       next(new CustomError('User with same email already exists', 400));
@@ -63,7 +64,8 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return;
     }
 
-    const user = await User.findOne({ email });
+    // const user = await User.findOne({ email });
+    const [user] = await getUserData(undefined, email);
     if (!user) {
       next(new CustomError('No user found', 404));
       return;
@@ -79,7 +81,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
     // TODO: add logic for a lot of login redis sessions
 
-    res.json({ user: createUserObject(user), accessToken, refreshToken });
+    res.json({ user: createUserObject(user, user.servers), accessToken, refreshToken });
   } catch (err) {
     next(err);
   }
@@ -88,7 +90,7 @@ export const logout = async (req: CustomRequest, res: Response, next: NextFuncti
   try {
     const { userId, uniqueCreationId } = req;
     await redisClient.hdel(userId, uniqueCreationId);
-    res.json({ ok: true });
+    res.status(204).json();
   } catch (err) {
     next(err);
   }

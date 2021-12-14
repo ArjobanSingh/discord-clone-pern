@@ -16,7 +16,7 @@ const {
 
 const createUserObject = (user: UserType, servers: ServerType[] | undefined = undefined): ServerMemberType => {
   const {
-    email, name, status, profile_picture: profilePicture, id,
+    email, name, status, profilePicture, id,
   } = user;
   const obj: ServerMemberType = {
     id,

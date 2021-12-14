@@ -19,7 +19,7 @@ export default class Server extends BaseEntity {
     ownerId: string;
 
     // this class will store foreign id for User class
-    @ManyToOne((type) => User, (user) => user.owned_servers, { onDelete: 'SET NULL' })
+    @ManyToOne((type) => User, (user) => user.ownedServers, { onDelete: 'SET NULL' })
     owner: User;
 
     @OneToMany((type) => ServerMember, (serverMember) => serverMember.server)

@@ -1,11 +1,7 @@
 import ServerType from './ServerType';
+import UserType from './User';
 
-interface ServerMemberType {
-  id: string,
-  email: string;
-  name: string;
-  profilePicture?: string;
-  status?: string;
+interface ServerMemberType extends UserType {
   isAdmin?: boolean;
   servers?: ServerType[];
 }
