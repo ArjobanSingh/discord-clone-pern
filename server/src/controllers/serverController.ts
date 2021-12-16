@@ -1,12 +1,13 @@
 import { NextFunction, Response } from 'express';
 import { validate } from 'class-validator';
-import { getConnection } from 'typeorm';
+import { FindManyOptions, getConnection, LessThan } from 'typeorm';
 import Server from '../entity/Server';
 import CustomRequest from '../interfaces/CustomRequest';
 import { createValidationError, CustomError } from '../utils/errors';
 import ServerMember from '../entity/ServerMember';
 import User from '../entity/User';
 import { addServerMembers } from '../utils/helperFunctions';
+import { AllServersQuery } from '../types/ServerTypes';
 
 export const createServer = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
@@ -76,10 +77,22 @@ export const joinServer = async (req: CustomRequest, res: Response, next: NextFu
   }
 };
 
-// TODO: make this paginated
+// TODO: make this paginated based on popularity or number of members in desc
 export const getAllServers = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const servers = await Server.find();
+    const { cursor, limit = '20' } = req.query as AllServersQuery;
+    const limitNumber = parseInt(limit, 10);
+
+    const take = Number.isNaN(limitNumber) || limitNumber > 20 ? 20 : limitNumber;
+    const queryObj: FindManyOptions = { order: { createdAt: 'DESC' }, take };
+
+    if (cursor && typeof cursor === 'string') {
+      queryObj.where = {
+        createdAt: LessThan(decodeURIComponent(cursor)),
+      };
+    }
+
+    const servers = await Server.find(queryObj);
     res.json(servers);
   } catch (err) {
     next(err);

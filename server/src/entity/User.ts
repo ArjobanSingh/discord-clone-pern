@@ -48,10 +48,10 @@ export default class User extends BaseEntity {
   @OneToMany((type) => ServerMember, (serverMember) => serverMember.user)
   serverMembers: ServerMember[]
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @CreateDateColumn({ type: 'timestamptz' })
+    createdAt: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
   async hashPassword() {

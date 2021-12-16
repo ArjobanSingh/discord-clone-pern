@@ -1,6 +1,6 @@
 import { IsNotEmpty, Length } from 'class-validator';
 import {
-  BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
+  BaseEntity, Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import User from './User';
 import ServerMember from './ServerMember';
@@ -30,9 +30,10 @@ export default class Server extends BaseEntity {
     })
     channelCount: number;
 
-    @CreateDateColumn()
+    @Index()
+    @CreateDateColumn({ type: 'timestamptz' })
     createdAt: Date;
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ type: 'timestamptz' })
     updatedAt: Date;
 }
