@@ -1,4 +1,4 @@
-import ServerType from './ServerType';
+import { ServerType } from '../types/ServerTypes';
 import UserType from './User';
 
 interface ServerMemberType extends UserType {

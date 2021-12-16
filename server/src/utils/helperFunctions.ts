@@ -1,9 +1,9 @@
 import { nanoid } from 'nanoid';
 import LoginDataType from '../interfaces/LoginData';
 import ServerMemberType from '../interfaces/ServerMemberType';
-import ServerType from '../interfaces/ServerType';
 import UserType from '../interfaces/User';
 import redisClient from '../redisConfig';
+import { ServerType } from '../types/ServerTypes';
 
 const jwt = require('jsonwebtoken');
 
