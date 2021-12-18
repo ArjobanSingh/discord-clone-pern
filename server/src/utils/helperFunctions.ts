@@ -1,9 +1,6 @@
 import { nanoid } from 'nanoid';
 import LoginDataType from '../interfaces/LoginData';
-import ServerMemberType from '../interfaces/ServerMemberType';
-import UserType from '../interfaces/User';
 import redisClient from '../redisConfig';
-import { ServerType } from '../types/ServerTypes';
 
 const jwt = require('jsonwebtoken');
 
@@ -13,22 +10,6 @@ const {
   ACCESS_TOKEN_EXPIRATION,
   REFRESH_TOKEN_EXPIRATION,
 } = process.env;
-
-const createUserObject = (user: UserType, servers: ServerType[] | undefined = undefined): ServerMemberType => {
-  const {
-    email, name, status, profilePicture, id,
-  } = user;
-  const obj: ServerMemberType = {
-    id,
-    email,
-    name,
-    status,
-    profilePicture,
-  };
-
-  if (servers) obj.servers = servers;
-  return obj;
-};
 
 const verifyWithPromise = (token: string, secret: string) => new Promise((resolve, reject) => {
   jwt.verify(token, secret, (err, decodedToken) => {
@@ -68,23 +49,10 @@ const createLoginData = async (userId: string): Promise<LoginDataType> => {
   return { accessToken, refreshToken };
 };
 
-const addServerMembers = (server: ServerType, users: UserType[]): ServerType => {
-  const newObj: ServerType = { ...server };
-  const allServerUsers = users.map((user: UserType) => {
-    const data = createUserObject(user);
-    data.isAdmin = server.ownerId === user.id;
-    return data;
-  });
-  newObj.members = allServerUsers;
-  return newObj;
-};
-
 export {
-  createUserObject,
   createAccessToken,
   createRefreshToken,
   verfifyToken,
   decodeJWT,
   createLoginData,
-  addServerMembers,
 };

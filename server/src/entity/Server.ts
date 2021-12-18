@@ -1,9 +1,14 @@
-import { IsNotEmpty, Length } from 'class-validator';
+import { IsEnum, IsNotEmpty, Length } from 'class-validator';
 import {
   BaseEntity, Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import User from './User';
 import ServerMember from './ServerMember';
+
+export enum ServerTypeEnum {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+}
 
 @Entity()
 export default class Server extends BaseEntity {
@@ -29,6 +34,14 @@ export default class Server extends BaseEntity {
       default: 0,
     })
     channelCount: number;
+
+    @Column({
+      type: 'enum',
+      enum: ServerTypeEnum,
+      default: ServerTypeEnum.PUBLIC,
+    })
+    @IsEnum(ServerTypeEnum)
+    type: ServerTypeEnum
 
     @Index()
     @CreateDateColumn({ type: 'timestamptz' })

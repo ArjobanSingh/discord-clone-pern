@@ -4,6 +4,12 @@ import {
 import Server from './Server';
 import User from './User';
 
+export enum MemberRole {
+  OWNER = 'OWNER',
+  ADMIN = 'ADMIN',
+  MODERATOR = 'MODERATOR',
+  USER = 'USER'
+}
 @Entity()
 export default class ServerMember extends BaseEntity {
   @PrimaryColumn('uuid')
@@ -12,8 +18,8 @@ export default class ServerMember extends BaseEntity {
   @PrimaryColumn('uuid')
   serverId: string;
 
-  @Column({ type: 'bool', default: false, nullable: true })
-  isAdmin: boolean;
+  @Column({ type: 'enum', enum: MemberRole, default: MemberRole.USER })
+  role: MemberRole;
 
   @ManyToOne((type) => User, (user) => user.serverMembers, { onDelete: 'CASCADE' })
   user: User

@@ -6,7 +6,6 @@ import { createValidationError, createValidationErrorObject, CustomError } from 
 import {
   createAccessToken,
   createLoginData,
-  createUserObject,
 } from '../utils/helperFunctions';
 import redisClient from '../redisConfig';
 import CustomRequest from '../interfaces/CustomRequest';
@@ -36,8 +35,22 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     await user.save();
 
     const { accessToken, refreshToken } = await createLoginData(user.id);
+    const {
+      id, status, profilePicture,
+    } = user;
 
-    res.status(201).json({ user: createUserObject(user, []), accessToken, refreshToken });
+    res.status(201).json({
+      user: {
+        id,
+        email: user.email,
+        name: user.name,
+        status,
+        profilePicture,
+        servers: [],
+      },
+      accessToken,
+      refreshToken,
+    });
   } catch (err) {
     if (err.name === 'QueryFailedError' && err.code === '23505') {
       next(new CustomError('User with same email already exists', 400));
@@ -71,17 +84,21 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return;
     }
 
-    const result = await bcrypt.compare(password, user.password);
+    const { password: hashedPassword, ...otherUserProps } = user;
+
+    const result = await bcrypt.compare(password, hashedPassword);
 
     if (!result) {
       next(new CustomError('Invalid credentials', 401));
       return;
     }
-    const { accessToken, refreshToken } = await createLoginData(user.id);
+    const { accessToken, refreshToken } = await createLoginData(otherUserProps.id);
+
+    // if (otherUserProps.servers)
 
     // TODO: add logic for a lot of login redis sessions
 
-    res.json({ user: createUserObject(user, user.servers), accessToken, refreshToken });
+    res.json({ user: otherUserProps, accessToken, refreshToken });
   } catch (err) {
     next(err);
   }

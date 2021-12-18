@@ -1,12 +1,11 @@
 import { NextFunction, Response } from 'express';
 import { validate } from 'class-validator';
 import { FindManyOptions, getConnection, LessThan } from 'typeorm';
-import Server from '../entity/Server';
+import Server, { ServerTypeEnum } from '../entity/Server';
 import CustomRequest from '../interfaces/CustomRequest';
 import { createValidationError, CustomError } from '../utils/errors';
-import ServerMember from '../entity/ServerMember';
+import ServerMember, { MemberRole } from '../entity/ServerMember';
 import User from '../entity/User';
-import { addServerMembers } from '../utils/helperFunctions';
 import { AllServersQuery } from '../types/ServerTypes';
 
 export const createServer = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -14,9 +13,11 @@ export const createServer = async (req: CustomRequest, res: Response, next: Next
     const { userId, body } = req;
 
     const user = await User.findOne(userId);
+
     const newServer = new Server();
     newServer.name = body.name;
     newServer.owner = user;
+    newServer.type = body.type || ServerTypeEnum.PUBLIC;
 
     const errors = await validate(newServer);
 
@@ -26,7 +27,7 @@ export const createServer = async (req: CustomRequest, res: Response, next: Next
     }
 
     const serverMember = new ServerMember();
-    serverMember.isAdmin = true;
+    serverMember.role = MemberRole.OWNER;
     serverMember.user = user;
     serverMember.server = newServer;
 
@@ -34,9 +35,19 @@ export const createServer = async (req: CustomRequest, res: Response, next: Next
       await transactionEntityManager.save(newServer);
       await transactionEntityManager.save(serverMember);
     });
+
     const { owner, ...otherSeverProps } = newServer;
 
-    res.status(201).json(addServerMembers(otherSeverProps, [user]));
+    res.status(201).json({
+      ...otherSeverProps,
+      members: [{
+        userName: user.name,
+        userId: user.id,
+        email: user.email,
+        profilePicture: user.profilePicture,
+        role: MemberRole.OWNER,
+      }],
+    });
   } catch (err) {
     next(err);
   }
@@ -53,6 +64,12 @@ export const joinServer = async (req: CustomRequest, res: Response, next: NextFu
     const server = await Server.findOne(`${query.serverId}`);
     if (!server) {
       next(new CustomError('No server found', 404));
+      return;
+    }
+
+    if (server.type === ServerTypeEnum.PRIVATE) {
+      // use cannot automatically join private servers
+      next(new CustomError('Forbidden', 403));
       return;
     }
 
@@ -112,7 +129,7 @@ export const getServerDetails = async (req: CustomRequest, res: Response, next: 
     const [server] = await getConnection().query(`
       SELECT s.*,
       json_agg(json_build_object(
-        'userName', u.name, 'userId', u.id, 'profilePicture', u."profilePicture", 'isAdmin', sm."isAdmin"
+        'userName', u.name, 'userId', u.id, 'profilePicture', u."profilePicture", 'role', sm.role
       )) as members
       FROM server "s"
       INNER JOIN server_member "sm" ON  s.id = sm."serverId"

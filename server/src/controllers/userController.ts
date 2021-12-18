@@ -1,7 +1,6 @@
 import { NextFunction, Response } from 'express';
 import CustomRequest from '../interfaces/CustomRequest';
 import { CustomError } from '../utils/errors';
-import { createUserObject } from '../utils/helperFunctions';
 import { getUserData } from '../utils/typeormHelpers';
 
 export const getCurrentUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -13,7 +12,8 @@ export const getCurrentUser = async (req: CustomRequest, res: Response, next: Ne
       next(new CustomError('No user found', 404));
       return;
     }
-    res.json(createUserObject(user, user.servers));
+    const { password, ...otherUserProps } = user;
+    res.json(otherUserProps);
   } catch (err) {
     next(err);
   }

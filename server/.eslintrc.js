@@ -19,6 +19,10 @@ module.exports = {
     // 'linebreak-style': ['error', process.platform === 'win32' ? 'windows' : 'unix'],
     'linebreak-style': 0,
     'max-len': [2, 120, 4],
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': 'error',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['error'],
   },
   settings: {
     'import/resolver': {
