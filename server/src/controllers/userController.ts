@@ -12,7 +12,7 @@ export const getCurrentUser = async (req: CustomRequest, res: Response, next: Ne
       next(new CustomError('No user found', 404));
       return;
     }
-    const { password, ...otherUserProps } = user;
+    const { password: _, ...otherUserProps } = user;
     res.json(otherUserProps);
   } catch (err) {
     next(err);

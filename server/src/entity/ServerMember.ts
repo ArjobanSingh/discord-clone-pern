@@ -10,6 +10,14 @@ export enum MemberRole {
   MODERATOR = 'MODERATOR',
   USER = 'USER'
 }
+
+export const enumScore = {
+  [MemberRole.USER]: 0,
+  [MemberRole.MODERATOR]: 1,
+  [MemberRole.ADMIN]: 2,
+  [MemberRole.OWNER]: 3,
+};
+
 @Entity()
 export default class ServerMember extends BaseEntity {
   @PrimaryColumn('uuid')

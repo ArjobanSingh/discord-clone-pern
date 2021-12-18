@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {
-  createServer, getAllServers, getServerDetails, joinServer,
+  createServer, deleteServer, getAllServers, getServerDetails, joinServer, updateServer, updateServerMemberRoles,
 } from '../controllers/serverController';
 import isAuthenticated from '../middlewarres/isAuthenticated';
 
@@ -10,5 +10,8 @@ serverRouter.get('/', isAuthenticated, getAllServers);
 serverRouter.get('/:serverId', isAuthenticated, getServerDetails);
 serverRouter.post('/create-server', isAuthenticated, createServer);
 serverRouter.post('/join-server', isAuthenticated, joinServer);
+serverRouter.put('/update-server', isAuthenticated, updateServer);
+serverRouter.put('/update-roles', isAuthenticated, updateServerMemberRoles);
+serverRouter.delete('/delete-server/:serverId', isAuthenticated, deleteServer);
 
 export default serverRouter;

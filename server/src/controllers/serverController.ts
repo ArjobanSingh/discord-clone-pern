@@ -1,12 +1,14 @@
 import { NextFunction, Response } from 'express';
-import { validate } from 'class-validator';
-import { FindManyOptions, getConnection, LessThan } from 'typeorm';
+import { isUUID, validate } from 'class-validator';
+import {
+  FindManyOptions, getConnection, In, LessThan,
+} from 'typeorm';
 import Server, { ServerTypeEnum } from '../entity/Server';
 import CustomRequest from '../interfaces/CustomRequest';
 import { createValidationError, CustomError } from '../utils/errors';
-import ServerMember, { MemberRole } from '../entity/ServerMember';
+import ServerMember, { enumScore, MemberRole } from '../entity/ServerMember';
 import User from '../entity/User';
-import { AllServersQuery } from '../types/ServerTypes';
+import { AllServersQuery, ServerType } from '../types/ServerTypes';
 
 export const createServer = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
@@ -36,7 +38,7 @@ export const createServer = async (req: CustomRequest, res: Response, next: Next
       await transactionEntityManager.save(serverMember);
     });
 
-    const { owner, ...otherSeverProps } = newServer;
+    const { owner: _, ...otherSeverProps } = newServer;
 
     res.status(201).json({
       ...otherSeverProps,
@@ -57,7 +59,7 @@ export const joinServer = async (req: CustomRequest, res: Response, next: NextFu
   try {
     const { userId, query } = req;
     if (!query?.serverId) {
-      next(new CustomError('No server found', 404));
+      next(new CustomError('Invalid serverId', 400));
       return;
     }
 
@@ -101,10 +103,15 @@ export const getAllServers = async (req: CustomRequest, res: Response, next: Nex
     const limitNumber = parseInt(limit, 10);
 
     const take = Number.isNaN(limitNumber) || limitNumber > 20 ? 20 : limitNumber;
-    const queryObj: FindManyOptions = { order: { createdAt: 'DESC' }, take };
+    const queryObj: FindManyOptions = {
+      where: { type: ServerTypeEnum.PUBLIC },
+      order: { createdAt: 'DESC' },
+      take,
+    };
 
     if (cursor && typeof cursor === 'string') {
       queryObj.where = {
+        type: ServerTypeEnum.PUBLIC,
         createdAt: LessThan(decodeURIComponent(cursor)),
       };
     }
@@ -126,7 +133,7 @@ export const getServerDetails = async (req: CustomRequest, res: Response, next: 
     }
 
     // get server details and with all users which are part of this as members
-    const [server] = await getConnection().query(`
+    const [server]: ServerType[] = await getConnection().query(`
       SELECT s.*,
       json_agg(json_build_object(
         'userName', u.name, 'userId', u.id, 'profilePicture', u."profilePicture", 'role', sm.role
@@ -134,14 +141,24 @@ export const getServerDetails = async (req: CustomRequest, res: Response, next: 
       FROM server "s"
       INNER JOIN server_member "sm" ON  s.id = sm."serverId"
       INNER JOIN users "u" ON u.id = sm."userId"
-      WHERE s.id = '${serverId}'
+      WHERE s.id = $1
       group by s.id
       limit 1;
-    `);
+    `, [serverId]);
 
     if (!server) {
       next(new CustomError('No server found', 404));
       return;
+    }
+
+    if (server.type === ServerTypeEnum.PRIVATE) {
+      // if current server is private, and user in not part of server
+      // throw error
+      const thisMember = server.members.find((member) => member.userId === req.userId);
+      if (!thisMember) {
+        next(new CustomError('Forbidden', 403));
+        return;
+      }
     }
     res.json(server);
   } catch (err) {
@@ -149,4 +166,139 @@ export const getServerDetails = async (req: CustomRequest, res: Response, next: 
   }
 };
 
-export const deleteServer = async (req: CustomRequest, res: Response, next: NextFunction) => {};
+export const updateServer = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { serverId, type } = req.body;
+
+    if (!serverId || !isUUID(serverId)) {
+      next(new CustomError('Invalid serverId', 400));
+      return;
+    }
+
+    if (!type || !Object.values(ServerTypeEnum).includes(type)) {
+      next(new CustomError('Invalid server type', 400));
+      return;
+    }
+
+    const server = await Server.findOne(serverId);
+    if (!server) {
+      next(new CustomError('Server not found', 404));
+      return;
+    }
+
+    if (server.ownerId !== req.userId) {
+      next(new CustomError('Forbidden', 403));
+      return;
+    }
+
+    if (server.type !== type) {
+      server.type = type;
+      await server.save();
+    }
+    // const [response, responseLength] = await getConnection().query(`
+    //   update server s
+    //   set "type" =
+    //     case
+    //     when s."ownerId" = $1 then $2
+    //     else s.type
+    //   end
+    //   where s.id = $3
+    //   returning s.id;
+    // `, [req.userId, type, serverId]);
+
+    // if (!response || !responseLength) {
+    //   next(new CustomError('Server not found', 404));
+    //   return;
+    // }
+
+    res.status(204).json();
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteServer = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { serverId } = req.params;
+    const server = await Server.findOne(serverId);
+
+    if (!server) {
+      next(new CustomError('No server found', 404));
+      return;
+    }
+
+    if (server.ownerId !== req.userId) {
+      next(new CustomError('Forbidden', 403));
+      return;
+    }
+    await Server.delete(serverId);
+    res.status(204).json();
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const updateServerMemberRoles = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { role, userId, serverId } = req.body;
+
+    if (!role || !isUUID(serverId) || !isUUID(userId) || !Object.values(MemberRole).includes(role)) {
+      next(new CustomError('Invalid body', 400));
+      return;
+    }
+
+    if (role === MemberRole.OWNER) {
+      next(new CustomError('Cannot update owner for Server', 400));
+      return;
+    }
+
+    const serverMembers = await ServerMember.find({
+      where: { userId: In([req.userId, userId]), serverId },
+      take: 2,
+    });
+
+    if (req.userId === userId) {
+      next(new CustomError('Cannot update role', 400));
+      return;
+    }
+
+    if (!serverMembers.length) {
+      next(new CustomError('Server not found', 404));
+      return;
+    }
+
+    if (serverMembers.length !== 2) {
+      next(new CustomError('Server members not found', 404));
+      return;
+    }
+
+    // requesting user: the one making this api request to update user role
+    const requestingUser = serverMembers.find((u) => u.userId === req.userId);
+
+    // requested user: the user, whose roles have to be updated
+    const requestedUser = serverMembers.find((u) => u.userId === userId);
+
+    // eg: mod cannot assign some user a role, which is greater than mode itself
+    if (enumScore[requestingUser.role] < enumScore[role]) {
+      // requesting user's role is smaller than the role he asked to update for other user
+      next(new CustomError('Forbidden', 403));
+      return;
+    }
+
+    // eh: mod cannot change role of any other mode, or user with higher role
+    if (enumScore[requestingUser.role] <= enumScore[requestedUser.role]) {
+      // requesting user's role is not greater than requested user's role
+      // this operation is denied
+      next(new CustomError('Forbidden', 403));
+      return;
+    }
+
+    if (requestedUser.role !== role) {
+      await ServerMember.update({ userId: requestedUser.userId, serverId }, { role });
+    }
+
+    res.status(204).json();
+  } catch (err) {
+    next(err);
+  }
+};
