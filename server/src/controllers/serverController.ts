@@ -58,7 +58,7 @@ export const createServer = async (req: CustomRequest, res: Response, next: Next
 export const joinServer = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { userId, query } = req;
-    if (!query?.serverId) {
+    if (!query?.serverId || !isUUID(query.serverId)) {
       next(new CustomError('Invalid serverId', 400));
       return;
     }
@@ -127,7 +127,7 @@ export const getServerDetails = async (req: CustomRequest, res: Response, next: 
   try {
     const { serverId } = req.params;
 
-    if (!serverId) {
+    if (!serverId || !isUUID(serverId)) {
       next(new CustomError('No server found', 404));
       return;
     }
@@ -220,6 +220,12 @@ export const updateServer = async (req: CustomRequest, res: Response, next: Next
 export const deleteServer = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { serverId } = req.params;
+
+    if (!serverId || !isUUID(serverId)) {
+      next(new CustomError('Invalid ServerId', 404));
+      return;
+    }
+
     const server = await Server.findOne(serverId);
 
     if (!server) {

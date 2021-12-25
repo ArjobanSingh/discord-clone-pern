@@ -40,6 +40,11 @@ createConnection()
       const status = err.status || 500;
       const { message = 'Something went wrong', error = { message } } = err;
 
+      if (res.headersSent) {
+        console.log('headers sent already');
+        return next(err);
+      }
+
       return res.status(status).json({
         error,
       });
