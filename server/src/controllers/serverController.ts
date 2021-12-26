@@ -9,6 +9,7 @@ import { createValidationError, CustomError } from '../utils/errors';
 import ServerMember, { enumScore, MemberRole } from '../entity/ServerMember';
 import User from '../entity/User';
 import { AllServersQuery, ServerType } from '../types/ServerTypes';
+import { getServerForJoinLink } from '../utils/helperFunctions';
 
 export const createServer = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
@@ -58,21 +59,32 @@ export const createServer = async (req: CustomRequest, res: Response, next: Next
 export const joinServer = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { userId, query } = req;
-    if (!query?.serverId || !isUUID(query.serverId)) {
+
+    let server: Server | undefined;
+
+    if (query.inviteLink) {
+      // user trying to join with invite link
+      server = await getServerForJoinLink(`${query.inviteLink}`);
+    } else if (!query.serverId || !isUUID(query.serverId)) {
+      // user in not trying to join with link and serverId is also not valid or present
+      // so throw error
       next(new CustomError('Invalid serverId', 400));
       return;
-    }
+    } else {
+      // valid serverId, so find the corresponding server
+      server = await Server.findOne(`${query.serverId}`);
+      if (!server) {
+        next(new CustomError('No server found', 404));
+        return;
+      }
 
-    const server = await Server.findOne(`${query.serverId}`);
-    if (!server) {
-      next(new CustomError('No server found', 404));
-      return;
-    }
-
-    if (server.type === ServerTypeEnum.PRIVATE) {
-      // use cannot automatically join private servers
-      next(new CustomError('Forbidden', 403));
-      return;
+      // if user is trying to join server with serverId, and that server is private
+      // return error, private servers can only be joined with join links
+      if (server.type === ServerTypeEnum.PRIVATE) {
+        // use cannot automatically join private servers
+        next(new CustomError('Forbidden', 403));
+        return;
+      }
     }
 
     let serverMember = await ServerMember.findOne({ where: { userId, serverId: server.id } });

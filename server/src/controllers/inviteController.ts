@@ -3,10 +3,11 @@ import { NextFunction, Response } from 'express';
 import { nanoid } from 'nanoid';
 import { getConnection, LessThan } from 'typeorm';
 import InviteLink, { MAX_MINUTE_LIMIT, MIN_MINUTE_LIMIT } from '../entity/InviteLink';
-import { ServerTypeEnum } from '../entity/Server';
-import { enumScore, MemberRole } from '../entity/ServerMember';
+import Server, { ServerTypeEnum } from '../entity/Server';
+import ServerMember, { enumScore, MemberRole } from '../entity/ServerMember';
 import CustomRequest from '../interfaces/CustomRequest';
 import { CustomError } from '../utils/errors';
+import { getServerForJoinLink } from '../utils/helperFunctions';
 
 export const createInvite = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
@@ -77,4 +78,17 @@ export const createInvite = async (req: CustomRequest, res: Response, next: Next
   }
 };
 
-export const verifyUrl = (req: CustomRequest, res: Response, next: NextFunction) => {};
+export const verifyUrl = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { inviteLink } = req.params;
+    if (!inviteLink) {
+      next(new CustomError('Link Not found', 404));
+      return;
+    }
+    const server = await getServerForJoinLink(inviteLink);
+
+    res.json(server);
+  } catch (err) {
+    next(err);
+  }
+};

@@ -1,6 +1,9 @@
 import { nanoid } from 'nanoid';
+import InviteLink from '../entity/InviteLink';
+import Server from '../entity/Server';
 import LoginDataType from '../interfaces/LoginData';
 import redisClient from '../redisConfig';
+import { CustomError } from './errors';
 
 const jwt = require('jsonwebtoken');
 
@@ -29,7 +32,7 @@ const createRefreshToken = (userId: string) => (
 const verfifyToken = async (token: string, isAccessToken = true): Promise<any> => {
   const secret = isAccessToken ? ACCESS_TOKEN_SECRET : REFRESH_TOKEN_SECRET;
   const payload = await verifyWithPromise(token, secret);
-  console.log('isAccessToken', isAccessToken, 'payload', payload);
+  // console.log('isAccessToken', isAccessToken, 'payload', payload);
   return payload;
 };
 
@@ -49,10 +52,31 @@ const createLoginData = async (userId: string): Promise<LoginDataType> => {
   return { accessToken, refreshToken };
 };
 
+const getServerForJoinLink = async (inviteLink: string): Promise<Server> => {
+  if (inviteLink.length !== 21) {
+    throw new CustomError('Invalid Join Link', 400);
+  }
+  const link = await InviteLink.findOne({ where: { urlPath: inviteLink } });
+  if (!link) {
+    throw new CustomError('Link not found', 404);
+  }
+
+  if (link.isExpired()) {
+    throw new CustomError('Link expired', 403);
+  }
+
+  const server = await Server.findOne(link.serverId);
+  if (!server) {
+    throw new CustomError('No server found', 404);
+  }
+  return server;
+};
+
 export {
   createAccessToken,
   createRefreshToken,
   verfifyToken,
   decodeJWT,
   createLoginData,
+  getServerForJoinLink,
 };
