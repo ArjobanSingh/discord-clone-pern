@@ -26,5 +26,6 @@ module.exports = {
     quotes: 'warn',
     'no-unused-vars': 'warn',
     'react/jsx-props-no-spreading': 0,
+    'no-empty-pattern': 'warn',
   },
 };

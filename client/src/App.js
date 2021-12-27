@@ -9,9 +9,11 @@ import { useDispatch } from 'react-redux';
 import CustomThemeProvider, { ColorModeContext } from './providers/CustomThemeProvider';
 import Auth from './components/Auth';
 import RequireAuth from './containers/RequireAuth';
-import Channels from './components/Channels';
 import { logoutRequested } from './redux/actions/auth';
 import useIsAuthenticated from './customHooks/useIsAuthenticated';
+import Channels from './containers/Channels';
+import Channel from './components/Channel';
+import NoChannel from './components/NoChannel';
 
 // const Auth = lazy(() => import('./components/Auth'));
 
@@ -36,7 +38,7 @@ const Child = () => {
     <>
       <Button
         sx={{
-          position: 'fixed', top: '10', left: '10px', zIndex: '20',
+          position: 'fixed', top: '10', right: '10px', zIndex: '20',
         }}
         color="primary"
         variant="contained"
@@ -48,7 +50,7 @@ const Child = () => {
       {isAuthenticated && (
         <Button
           sx={{
-            position: 'fixed', top: '10', left: '210px', zIndex: '20',
+            position: 'fixed', top: '10', right: '210px', zIndex: '20',
           }}
           color="primary"
           variant="contained"
@@ -74,14 +76,17 @@ function App() {
                 element={<Auth />}
               />
               <Route
-                path="/"
+                path="channels"
                 element={(
                   <RequireAuth>
                     <Channels />
                   </RequireAuth>
                 )}
-              />
-              <Route path="*" element={<Navigate replace to="/" />} />
+              >
+                <Route path=":channelId" element={<Channel />} />
+                <Route index element={<NoChannel />} />
+              </Route>
+              <Route path="*" element={<Navigate replace to="/channels/" />} />
             </Routes>
           </Suspense>
         </InnerWrapper>

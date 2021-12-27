@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useLocation, Navigate } from 'react-router-dom';
-import useIsAuthenticated from '../customHooks/useIsAuthenticated';
+import useIsAuthenticated from '../../customHooks/useIsAuthenticated';
 
 const RequireAuth = ({ children }) => {
   const isAuthenticated = useIsAuthenticated();
