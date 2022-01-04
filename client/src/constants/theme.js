@@ -17,7 +17,7 @@ export const LIGHT_THEME_OPTIONS = {
       main: '#f50057',
     },
     background: {
-      default: '#fdfdfd',
+      default: '#fff',
       paper: '#fdfdfd',
     },
   },

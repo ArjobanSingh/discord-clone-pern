@@ -1,21 +1,14 @@
 import {
-  lazy, Suspense, useContext,
+  useContext,
 } from 'react';
 import './App.css';
 import { styled } from '@mui/material/styles';
-import { Routes, Route, Navigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import CustomThemeProvider, { ColorModeContext } from './providers/CustomThemeProvider';
-import Auth from './components/Auth';
-import RequireAuth from './containers/RequireAuth';
 import { logoutRequested } from './redux/actions/auth';
 import useIsAuthenticated from './customHooks/useIsAuthenticated';
-import Channels from './containers/Channels';
-import Channel from './components/Channel';
-import NoChannel from './components/NoChannel';
-
-// const Auth = lazy(() => import('./components/Auth'));
+import AppRoutes from './containers/Routes';
 
 const Container = styled('div')(({ theme }) => `
   background-color: ${theme.palette.background.default};
@@ -69,26 +62,7 @@ function App() {
       <Container>
         <Child />
         <InnerWrapper>
-          <Suspense fallback={<div>Loader...</div>}>
-            <Routes>
-              <Route
-                path="/login"
-                element={<Auth />}
-              />
-              <Route
-                path="channels"
-                element={(
-                  <RequireAuth>
-                    <Channels />
-                  </RequireAuth>
-                )}
-              >
-                <Route path=":channelId" element={<Channel />} />
-                <Route index element={<NoChannel />} />
-              </Route>
-              <Route path="*" element={<Navigate replace to="/channels/" />} />
-            </Routes>
-          </Suspense>
+          <AppRoutes />
         </InnerWrapper>
       </Container>
     </CustomThemeProvider>

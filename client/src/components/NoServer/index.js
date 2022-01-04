@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 
-const NoChannel = (props) => {
+const NoServer = (props) => {
   const {} = props;
   return (
     <div>
@@ -9,8 +9,8 @@ const NoChannel = (props) => {
   );
 };
 
-NoChannel.propTypes = {
+NoServer.propTypes = {
 
 };
 
-export default NoChannel;
+export default NoServer;
