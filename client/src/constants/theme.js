@@ -1,3 +1,4 @@
+import { darken } from '@mui/material';
 import { grey } from '@mui/material/colors';
 
 export const DARK_THEME = 'dark';
@@ -18,7 +19,8 @@ export const LIGHT_THEME_OPTIONS = {
     },
     background: {
       default: '#fff',
-      paper: '#fdfdfd',
+      paper: '#fafafa',
+      darker: darken('#fafafa', 0.2),
     },
   },
   typography: {
@@ -46,6 +48,7 @@ export const DARK_THEME_OPTIONS = {
     background: {
       default: '#36393f',
       paper: '#2c2f33',
+      darker: darken('#2c2f33', 0.2),
     },
     text: {
       primary: '#fff',
