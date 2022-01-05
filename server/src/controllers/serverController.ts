@@ -1,5 +1,7 @@
 import { NextFunction, Response } from 'express';
-import { isUUID, validate } from 'class-validator';
+import {
+  isString, isURL, isUUID, validate,
+} from 'class-validator';
 import {
   FindManyOptions, getConnection, In, LessThan,
 } from 'typeorm';
@@ -16,11 +18,13 @@ export const createServer = async (req: CustomRequest, res: Response, next: Next
     const { userId, body } = req;
 
     const user = await User.findOne(userId);
+    const { avatar } = body;
 
     const newServer = new Server();
     newServer.name = body.name;
     newServer.owner = user;
     newServer.type = body.type || ServerTypeEnum.PUBLIC;
+    if (isString(avatar) && isURL(avatar)) newServer.avatar = avatar;
 
     const errors = await validate(newServer);
 

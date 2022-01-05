@@ -1,4 +1,6 @@
-import { IsEnum, IsNotEmpty, Length } from 'class-validator';
+import {
+  IsEnum, IsNotEmpty, IsString, IsUrl, Length,
+} from 'class-validator';
 import {
   BaseEntity, Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
@@ -22,6 +24,9 @@ export default class Server extends BaseEntity {
 
     @Column('uuid')
     ownerId: string;
+
+    @Column({ nullable: true })
+    avatar: string;
 
     // this class will store foreign id for User class
     @ManyToOne((type) => User, (user) => user.ownedServers, { onDelete: 'SET NULL' })
