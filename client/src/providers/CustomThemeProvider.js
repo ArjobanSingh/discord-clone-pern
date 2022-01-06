@@ -1,5 +1,6 @@
 import { createContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
+import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import {
   DARK_THEME, DARK_THEME_OPTIONS, LIGHT_THEME, LIGHT_THEME_OPTIONS,
@@ -23,7 +24,9 @@ const CustomThemeProvider = ({ children }) => {
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
-        {children}
+        <StyledThemeProvider theme={theme}>
+          {children}
+        </StyledThemeProvider>
       </ThemeProvider>
     </ColorModeContext.Provider>
   );

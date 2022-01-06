@@ -9,6 +9,7 @@ import CustomThemeProvider, { ColorModeContext } from './providers/CustomThemePr
 import { logoutRequested } from './redux/actions/auth';
 import useIsAuthenticated from './customHooks/useIsAuthenticated';
 import AppRoutes from './containers/Routes';
+import BaseStyles from './BaseStyles';
 
 const Container = styled('div')(({ theme }) => `
   background-color: ${theme.palette.background.default};
@@ -59,6 +60,7 @@ const Child = () => {
 function App() {
   return (
     <CustomThemeProvider>
+      <BaseStyles />
       <Container>
         <Child />
         <InnerWrapper>

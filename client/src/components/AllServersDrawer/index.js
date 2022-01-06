@@ -1,8 +1,14 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
+import TouchRipple from '@mui/material/ButtonBase/TouchRipple';
 import useUser from '../../customHooks/userUser';
 import { getCharacterName } from '../../utils/helperFunctions';
-import { ServerIconList, SidebarContainer, StyledAvatar } from './styles';
+import {
+  AvatarWrapper,
+  Bar, barStyleCss, ServerIconList, SidebarContainer, StyledAvatar, VerticalBar,
+} from './styles';
+import Logo from '../../common/Logo';
+import { FlexDiv } from '../../common/StyledComponents';
 
 const AllServersDrawer = (props) => {
   const { user: { servers } } = useUser();
@@ -19,16 +25,29 @@ const AllServersDrawer = (props) => {
   return (
     <SidebarContainer>
       <ServerIconList>
-        {servers.map((server) => (
+        <AvatarWrapper>
           <StyledAvatar
-            key={server.serverId}
-            src={server.avatar}
-            data-serverid={server.serverId}
-            onClick={openThisServer}
-            selected={server.serverId === selectedServer}
+            selected={selectedServer === '@me'}
+            onClick={() => { setSelectedServer('@me'); }}
           >
-            {getCharacterName(server.serverName)}
+            <Logo />
           </StyledAvatar>
+          <VerticalBar selected={selectedServer === '@me'} />
+        </AvatarWrapper>
+
+        <Bar />
+        {servers.map((server) => (
+          <AvatarWrapper key={server.serverId}>
+            <StyledAvatar
+              src={server.avatar}
+              data-serverid={server.serverId}
+              onClick={openThisServer}
+              selected={server.serverId === selectedServer}
+            >
+              {getCharacterName(server.serverName)}
+            </StyledAvatar>
+            <VerticalBar selected={server.serverId === selectedServer} />
+          </AvatarWrapper>
         ))}
       </ServerIconList>
     </SidebarContainer>
