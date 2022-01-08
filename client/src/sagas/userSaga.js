@@ -3,6 +3,7 @@ import {
 } from 'redux-saga/effects';
 import * as C from '../constants/user';
 import { logoutSuccess } from '../redux/actions/auth';
+import { saveAllServers } from '../redux/actions/servers';
 import { userFailed, userSuccess } from '../redux/actions/user';
 import { UserApi } from '../utils/apiEndpoints';
 import axiosInstance from '../utils/axiosConfig';
@@ -11,6 +12,7 @@ function* fetchCurrentUser() {
   try {
     const response = yield call(axiosInstance.get, UserApi.GET_CURRENT_USER);
     yield put(userSuccess(response.data));
+    yield put(saveAllServers(response.data.servers));
   } catch (err) {
     console.log('User error', err.response, err.message);
     if (err.response) {

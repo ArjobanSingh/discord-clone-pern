@@ -2,10 +2,12 @@ import { combineReducers } from 'redux';
 import { AUTH_SIGN_OUT_SUCCESS } from '../../constants/auth';
 import auth from './auth';
 import user from './user';
+import servers from './servers';
 
 const appReducer = combineReducers({
   auth,
   user,
+  servers,
 });
 
 const rootReducer = (state, action) => {

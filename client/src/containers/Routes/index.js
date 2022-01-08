@@ -5,7 +5,7 @@ import RequireAuth from '../RequireAuth';
 import Servers from '../Servers';
 import Server from '../../components/Server';
 import Channel from '../../components/Channel';
-import NoServer from '../../components/NoServer';
+import MeServer from '../../components/MeServer';
 import Auth from '../../components/Auth';
 
 // const Auth = lazy(() => import('./components/Auth'));
@@ -25,12 +25,13 @@ const AppRoutes = (props) => (
           </RequireAuth>
         )}
       >
+        <Route path="@me" element={<MeServer />} />
         <Route path=":serverId" element={<Server />}>
           <Route path=":channelId" element={<Channel />} />
         </Route>
-        <Route index element={<NoServer />} />
+        <Route index element={<Navigate replace to="@me" />} />
       </Route>
-      <Route path="*" element={<Navigate replace to="/channels/" />} />
+      <Route path="*" element={<Navigate replace to="/channels/@me" />} />
     </Routes>
   </Suspense>
 );
