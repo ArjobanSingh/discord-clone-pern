@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import {
   NavLink,
 } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import useUser from '../../customHooks/userUser';
 import { getCharacterName } from '../../utils/helperFunctions';
 import {
@@ -9,9 +10,10 @@ import {
   Bar, ServerIconList, SidebarContainer, StyledAvatar, VerticalBar,
 } from './styles';
 import Logo from '../../common/Logo';
+import ChannelList from '../ChannelList';
 
 const AllServersDrawer = (props) => {
-  const { user: { servers } } = useUser();
+  const servers = useSelector((state) => state.servers);
 
   return (
     <SidebarContainer>
@@ -30,7 +32,7 @@ const AllServersDrawer = (props) => {
         </NavLink>
 
         <Bar />
-        {servers.map((server) => (
+        {Object.values(servers).map((server) => (
           <NavLink to={server.serverId} key={server.serverId}>
             {({ isActive }) => (
               <AvatarWrapper>
@@ -46,6 +48,7 @@ const AllServersDrawer = (props) => {
           </NavLink>
         ))}
       </ServerIconList>
+      <ChannelList />
     </SidebarContainer>
   );
 };

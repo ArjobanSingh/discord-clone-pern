@@ -1,18 +1,17 @@
 import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Outlet, useParams } from 'react-router-dom';
+import { Navigate, Outlet, useParams } from 'react-router-dom';
 import LoadingErrorWrapper from '../../containers/LoadingErrorWrapper';
 import { serverDetailsRequested } from '../../redux/actions/servers';
-// import useDidUpdate from '../../customHooks/useDidUpdate';
+
+const dummyChannels = [{ channelId: 'first-channel-id' }];
 
 // this component will only render, after we have fetched user details and server list
 const Server = (props) => {
   const params = useParams();
   const dispatch = useDispatch();
   const serverDetails = useSelector((state) => state.servers[params.serverId]);
-
-  console.log('params', params);
 
   useEffect(() => {
     if (serverDetails) {
@@ -23,21 +22,14 @@ const Server = (props) => {
     }
   }, [serverDetails]);
 
-  // TODO: server-details fetched, push to channel route
-  // useDidUpdate(() => {
-  //   if (serverDetails?.isServerDetailsFetched) {
-  //     let channelRoute = params.channelId;
-  //     if (!channelRoute) {
-  //       [channelRoute] = serverDetails.channels;
-  //     }
-  //   }
-  // }, [serverDetails?.isServerDetailsFetched, params.channelId]);
-
   if (!serverDetails) {
     return (
       <div>No server found: 404</div>
     );
   }
+
+  // TODO: use real channels data, and remove this default dummyChannels
+  const { channels: [{ channelId: fistChannelId }] = dummyChannels } = serverDetails;
 
   return (
     <LoadingErrorWrapper
@@ -46,10 +38,12 @@ const Server = (props) => {
       isLoading={serverDetails.isFetchingData && !serverDetails.members}
       loader={<div>Server Loading...</div>}
     >
-      <div>
-        Single Server
-        <Outlet />
-      </div>
+      {/* if user directly navigating to some channel open that channel,
+        otherwise navigate user to first channel of opened server */}
+      {params.channelId
+        ? <Outlet />
+        : <Navigate replace to={`/channels/${serverDetails.serverId}/${fistChannelId}`} />}
+
     </LoadingErrorWrapper>
   );
 };

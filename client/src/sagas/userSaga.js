@@ -11,8 +11,9 @@ import axiosInstance from '../utils/axiosConfig';
 function* fetchCurrentUser() {
   try {
     const response = yield call(axiosInstance.get, UserApi.GET_CURRENT_USER);
-    yield put(userSuccess(response.data));
-    yield put(saveAllServers(response.data.servers));
+    const { servers, ...restUserData } = response.data;
+    yield put(userSuccess(restUserData));
+    yield put(saveAllServers(servers));
   } catch (err) {
     console.log('User error', err.response, err.message);
     if (err.response) {
