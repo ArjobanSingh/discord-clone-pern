@@ -8,3 +8,7 @@ export const AuthApi = {
 export const UserApi = {
   GET_CURRENT_USER: '/user',
 };
+
+export const ServerApi = {
+  GET_SERVER_DETAILS: '/server',
+};

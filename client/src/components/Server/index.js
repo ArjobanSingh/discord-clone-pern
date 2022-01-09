@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, Outlet, useParams } from 'react-router-dom';
@@ -17,7 +17,7 @@ const Server = (props) => {
     if (serverDetails) {
       if (!serverDetails.members && !serverDetails.isFetchingData) {
         // if members not present or not yet fetching server details, fetch server details
-        dispatch(serverDetailsRequested(serverDetails.serverId));
+        dispatch(serverDetailsRequested(serverDetails.id));
       }
     }
   }, [serverDetails]);
@@ -42,7 +42,7 @@ const Server = (props) => {
         otherwise navigate user to first channel of opened server */}
       {params.channelId
         ? <Outlet />
-        : <Navigate replace to={`/channels/${serverDetails.serverId}/${fistChannelId}`} />}
+        : <Navigate replace to={`/channels/${serverDetails.id}/${fistChannelId}`} />}
 
     </LoadingErrorWrapper>
   );

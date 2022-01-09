@@ -4,11 +4,13 @@ export default (state = {}, action) => {
   switch (action.type) {
     case C.SAVE_ALL_SERVERS_LIST:
       return action.payload.servers.reduce((acc, server) => {
+        const { serverName, serverId, ...rest } = server;
         acc[server.serverId] = {
-          ...server,
+          ...rest,
+          name: serverName,
+          id: serverId,
           isFetchingData: false,
           error: null,
-          isServerDetailsFetched: false,
         };
         return acc;
       }, {});
@@ -19,12 +21,38 @@ export default (state = {}, action) => {
           ...action.payload.data,
           isFetchingData: false,
           error: null,
-          isServerDetailsFetched: false,
         },
       };
     case C.REMOVE_SERVER: {
       const newState = { ...state };
       delete newState[action.payload.serverId];
+      return newState;
+    }
+    case C.SERVER_DETAILS_REQUESTED: {
+      const newState = { ...state };
+      newState[action.payload.serverId] = {
+        ...newState[action.payload.serverId],
+        isFetchingData: true,
+        error: null,
+      };
+      return newState;
+    }
+    case C.SERVER_DETAILS_FAILED: {
+      const newState = { ...state };
+      newState[action.payload.serverId] = {
+        ...newState[action.payload.serverId],
+        isFetchingData: false,
+        error: action.payload.error,
+      };
+      return newState;
+    }
+    case C.SERVER_DETAILS_SUCCESS: {
+      const newState = { ...state };
+      newState[action.payload.data.id] = {
+        ...action.payload.data,
+        isFetchingData: false,
+        error: null,
+      };
       return newState;
     }
     default:

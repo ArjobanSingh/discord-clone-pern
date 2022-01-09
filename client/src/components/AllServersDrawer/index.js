@@ -1,18 +1,21 @@
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import {
   NavLink,
 } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import useUser from '../../customHooks/userUser';
 import { getCharacterName } from '../../utils/helperFunctions';
 import {
   AvatarWrapper,
-  Bar, ServerIconList, SidebarContainer, StyledAvatar, VerticalBar,
+  Bar,
+  ServerIconList,
+  SidebarContainer,
+  StyledAvatar,
+  VerticalBar,
 } from './styles';
 import Logo from '../../common/Logo';
 import ChannelList from '../ChannelList';
 
-const AllServersDrawer = (props) => {
+const AllServersDrawer = () => {
   const servers = useSelector((state) => state.servers);
 
   return (
@@ -33,14 +36,14 @@ const AllServersDrawer = (props) => {
 
         <Bar />
         {Object.values(servers).map((server) => (
-          <NavLink to={server.serverId} key={server.serverId}>
+          <NavLink to={server.id} key={server.id}>
             {({ isActive }) => (
               <AvatarWrapper>
                 <StyledAvatar
                   src={server.avatar}
                   selected={isActive}
                 >
-                  {getCharacterName(server.serverName)}
+                  {getCharacterName(server.name)}
                 </StyledAvatar>
                 <VerticalBar selected={isActive} />
               </AvatarWrapper>

@@ -17,6 +17,7 @@ export const ServerIconList = styled('div')(({ theme }) => `
   flex-direction: column;
   gap: 10px;
   align-items: center;
+  min-width: 74px;
 
   -ms-overflow-style: none;
   scrollbar-width: none;

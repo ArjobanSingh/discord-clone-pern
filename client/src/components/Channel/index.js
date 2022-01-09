@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 
-const Channel = (props) => {
+const Channel = () => {
   const params = useParams();
   console.log('channel id', params.channelId);
   return (

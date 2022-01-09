@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -11,7 +11,7 @@ import Signup from './Signup';
 import useDidUpdate from '../../customHooks/useDidUpdate';
 import useIsAuthenticated from '../../customHooks/useIsAuthenticated';
 
-const Auth = (props) => {
+const Auth = () => {
   const isAuthenticated = useIsAuthenticated();
   const location = useLocation();
   const navigate = useNavigate();

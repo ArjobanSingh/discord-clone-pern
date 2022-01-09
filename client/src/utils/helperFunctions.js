@@ -1,3 +1,5 @@
+import { logoutSuccess } from '../redux/actions/auth';
+
 export function stringToColor(string) {
   let hash = 0;
   let i;
@@ -23,4 +25,12 @@ export function getCharacterName(name) {
   const [firstChar] = firstName;
   const secondChar = lastName ? lastName[0] : firstName[1];
   return `${firstChar.toUpperCase()}${secondChar}`;
+}
+
+export function handleError(err, callback) {
+  if (!err.response) return callback({ message: err.message }, err);
+
+  const { status, data } = err.response;
+  if (status === 401) return logoutSuccess();
+  return callback(data.error, err);
 }

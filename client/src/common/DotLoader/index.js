@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import styles from './DotLoader.module.css';
 
-const DotLoader = (props) => (
+const DotLoader = () => (
   <div className={styles['dot-flashing']} />
 );
 

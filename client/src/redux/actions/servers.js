@@ -14,9 +14,10 @@ export const serverDetailsRequested = (serverId) => ({
   },
 });
 
-export const serverDetailsFailed = (error) => ({
+export const serverDetailsFailed = (serverId, error) => ({
   type: C.SERVER_DETAILS_FAILED,
   payload: {
+    serverId,
     error,
   },
 });
