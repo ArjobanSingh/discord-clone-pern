@@ -6,6 +6,7 @@ import {
   logoutSuccess,
   registrationFailed, registrationSuccess, signInFailed, signInSuccess,
 } from '../redux/actions/auth';
+import { saveAllServers } from '../redux/actions/servers';
 import { userSuccess } from '../redux/actions/user';
 import { AuthApi } from '../utils/apiEndpoints';
 import axiosInstance, { getAuthTokens, removeTokens, setTokens } from '../utils/axiosConfig';
@@ -17,7 +18,10 @@ function* loginUser(actionData) {
     const { accessToken, refreshToken, user } = response.data;
     setTokens(accessToken, refreshToken);
     yield put(signInSuccess());
-    yield put(userSuccess(user));
+
+    const { servers, ...restUserData } = user;
+    yield put(saveAllServers(servers));
+    yield put(userSuccess(restUserData));
   } catch (err) {
     console.log('Login error', err.response, err.message);
     if (err.response?.data) {
@@ -54,7 +58,10 @@ function* registerUser(actionData) {
     const { accessToken, refreshToken, user } = response.data;
     setTokens(accessToken, refreshToken);
     yield put(registrationSuccess());
-    yield put(userSuccess(user));
+
+    const { servers, ...restUserData } = user;
+    yield put(saveAllServers(servers));
+    yield put(userSuccess(restUserData));
   } catch (err) {
     console.log('register error', err.response, err.message);
     if (err.response?.data) {

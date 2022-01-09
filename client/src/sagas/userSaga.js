@@ -12,8 +12,8 @@ function* fetchCurrentUser() {
   try {
     const response = yield call(axiosInstance.get, UserApi.GET_CURRENT_USER);
     const { servers, ...restUserData } = response.data;
-    yield put(userSuccess(restUserData));
     yield put(saveAllServers(servers));
+    yield put(userSuccess(restUserData));
   } catch (err) {
     console.log('User error', err.response, err.message);
     yield put(

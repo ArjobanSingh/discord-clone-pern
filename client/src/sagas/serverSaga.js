@@ -12,7 +12,6 @@ function* getServerDetails(actionData) {
   try {
     const url = `${ServerApi.GET_SERVER_DETAILS}/${serverId}`;
     const response = yield call(axiosInstance.get, url);
-    console.log({ response });
     yield put(serverDetailsSuccess(response.data));
   } catch (err) {
     yield put(

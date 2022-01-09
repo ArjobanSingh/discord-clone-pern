@@ -1,22 +1,34 @@
 import PropTypes from 'prop-types';
-import { styled } from '@mui/material/styles';
+import styled from 'styled-components';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 
 const dummyThemeFunc = () => '';
 
-const Input = styled('input')(({
-  theme, themeFunc = dummyThemeFunc, error, width = '',
+const Input = styled('input')`
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  font-size: inherit;
+`;
+
+const InputWrapper = styled.div(({
+  theme, width, error, injectCss = dummyThemeFunc,
 }) => `
   width: ${width};
-  color: ${theme.palette.text.secondary};
-  font-size: ${theme.typography.body1.fontSize};
+  display: flex;
   border: 1px solid ${error ? theme.palette.error.light : theme.palette.input.borderColor};
-  padding: ${theme.spacing(1)};
   background: ${theme.palette.input.background};
   border-radius: ${theme.shape.borderRadius}px;
+  color: ${theme.palette.text.secondary};
+  padding: ${theme.spacing(1)};
+  font-size: ${theme.typography.body1.fontSize};
+  gap: 10px;
+  align-items: center;
 
-  ${themeFunc(theme)}
+  ${injectCss(theme)}
 `);
 
 const ErrorDash = styled('span')`
@@ -28,7 +40,7 @@ const StyledLabel = styled(InputLabel)`
 `;
 
 const StyledTextfield = ({
-  id, label, isError, errorMessage, ...rest
+  id, label, isError, errorMessage, injectCss, startIcon, endIcon, ...rest
 }) => (
   <>
     <StyledLabel htmlFor={id}>
@@ -51,20 +63,31 @@ const StyledTextfield = ({
       </Typography>
       )}
     </StyledLabel>
-    <Input id={id} {...rest} error={isError ? 'error' : ''} />
+    <InputWrapper injectCss={injectCss}>
+      {startIcon}
+      <Input id={id} {...rest} error={isError ? 'error' : ''} />
+      {endIcon}
+    </InputWrapper>
   </>
 );
 
 StyledTextfield.propTypes = {
   id: PropTypes.string.isRequired,
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   isError: PropTypes.bool,
   errorMessage: PropTypes.string,
+  injectCss: PropTypes.func,
+  startIcon: PropTypes.node,
+  endIcon: PropTypes.node,
 };
 
 StyledTextfield.defaultProps = {
   isError: false,
   errorMessage: null,
+  label: null,
+  injectCss: dummyThemeFunc,
+  startIcon: null,
+  endIcon: null,
 };
 
 export default StyledTextfield;

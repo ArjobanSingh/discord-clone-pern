@@ -3,9 +3,7 @@ import { createGlobalStyle } from 'styled-components';
 export default createGlobalStyle`
   body {
     -webkit-tap-highlight-color: transparent;
-    line-height: 1.2;
-    // font.size(16)}
-    // font.regular}
+    font-family: 'Raleway', sans-serif;
   }
 
   ::-webkit-scrollbar {
