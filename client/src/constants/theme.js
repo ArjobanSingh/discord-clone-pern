@@ -22,6 +22,10 @@ export const LIGHT_THEME_OPTIONS = {
       paper: '#fafafa',
       darker: darken('#fafafa', 0.2),
     },
+    text: {
+      secondary: grey[600],
+      secondaryDark: grey[800],
+    },
   },
   typography: {
     fontWeightBold: 600,
@@ -53,6 +57,7 @@ export const DARK_THEME_OPTIONS = {
     },
     text: {
       primary: '#fff',
+      secondaryDark: grey[500],
       secondary: grey[300],
     },
   },

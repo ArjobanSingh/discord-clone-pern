@@ -77,7 +77,15 @@ const Login = (props) => {
       >
         <InputWrapper>
           <StyledTextfield
-            label="EMAIL"
+            label={(
+              <Typography
+                variant="body2"
+                color={!!errors.email || !!errors.message ? 'error.light' : 'text.secondary'}
+                component="span"
+              >
+                EMAIL
+              </Typography>
+           )}
             id="login email"
             type="email"
             name="email"
@@ -89,7 +97,15 @@ const Login = (props) => {
 
         <InputWrapper>
           <StyledTextfield
-            label="PASSWORD"
+            label={(
+              <Typography
+                variant="body2"
+                color={!!errors.password || !!errors.message ? 'error.light' : 'text.secondary'}
+                component="span"
+              >
+                PASSWORD
+              </Typography>
+            )}
             id="login password"
             type="password"
             name="password"

@@ -17,7 +17,7 @@ const Input = styled('input')`
 const InputWrapper = styled.div(({
   theme, width, error, injectCss = dummyThemeFunc,
 }) => `
-  width: ${width};
+  width: ${width || ''};
   display: flex;
   border: 1px solid ${error ? theme.palette.error.light : theme.palette.input.borderColor};
   background: ${theme.palette.input.background};
@@ -44,13 +44,7 @@ const StyledTextfield = ({
 }) => (
   <>
     <StyledLabel htmlFor={id}>
-      <Typography
-        variant="body2"
-        color={isError ? 'error.light' : 'text.secondary'}
-        component="span"
-      >
-        {label}
-      </Typography>
+      {label}
       {!!errorMessage && (
       <Typography
         variant="caption"
@@ -73,7 +67,7 @@ const StyledTextfield = ({
 
 StyledTextfield.propTypes = {
   id: PropTypes.string.isRequired,
-  label: PropTypes.string,
+  label: PropTypes.node,
   isError: PropTypes.bool,
   errorMessage: PropTypes.string,
   injectCss: PropTypes.func,

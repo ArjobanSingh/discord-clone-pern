@@ -72,7 +72,15 @@ const Signup = (props) => {
       >
         <InputWrapper>
           <StyledTextfield
-            label="EMAIL"
+            label={(
+              <Typography
+                variant="body2"
+                color={!!errors.email || !!errors.message ? 'error.light' : 'text.secondary'}
+                component="span"
+              >
+                EMAIL
+              </Typography>
+            )}
             id="signup email"
             type="email"
             name="email"
@@ -84,7 +92,15 @@ const Signup = (props) => {
 
         <InputWrapper>
           <StyledTextfield
-            label="NAME"
+            label={(
+              <Typography
+                variant="body2"
+                color={!!errors.name || !!errors.message ? 'error.light' : 'text.secondary'}
+                component="span"
+              >
+                NAME
+              </Typography>
+            )}
             id="signup name"
             type="text"
             name="name"
@@ -95,7 +111,15 @@ const Signup = (props) => {
 
         <InputWrapper>
           <StyledTextfield
-            label="PASSWORD"
+            label={(
+              <Typography
+                variant="body2"
+                color={!!errors.password || !!errors.message ? 'error.light' : 'text.secondary'}
+                component="span"
+              >
+                PASSWORD
+              </Typography>
+            )}
             id="signup password"
             type="password"
             name="password"
