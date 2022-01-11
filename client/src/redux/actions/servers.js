@@ -40,3 +40,8 @@ export const removeServer = (serverId) => ({
   type: C.REMOVE_SERVER,
   payload: { serverId },
 });
+
+export const saveUrl = (payload) => ({
+  type: C.SAVE_INVITE_URL,
+  payload,
+});

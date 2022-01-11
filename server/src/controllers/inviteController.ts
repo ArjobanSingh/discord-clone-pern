@@ -69,7 +69,12 @@ export const createInvite = async (req: CustomRequest, res: Response, next: Next
       await link.save();
     }
 
-    res.json({ inviteUrl: link.urlPath });
+    res.json({
+      inviteUrl: link.urlPath,
+      expireAt: link.expireAt,
+      minutes: link.minutes,
+      serverId: link.serverId,
+    });
 
     // delete all expired links, after sending response to user
     InviteLink.delete({ expireAt: LessThan(new Date()) });

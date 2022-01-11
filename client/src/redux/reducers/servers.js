@@ -1,4 +1,5 @@
 import * as C from '../../constants/servers';
+import { APP_URL } from '../../utils/axiosConfig';
 
 export default (state = {}, action) => {
   switch (action.type) {
@@ -11,6 +12,7 @@ export default (state = {}, action) => {
           id: serverId,
           isFetchingData: false,
           error: null,
+          inviteUrls: {},
         };
         return acc;
       }, {});
@@ -21,6 +23,7 @@ export default (state = {}, action) => {
           ...action.payload.data,
           isFetchingData: false,
           error: null,
+          inviteUrls: {},
         },
       };
     case C.REMOVE_SERVER: {
@@ -50,8 +53,26 @@ export default (state = {}, action) => {
       const newState = { ...state };
       newState[action.payload.data.id] = {
         ...action.payload.data,
+        inviteUrls: { ...newState[action.payload.data.id].inviteUrls },
         isFetchingData: false,
         error: null,
+      };
+      return newState;
+    }
+    case C.SAVE_INVITE_URL: {
+      const newState = { ...state };
+      const {
+        serverId, minutes, inviteUrl, expireAt,
+      } = action.payload;
+      newState[serverId] = {
+        ...newState[serverId],
+        inviteUrls: {
+          ...newState[serverId].inviteUrls,
+          [minutes]: {
+            inviteUrl: `${APP_URL}/${inviteUrl}`,
+            expireAt,
+          },
+        },
       };
       return newState;
     }

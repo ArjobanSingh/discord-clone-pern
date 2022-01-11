@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
@@ -8,16 +9,62 @@ import CloseIcon from '@mui/icons-material/Close';
 import { IconWrapper, InviteModalContainer, StyledSelect } from './styles';
 import StyledTextfield from '../../common/StyledTextfield';
 import { expirationOptions, sevenDaysInMinutes } from '../../constants/inviteUrl';
+import axiosInstance from '../../utils/axiosConfig';
+import { InviteApi } from '../../utils/apiEndpoints';
+import { saveUrl } from '../../redux/actions/servers';
+import { handleError } from '../../utils/helperFunctions';
 
 const readOnlyHandler = () => {};
 
 const InviteModal = (props) => {
-  const { closeModal } = props;
+  const { closeModal, inviteUrls, serverId } = props;
+  const dispatch = useDispatch();
+
   const [expirationLimit, setExpirationLimit] = useState(sevenDaysInMinutes);
-  const [joinUrl, setJoinUrl] = useState('https://join-url');
+  const [joinUrl, setJoinUrl] = useState('');
+  const [isFetchError, setIsFetchError] = useState(false);
+
+  // simple api request, easy to do here, than in redux-saga
+  const getUrl = async () => {
+    const requestedServerId = serverId;
+    try {
+      setJoinUrl('Fetching Url...');
+      setIsFetchError(false);
+      const payload = { serverId: requestedServerId, minutes: expirationLimit };
+      const response = await axiosInstance.post(InviteApi.CREATE_INVITE_URL, payload);
+      dispatch(saveUrl(response.data));
+    } catch (err) {
+      // if current opened Server and server whose url is requeted matches
+      // than only show error
+      if (requestedServerId === serverId) {
+        handleError(err, (error) => {
+          setIsFetchError(true);
+          setJoinUrl(error.message || 'Something went wrong');
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    const savedUrl = inviteUrls[expirationLimit];
+    if (savedUrl && new Date(savedUrl.expireAt) > Date.now()) {
+      // valid and not expired url present for this limit
+      setJoinUrl(savedUrl.inviteUrl);
+      return;
+    }
+    getUrl();
+  }, [inviteUrls, expirationLimit, serverId, dispatch]);
 
   const handleLimitChange = ({ target: { value } }) => {
     setExpirationLimit(value);
+  };
+
+  const copyUrl = () => {
+    navigator.clipboard.writeText(joinUrl).then(() => {
+      console.log('copied');
+    }, () => {
+      console.log('copy failed');
+    });
   };
 
   return (
@@ -78,12 +125,23 @@ const InviteModal = (props) => {
             id="join-url-input"
             value={joinUrl}
             onChange={readOnlyHandler}
-            endIcon={(
+            endIcon={isFetchError ? (
+              <Button
+                type="submit"
+                color="error"
+                variant="contained"
+                size="small"
+                onClick={getUrl}
+              >
+                Retry
+              </Button>
+            ) : (
               <Button
                 type="submit"
                 color="primary"
                 variant="contained"
                 size="small"
+                onClick={copyUrl}
               >
                 Copy
               </Button>
@@ -105,6 +163,8 @@ const InviteModal = (props) => {
 
 InviteModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
+  inviteUrls: PropTypes.objectOf(PropTypes.object).isRequired,
+  serverId: PropTypes.string.isRequired,
 };
 
 export default InviteModal;

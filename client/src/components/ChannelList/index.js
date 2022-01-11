@@ -70,7 +70,11 @@ const ChannelList = (props) => {
         aria-labelledby="invite-modal-title"
       >
         <div>
-          <InviteModal closeModal={toggleInviteModal} />
+          <InviteModal
+            serverId={currentServer.id}
+            closeModal={toggleInviteModal}
+            inviteUrls={currentServer.inviteUrls}
+          />
         </div>
       </TransitionModal>
     </>

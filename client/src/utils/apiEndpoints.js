@@ -12,3 +12,7 @@ export const UserApi = {
 export const ServerApi = {
   GET_SERVER_DETAILS: '/server',
 };
+
+export const InviteApi = {
+  CREATE_INVITE_URL: '/invite',
+};

@@ -14,7 +14,7 @@ export const InviteModalContainer = styled.div(({ theme }) => `
   };
 
   ${theme.breakpoints.up('sm')} {
-    width: 28rem;
+    width: 30rem;
   };
 `);
 
