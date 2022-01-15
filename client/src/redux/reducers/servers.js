@@ -16,10 +16,10 @@ export default (state = {}, action) => {
         };
         return acc;
       }, {});
-    case C.ADD_SERVER:
+    case C.JOIN_SERVER_SUCCESS:
       return {
         ...state,
-        [action.payload.data.serverId]: {
+        [action.payload.serverId]: {
           ...action.payload.data,
           isFetchingData: false,
           error: null,

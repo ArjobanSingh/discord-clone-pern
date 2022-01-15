@@ -10,9 +10,11 @@ import { getCharacterName } from '../../utils/helperFunctions';
 import { getJoinServerApi, getServerDetails } from '../../redux/reducers';
 import { joinServerRequested } from '../../redux/actions/servers';
 import DotLoader from '../../common/DotLoader';
+import Error from '../../common/Error';
+import useDidUpdate from '../../customHooks/useDidUpdate';
 
 const MainContent = (props) => {
-  const { server } = props;
+  const { server, inviteId } = props;
 
   const savedServer = useSelector((state) => getServerDetails(state, server.id));
   const joinServerApi = useSelector((state) => getJoinServerApi(state, server.id)) || {};
@@ -26,10 +28,15 @@ const MainContent = (props) => {
       return;
     }
 
-    dispatch(joinServerRequested(server.id));
+    dispatch(joinServerRequested(server, inviteId));
   };
 
   const { isLoading: isJoiningServer, error } = joinServerApi;
+
+  useDidUpdate(() => {
+    // after join server api success, savedServer will be present in reducer
+    if (savedServer) navigate(`/channels/${savedServer.id}`, { replace: true });
+  }, [savedServer]);
 
   return (
     <>
@@ -55,6 +62,7 @@ const MainContent = (props) => {
         <Typography variant="body2" visibility={isJoiningServer ? 'hidden' : ''}>Accept Invite</Typography>
         {isJoiningServer && <DotLoader />}
       </Button>
+      {!!error && <Error>{error.message || 'Something went wrong in joining server'}</Error>}
     </>
   );
 };
@@ -64,6 +72,7 @@ MainContent.propTypes = {
     name: PropTypes.string.isRequired,
     id: PropTypes.string.isRequired,
   }).isRequired,
+  inviteId: PropTypes.string.isRequired,
 };
 
 export default MainContent;

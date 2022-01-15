@@ -29,13 +29,6 @@ export const serverDetailsSuccess = (data) => ({
   },
 });
 
-export const addServer = (data) => ({
-  type: C.ADD_SERVER,
-  payload: {
-    data,
-  },
-});
-
 export const removeServer = (serverId) => ({
   type: C.REMOVE_SERVER,
   payload: { serverId },
@@ -46,9 +39,9 @@ export const saveUrl = (payload) => ({
   payload,
 });
 
-export const joinServerRequested = (serverId) => ({
+export const joinServerRequested = (server, inviteLink) => ({
   type: C.JOIN_SERVER_REQUESTED,
-  payload: { serverId },
+  payload: { server, inviteLink },
 });
 
 export const joinServerFailed = (serverId, error) => ({

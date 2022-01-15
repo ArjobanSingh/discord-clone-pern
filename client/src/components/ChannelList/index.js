@@ -1,5 +1,5 @@
 // import PropTypes from 'prop-types';
-import { memo, useState } from 'react';
+import { memo, useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
@@ -9,11 +9,19 @@ import { ChannelListContainer, InviteSection, InviteSectionWrapper } from './sty
 import TransitionModal from '../../common/TransitionModal';
 import InviteModal from '../InviteModal';
 import { getServerDetails } from '../../redux/reducers';
+import useUser from '../../customHooks/userUser';
+import { Roles } from '../../constants/serverMembers';
+import { ServerTypes } from '../../constants/servers';
 
 const ChannelList = (props) => {
   const params = useParams();
   const currentServer = useSelector((state) => getServerDetails(state, params.serverId));
+  const { user } = useUser();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+
+  const serverMember = useMemo(() => (
+    currentServer?.members?.find((member) => member.userId === user.id)
+  ), [currentServer?.members]);
 
   const toggleInviteModal = () => {
     setIsInviteModalOpen((prev) => !prev);
@@ -26,6 +34,10 @@ const ChannelList = (props) => {
   if (!currentServer) {
     return <div>No such server found</div>;
   }
+
+  // TODO: correct loading when fetching server members
+  const hideInvite = !serverMember
+    || (serverMember.role === Roles.USER && currentServer.type === ServerTypes.PRIVATE);
 
   return (
     <>
@@ -45,43 +57,47 @@ const ChannelList = (props) => {
             {`${currentServer.name[0].toUpperCase()}${currentServer.name.slice(1)}`}
           </Typography>
         </Header>
-        <InviteSectionWrapper>
-          <InviteSection>
-            {['An adventure begins.', 'Let\'s add some friends!'].map((text) => (
-              <Typography
-                key={text}
-                variant="body2"
-                component="div"
-                fontWeight="fontWeightLight"
-              >
-                {text}
+        {!hideInvite && (
+          <InviteSectionWrapper>
+            <InviteSection>
+              {['An adventure begins.', 'Let\'s add some friends!'].map((text) => (
+                <Typography
+                  key={text}
+                  variant="body2"
+                  component="div"
+                  fontWeight="fontWeightLight"
+                >
+                  {text}
 
-              </Typography>
-            ))}
-            <Button
-              type="submit"
-              color="primary"
-              variant="contained"
-              onClick={toggleInviteModal}
-            >
-              <div>Invite People</div>
-            </Button>
-          </InviteSection>
-        </InviteSectionWrapper>
+                </Typography>
+              ))}
+              <Button
+                type="submit"
+                color="primary"
+                variant="contained"
+                onClick={toggleInviteModal}
+              >
+                <div>Invite People</div>
+              </Button>
+            </InviteSection>
+          </InviteSectionWrapper>
+        )}
       </ChannelListContainer>
-      <TransitionModal
-        open={isInviteModalOpen}
-        onClose={toggleInviteModal}
-        aria-labelledby="invite-modal-title"
-      >
-        <div>
-          <InviteModal
-            serverId={currentServer.id}
-            closeModal={toggleInviteModal}
-            inviteUrls={currentServer.inviteUrls}
-          />
-        </div>
-      </TransitionModal>
+      {!hideInvite && (
+        <TransitionModal
+          open={isInviteModalOpen}
+          onClose={toggleInviteModal}
+          aria-labelledby="invite-modal-title"
+        >
+          <div>
+            <InviteModal
+              serverId={currentServer.id}
+              closeModal={toggleInviteModal}
+              inviteUrls={currentServer.inviteUrls}
+            />
+          </div>
+        </TransitionModal>
+      )}
     </>
   );
 };

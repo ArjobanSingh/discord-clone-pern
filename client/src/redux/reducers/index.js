@@ -21,6 +21,7 @@ const rootReducer = (state, action) => {
 
 export default rootReducer;
 
+// root selectors
 export const getJoinServerApi = (state, serverId) => (
   fromJoinServer.getJoinServerApi(state.joinServers, serverId)
 );

@@ -8,6 +8,9 @@ export const JOIN_SERVER_REQUESTED = 'JOIN_SERVER_REQUESTED';
 export const JOIN_SERVER_FAILED = 'JOIN_SERVER_FAILED';
 export const JOIN_SERVER_SUCCESS = 'JOIN_SERVER_SUCCESS';
 
-export const ADD_SERVER = 'ADD_SERVER';
 export const REMOVE_SERVER = 'REMOVE_SERVER';
 export const SAVE_INVITE_URL = 'SAVE_INVITE_URL';
+
+export const ServerTypes = {
+  PRIVATE: 'private',
+};

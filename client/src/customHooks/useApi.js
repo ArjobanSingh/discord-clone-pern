@@ -35,7 +35,7 @@ const useApi = (
       dispatch({ type: API_SUCCESS, payload: { data: reponse } });
     } catch (err) {
       const sessionExpireError = handleError(err, (error) => {
-        dispatch({ type: API_SUCCESS, payload: { error } });
+        dispatch({ type: API_FAILED, payload: { error } });
       });
       if (sessionExpireError) dispatch(sessionExpireError);
     }
