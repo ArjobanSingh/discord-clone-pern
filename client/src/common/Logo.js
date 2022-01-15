@@ -1,8 +1,8 @@
 const Logo = () => (
   <svg
     aria-hidden="false"
-    width="28"
-    height="20"
+    width="1em"
+    height="1em"
     viewBox="0 0 28 20"
   >
     <path

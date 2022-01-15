@@ -8,10 +8,11 @@ import { Header } from '../../common/StyledComponents';
 import { ChannelListContainer, InviteSection, InviteSectionWrapper } from './styles';
 import TransitionModal from '../../common/TransitionModal';
 import InviteModal from '../InviteModal';
+import { getServerDetails } from '../../redux/reducers';
 
 const ChannelList = (props) => {
   const params = useParams();
-  const currentServer = useSelector((state) => state.servers[params.serverId]);
+  const currentServer = useSelector((state) => getServerDetails(state, params.serverId));
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   const toggleInviteModal = () => {
@@ -20,6 +21,10 @@ const ChannelList = (props) => {
 
   if (!params.serverId) {
     return <div>Me server list</div>;
+  }
+
+  if (!currentServer) {
+    return <div>No such server found</div>;
   }
 
   return (

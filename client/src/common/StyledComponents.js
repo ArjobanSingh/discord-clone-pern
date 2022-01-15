@@ -5,7 +5,7 @@ export const FlexDiv = styled.div(({ theme, injectCss }) => `
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  ${injectCss(theme)}
+  ${typeof injectCss === 'function' ? injectCss(theme) : injectCss}
 `);
 
 export const Header = styled.header`

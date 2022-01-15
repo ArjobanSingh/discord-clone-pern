@@ -38,14 +38,14 @@ export const VerticalBar = styled('div')(({ theme, selected }) => `
   transition: height 0.2s;
 `);
 
-export const StyledAvatar = styled(Avatar)(({ theme, selected }) => `
+export const StyledAvatar = styled(Avatar)(({ theme, selected, fontSize }) => `
   background-color: ${selected
     ? theme.palette.primary.main : theme.palette.background.default};
   color: ${theme.palette.text.primary};
   width: 50px;
   height: 50px;
   transition: border-radius 0.2s, transform 0.2s;
-  font-size: ${theme.typography.subtitle1.fontSize};
+  font-size: ${fontSize || theme.typography.subtitle1.fontSize};
   border-radius: ${selected ? '30%' : '50%'};
   position: revert;
 

@@ -69,7 +69,7 @@ export default (state = {}, action) => {
         inviteUrls: {
           ...newState[serverId].inviteUrls,
           [minutes]: {
-            inviteUrl: `${APP_URL}/${inviteUrl}`,
+            inviteUrl: `${APP_URL}/invite/${inviteUrl}`,
             expireAt,
           },
         },
@@ -80,3 +80,6 @@ export default (state = {}, action) => {
       return state;
   }
 };
+
+export const getAllServers = (state) => state;
+export const getServerDetails = (state, serverId) => state[serverId];

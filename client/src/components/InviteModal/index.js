@@ -34,13 +34,13 @@ const InviteModal = (props) => {
       const response = await axiosInstance.post(InviteApi.CREATE_INVITE_URL, payload);
       dispatch(saveUrl(response.data));
     } catch (err) {
-      // if current opened Server and server whose url is requeted matches
-      // than only show error
+      // if current opened Server and server whose url is requeted matches, than only show error
       if (requestedServerId === serverId) {
-        handleError(err, (error) => {
+        const sessionExpireError = handleError(err, (error) => {
           setIsFetchError(true);
           setJoinUrl(error.message || 'Something went wrong');
         });
+        if (sessionExpireError) dispatch(sessionExpireError);
       }
     }
   };
@@ -147,12 +147,12 @@ const InviteModal = (props) => {
               </Button>
             )}
             injectCss={(theme) => `
-            height: 41px;
-            padding-block: ${theme.spacing(0.5)};
+              height: 41px;
+              padding-block: ${theme.spacing(0.5)};
 
-            &:focus-within {
-              border: 1px solid ${theme.palette.primary.main};
-            }
+              &:focus-within {
+                border: 1px solid ${theme.palette.primary.main};
+              }
           `}
           />
         </div>

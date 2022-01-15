@@ -14,9 +14,10 @@ import {
 } from './styles';
 import Logo from '../../common/Logo';
 import ChannelList from '../ChannelList';
+import { getAllServers } from '../../redux/reducers';
 
 const AllServersDrawer = () => {
-  const servers = useSelector((state) => state.servers);
+  const servers = useSelector(getAllServers);
 
   return (
     <SidebarContainer>
@@ -26,6 +27,7 @@ const AllServersDrawer = () => {
             <AvatarWrapper>
               <StyledAvatar
                 selected={isActive}
+                fontSize="1.7rem"
               >
                 <Logo />
               </StyledAvatar>

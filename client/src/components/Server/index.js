@@ -2,8 +2,8 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, Outlet, useParams } from 'react-router-dom';
-import LoadingErrorWrapper from '../../containers/LoadingErrorWrapper';
 import { serverDetailsRequested } from '../../redux/actions/servers';
+import { getServerDetails } from '../../redux/reducers';
 
 const dummyChannels = [{ channelId: 'first-channel-id' }];
 
@@ -11,7 +11,7 @@ const dummyChannels = [{ channelId: 'first-channel-id' }];
 const Server = (props) => {
   const params = useParams();
   const dispatch = useDispatch();
-  const serverDetails = useSelector((state) => state.servers[params.serverId]);
+  const serverDetails = useSelector((state) => getServerDetails(state, params.serverId));
 
   useEffect(() => {
     if (serverDetails) {
@@ -31,21 +31,11 @@ const Server = (props) => {
   // TODO: use real channels data, and remove this default dummyChannels
   const { channels: [{ channelId: fistChannelId }] = dummyChannels } = serverDetails;
 
-  return (
-    <LoadingErrorWrapper
-      isError={!!serverDetails.error}
-      errorUi={<div>Server fetch error</div>}
-      isLoading={serverDetails.isFetchingData && !serverDetails.members}
-      loader={<div>Server Loading...</div>}
-    >
-      {/* if user directly navigating to some channel open that channel,
-        otherwise navigate user to first channel of opened server */}
-      {params.channelId
-        ? <Outlet />
-        : <Navigate replace to={`/channels/${serverDetails.id}/${fistChannelId}`} />}
+  if (serverDetails.error) return <div>Server fetch error</div>;
+  if (serverDetails.isFetchingData && !serverDetails.members) return <div>Server Loading...</div>;
 
-    </LoadingErrorWrapper>
-  );
+  if (params.channelId) return <Outlet />;
+  return <Navigate replace to={`/channels/${serverDetails.id}/${fistChannelId}`} />;
 };
 
 Server.propTypes = {

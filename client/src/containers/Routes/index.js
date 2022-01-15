@@ -7,6 +7,7 @@ import Server from '../../components/Server';
 import Channel from '../../components/Channel';
 import MeServer from '../../components/MeServer';
 import Auth from '../../components/Auth';
+import InvitePage from '../InvitePage';
 
 // const Auth = lazy(() => import('./components/Auth'));
 
@@ -16,6 +17,14 @@ const AppRoutes = (props) => (
       <Route
         path="/login"
         element={<Auth />}
+      />
+      <Route
+        path="/invite/:inviteId"
+        element={(
+          <RequireAuth>
+            <InvitePage />
+          </RequireAuth>
+      )}
       />
       <Route
         path="channels"

@@ -1,25 +1,17 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import Box from '@mui/material/Box';
 import ResponsiveDrawer from '../../common/ResponsiveDrawer';
 import useUser from '../../customHooks/userUser';
-import { userRequested } from '../../redux/actions/user';
 import useMobileDrawerState from '../../customHooks/useMobileDrawerState';
 import AllServersDrawer from '../../components/AllServersDrawer';
 
 const Servers = (props) => {
-  const dispatch = useDispatch();
   const { user, isLoading, error } = useUser();
 
   const [mobileOpen, handleMobileDrawerToggle] = useMobileDrawerState();
-
-  useEffect(() => {
-    if (!user) dispatch(userRequested());
-  }, []);
 
   if (error) return error.message;
 

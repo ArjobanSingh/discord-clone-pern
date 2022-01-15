@@ -15,4 +15,5 @@ export const ServerApi = {
 
 export const InviteApi = {
   CREATE_INVITE_URL: '/invite',
+  VERIFY_INVITE_URL: '/invite',
 };

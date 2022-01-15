@@ -54,7 +54,7 @@ const Auth = () => {
           width={{ xs: '100%', sm: '500px' }}
           backgroundColor="background.paper"
           padding={(theme) => theme.spacing(3)}
-          borderRadius={1.25}
+          borderRadius={{ xs: 0, sm: 1.25 }}
         >
           <Box
             marginTop={{ xs: '100px', sm: '0' }}

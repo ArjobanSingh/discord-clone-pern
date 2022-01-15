@@ -112,6 +112,39 @@ export const joinServer = async (req: CustomRequest, res: Response, next: NextFu
   }
 };
 
+export const leaveServer = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { serverId } = req.params;
+    if (!serverId || !isUUID(serverId)) {
+      next(new CustomError('Invalid serverId', 400));
+      return;
+    }
+
+    const server = await Server.findOne(serverId);
+
+    if (!server) {
+      // no corresponding server, nothing to do
+      res.status(204).json();
+      return;
+    }
+
+    if (server.ownerId === req.userId) {
+      // TODO: owner cannot leave server for now
+      next(new CustomError('Owner cannot leave it\'s own server', 403));
+      return;
+    }
+
+    await ServerMember.delete({
+      serverId,
+      userId: req.userId,
+    });
+
+    res.status(204).json();
+  } catch (err) {
+    next(err);
+  }
+};
+
 // TODO: make this paginated based on popularity or number of members in desc
 export const getAllServers = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {

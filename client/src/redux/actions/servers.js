@@ -45,3 +45,18 @@ export const saveUrl = (payload) => ({
   type: C.SAVE_INVITE_URL,
   payload,
 });
+
+export const joinServerRequested = (serverId) => ({
+  type: C.JOIN_SERVER_REQUESTED,
+  payload: { serverId },
+});
+
+export const joinServerFailed = (serverId, error) => ({
+  type: C.JOIN_SERVER_FAILED,
+  payload: { serverId, error },
+});
+
+export const joinServerSucess = (serverId, data) => ({
+  type: C.JOIN_SERVER_SUCCESS,
+  payload: { serverId, data },
+});
