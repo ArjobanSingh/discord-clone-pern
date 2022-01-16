@@ -9,7 +9,7 @@ import { ChannelListContainer, InviteSection, InviteSectionWrapper } from './sty
 import TransitionModal from '../../common/TransitionModal';
 import InviteModal from '../InviteModal';
 import { getServerDetails } from '../../redux/reducers';
-import useUser from '../../customHooks/userUser';
+import useUser from '../../customHooks/useUser';
 import { Roles } from '../../constants/serverMembers';
 import { ServerTypes } from '../../constants/servers';
 

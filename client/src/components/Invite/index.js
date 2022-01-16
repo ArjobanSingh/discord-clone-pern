@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import { Wrapper } from './styles';
 import { InviteApi } from '../../utils/apiEndpoints';
-import useUser from '../../customHooks/userUser';
+import useUser from '../../customHooks/useUser';
 import useApi from '../../customHooks/useApi';
 import MainContent from './MainContent';
 import { INVITE_LINK_EXPIRED } from '../../constants/images';

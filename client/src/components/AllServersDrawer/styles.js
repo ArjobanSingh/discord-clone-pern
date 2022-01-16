@@ -37,10 +37,16 @@ export const VerticalBar = styled('div')(({ theme, selected }) => `
   background-color: ${theme.palette.text.primary};
   transition: height 0.2s;
 `);
+const getBackgroundColor = ({ theme, selected, explore }) => {
+  if (!selected) return theme.palette.background.default;
+  if (explore) return theme.palette.success.light;
+  return theme.palette.primary.main;
+};
 
-export const StyledAvatar = styled(Avatar)(({ theme, selected, fontSize }) => `
-  background-color: ${selected
-    ? theme.palette.primary.main : theme.palette.background.default};
+export const StyledAvatar = styled(Avatar)(({
+  theme, selected, fontSize, explore,
+}) => `
+  background-color: ${getBackgroundColor({ theme, selected, explore })};
   color: ${theme.palette.text.primary};
   width: 50px;
   height: 50px;
@@ -51,7 +57,8 @@ export const StyledAvatar = styled(Avatar)(({ theme, selected, fontSize }) => `
 
   &:hover {
     border-radius: 30%;
-    background-color: ${theme.palette.primary.main};
+    background-color: ${explore
+    ? theme.palette.success.light : theme.palette.primary.main};
     cursor: pointer;
   };
 

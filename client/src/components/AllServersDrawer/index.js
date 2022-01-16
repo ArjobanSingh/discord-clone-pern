@@ -1,4 +1,4 @@
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import {
   NavLink,
 } from 'react-router-dom';
@@ -15,14 +15,15 @@ import {
 import Logo from '../../common/Logo';
 import ChannelList from '../ChannelList';
 import { getAllServers } from '../../redux/reducers';
+import Explore from '../../common/Explore';
 
-const AllServersDrawer = () => {
+const AllServersDrawer = ({ isDiscoveryPage }) => {
   const servers = useSelector(getAllServers);
 
   return (
     <SidebarContainer>
       <ServerIconList>
-        <NavLink to="@me">
+        <NavLink to="/channels/@me">
           {({ isActive }) => (
             <AvatarWrapper>
               <StyledAvatar
@@ -38,7 +39,7 @@ const AllServersDrawer = () => {
 
         <Bar />
         {Object.values(servers).map((server) => (
-          <NavLink to={server.id} key={server.id}>
+          <NavLink to={`/channels/${server.id}`} key={server.id}>
             {({ isActive }) => (
               <AvatarWrapper>
                 <StyledAvatar
@@ -52,14 +53,29 @@ const AllServersDrawer = () => {
             )}
           </NavLink>
         ))}
+
+        <NavLink to="/guild-discovery">
+          {({ isActive }) => (
+            <AvatarWrapper>
+              <StyledAvatar
+                explore
+                selected={isActive}
+                fontSize="1.7rem"
+              >
+                <Explore />
+              </StyledAvatar>
+              <VerticalBar selected={isActive} />
+            </AvatarWrapper>
+          )}
+        </NavLink>
       </ServerIconList>
-      <ChannelList />
+      {!isDiscoveryPage && <ChannelList />}
     </SidebarContainer>
   );
 };
 
 AllServersDrawer.propTypes = {
-
+  isDiscoveryPage: PropTypes.bool.isRequired,
 };
 
 export default AllServersDrawer;

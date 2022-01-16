@@ -8,6 +8,7 @@ import Channel from '../../components/Channel';
 import MeServer from '../../components/MeServer';
 import Auth from '../../components/Auth';
 import InvitePage from '../InvitePage';
+import ServerDiscovery from '../../components/ServerDiscovery';
 
 // const Auth = lazy(() => import('./components/Auth'));
 
@@ -18,6 +19,16 @@ const AppRoutes = (props) => (
         path="/login"
         element={<Auth />}
       />
+      <Route
+        path="/guild-discovery"
+        element={(
+          <RequireAuth>
+            <Servers />
+          </RequireAuth>
+      )}
+      >
+        <Route index element={<ServerDiscovery />} />
+      </Route>
       <Route
         path="/invite/:inviteId"
         element={(
