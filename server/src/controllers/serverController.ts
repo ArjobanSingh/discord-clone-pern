@@ -18,12 +18,15 @@ export const createServer = async (req: CustomRequest, res: Response, next: Next
     const { userId, body } = req;
 
     const user = await User.findOne(userId);
-    const { avatar } = body;
+    const { avatar, description } = body;
 
     const newServer = new Server();
     newServer.name = body.name;
     newServer.owner = user;
     newServer.type = body.type || ServerTypeEnum.PUBLIC;
+    newServer.memberCount = 1;
+
+    if (isString(description)) newServer.description = description;
     if (isString(avatar) && isURL(avatar)) newServer.avatar = avatar;
 
     const errors = await validate(newServer);
@@ -104,7 +107,12 @@ export const joinServer = async (req: CustomRequest, res: Response, next: NextFu
     serverMember.user = user;
     serverMember.server = server;
 
-    await serverMember.save();
+    // either save or fail both
+    await getConnection().transaction(async (transactionEntityManager) => {
+      // TODO: use insert method to prevent unncessary SELECT query before inserting
+      await transactionEntityManager.save(serverMember);
+      await transactionEntityManager.update(Server, server.id, { memberCount: () => '"memberCount" + 1' });
+    });
 
     res.status(204).json();
   } catch (err) {
@@ -134,9 +142,9 @@ export const leaveServer = async (req: CustomRequest, res: Response, next: NextF
       return;
     }
 
-    await ServerMember.delete({
-      serverId,
-      userId: req.userId,
+    await getConnection().transaction(async (transactionEntityManager) => {
+      await transactionEntityManager.delete(ServerMember, { serverId, userId: req.userId });
+      await transactionEntityManager.update(Server, serverId, { memberCount: () => '"memberCount" - 1' });
     });
 
     res.status(204).json();

@@ -1,5 +1,5 @@
 import {
-  IsEnum, IsNotEmpty, IsString, IsUrl, Length,
+  IsEnum, IsNotEmpty, IsString, Length, MaxLength,
 } from 'class-validator';
 import {
   BaseEntity, Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
@@ -19,8 +19,13 @@ export default class Server extends BaseEntity {
 
     @Column({ length: 120 })
     @IsNotEmpty()
+    @IsString()
     @Length(3, 120)
     name: string;
+
+    @Column({ length: 2000, nullable: true })
+    @MaxLength(2000)
+    description: string;
 
     @Column('uuid')
     ownerId: string;
@@ -39,6 +44,12 @@ export default class Server extends BaseEntity {
       default: 0,
     })
     channelCount: number;
+
+    // easy way to get members count, instead of getting all relations with query
+    @Column({
+      default: 0,
+    })
+    memberCount: number;
 
     @Column({
       type: 'enum',
