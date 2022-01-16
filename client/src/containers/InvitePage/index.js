@@ -30,8 +30,8 @@ const InvitePage = (props) => {
           item
           height={{ xs: '100%', sm: 'auto' }}
           width={{ xs: '100%', sm: '500px' }}
-          minHeight="265px"
-          backgroundColor="background.paper"
+          minHeight="260px"
+          backgroundColor="background.default"
           padding={(theme) => theme.spacing(3)}
           borderRadius={{ xs: 0, sm: 1.25 }}
         >

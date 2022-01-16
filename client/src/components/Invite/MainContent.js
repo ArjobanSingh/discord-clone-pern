@@ -5,13 +5,14 @@ import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { FlexDiv } from '../../common/StyledComponents';
-import { serverLogoSx } from './styles';
+import { logoSx, serverLogoSx } from './styles';
 import { getCharacterName } from '../../utils/helperFunctions';
 import { getJoinServerApi, getServerDetails } from '../../redux/reducers';
 import { joinServerRequested } from '../../redux/actions/servers';
 import DotLoader from '../../common/DotLoader';
 import Error from '../../common/Error';
 import useDidUpdate from '../../customHooks/useDidUpdate';
+import Logo from '../../common/Logo';
 
 const MainContent = (props) => {
   const { server, inviteId } = props;
@@ -40,6 +41,9 @@ const MainContent = (props) => {
 
   return (
     <>
+      <Avatar sx={logoSx}>
+        <Logo />
+      </Avatar>
       <Typography
         variant="subtitle2"
         color="text.secondaryDark"

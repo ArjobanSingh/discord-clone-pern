@@ -24,3 +24,7 @@ export const serverLogoSx = {
   width: '30px',
   height: '30px',
 };
+
+export const skeletonButtonSx = {
+  borderRadius: (theme) => `${theme.shape.borderRadius}px`,
+};
