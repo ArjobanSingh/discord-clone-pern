@@ -3,7 +3,7 @@ import { AUTH_SIGN_OUT_SUCCESS } from '../../constants/auth';
 import auth from './auth';
 import user from './user';
 import servers, * as fromServers from './servers';
-import joinServers, * as fromJoinServer from '../../constants/join-servers';
+import joinServers, * as fromJoinServer from './join-servers';
 
 const appReducer = combineReducers({
   auth,

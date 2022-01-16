@@ -109,8 +109,7 @@ export const joinServer = async (req: CustomRequest, res: Response, next: NextFu
 
     // either save or fail both
     await getConnection().transaction(async (transactionEntityManager) => {
-      // TODO: use insert method to prevent unncessary SELECT query before inserting
-      await transactionEntityManager.save(serverMember);
+      await transactionEntityManager.insert(ServerMember, serverMember);
       await transactionEntityManager.update(Server, server.id, { memberCount: () => '"memberCount" + 1' });
     });
 

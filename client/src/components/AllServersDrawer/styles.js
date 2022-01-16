@@ -1,4 +1,4 @@
-import { styled } from '@mui/material/styles';
+import styled from 'styled-components';
 import Avatar from '@mui/material/Avatar';
 
 export const SidebarContainer = styled('aside')`

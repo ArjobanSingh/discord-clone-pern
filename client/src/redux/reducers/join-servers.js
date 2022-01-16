@@ -1,4 +1,4 @@
-import * as C from './servers';
+import * as C from '../../constants/servers';
 
 export default (state = {}, action) => {
   switch (action.type) {

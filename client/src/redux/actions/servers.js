@@ -53,3 +53,17 @@ export const joinServerSucess = (serverId, data) => ({
   type: C.JOIN_SERVER_SUCCESS,
   payload: { serverId, data },
 });
+
+export const exploreServersRequested = () => ({
+  type: C.EXPLORE_SERVERS_REQUESTED,
+});
+
+export const exploreServersFailed = (error) => ({
+  type: C.EXPLORE_SERVERS_REQUESTED,
+  payload: { error },
+});
+
+export const exploreServersSuccess = (data) => ({
+  type: C.EXPLORE_SERVERS_SUCCESS,
+  payload: { data },
+});

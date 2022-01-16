@@ -58,7 +58,7 @@ const AllServersDrawer = ({ isDiscoveryPage }) => {
           {({ isActive }) => (
             <AvatarWrapper>
               <StyledAvatar
-                explore
+                explore="true" // to prevent bool attribute being passed to dom element
                 selected={isActive}
                 fontSize="1.7rem"
               >
