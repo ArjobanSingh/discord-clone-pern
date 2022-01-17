@@ -37,3 +37,5 @@ export const getRegisterAuthState = (state) => fromAuth.getRegisterAuthState(sta
 export const getIsAuthenticated = (state) => fromAuth.getIsAuthenticated(state.auth);
 
 export const getUser = (state) => state.user;
+
+export const getExploreServers = (state) => state.exploreServers;
