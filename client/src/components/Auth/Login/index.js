@@ -10,12 +10,13 @@ import { signInRequested } from '../../../redux/actions/auth';
 import DotLoader from '../../../common/DotLoader';
 import Error from '../../../common/Error';
 import useAuthState from '../../../customHooks/useAuthState';
+import { getLoginAuthState } from '../../../redux/reducers';
 
 const Login = (props) => {
   const { switchScreen } = props;
   const dispatch = useDispatch();
 
-  const { isLoading, errors, setErrors } = useAuthState((state) => state.auth.login);
+  const { isLoading, errors, setErrors } = useAuthState((state) => getLoginAuthState(state));
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -44,3 +44,7 @@ export default combineReducers({
   login: loginReducer,
   register: registerReducer,
 });
+
+export const getLoginAuthState = (state) => state.login;
+export const getRegisterAuthState = (state) => state.register;
+export const getIsAuthenticated = (state) => state.main.isAuthenticated;

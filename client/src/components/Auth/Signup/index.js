@@ -10,12 +10,13 @@ import Error from '../../../common/Error';
 import DotLoader from '../../../common/DotLoader';
 import useAuthState from '../../../customHooks/useAuthState';
 import { registrationRequested } from '../../../redux/actions/auth';
+import { getRegisterAuthState } from '../../../redux/reducers';
 
 const Signup = (props) => {
   const { switchScreen } = props;
   const dispatch = useDispatch();
 
-  const { isLoading, errors, setErrors } = useAuthState((state) => state.auth.register);
+  const { isLoading, errors, setErrors } = useAuthState((state) => getRegisterAuthState(state));
 
   const handleSubmit = (e) => {
     e.preventDefault();

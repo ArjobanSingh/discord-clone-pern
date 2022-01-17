@@ -155,10 +155,10 @@ export const leaveServer = async (req: CustomRequest, res: Response, next: NextF
 // TODO: make this paginated based on popularity or number of members in desc
 export const getAllServers = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
-    const { cursor, limit = '20' } = req.query as AllServersQuery;
+    const { cursor, limit = '50' } = req.query as AllServersQuery;
     const limitNumber = parseInt(limit, 10);
 
-    const take = Number.isNaN(limitNumber) || limitNumber > 20 ? 20 : limitNumber;
+    const take = Number.isNaN(limitNumber) || limitNumber > 50 ? 50 : limitNumber;
     const queryObj: FindManyOptions = {
       where: { type: ServerTypeEnum.PUBLIC },
       order: { createdAt: 'DESC' },

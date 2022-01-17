@@ -1,10 +1,11 @@
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { userRequested } from '../redux/actions/user';
+import { getUser } from '../redux/reducers';
 import useIsAuthenticated from './useIsAuthenticated';
 
 const useUser = () => {
-  const { user, isLoading, error } = useSelector((state) => state.user);
+  const { user, isLoading, error } = useSelector((state) => getUser(state));
   const isAuthenticated = useIsAuthenticated();
 
   const dispatch = useDispatch();

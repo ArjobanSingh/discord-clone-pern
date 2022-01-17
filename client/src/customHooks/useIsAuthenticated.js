@@ -1,7 +1,8 @@
 import { useSelector } from 'react-redux';
+import { getIsAuthenticated } from '../redux/reducers';
 
 const useIsAuthenticated = () => {
-  const isAuthenticated = useSelector((state) => state.auth.main.isAuthenticated);
+  const isAuthenticated = useSelector((state) => getIsAuthenticated(state));
   return isAuthenticated;
 };
 
