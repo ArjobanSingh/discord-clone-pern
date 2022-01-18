@@ -2,8 +2,10 @@ import {
   all, call, put, takeEvery, takeLatest,
 } from 'redux-saga/effects';
 import axiosInstance from '../utils/axiosConfig';
-import { JOIN_SERVER_REQUESTED, SERVER_DETAILS_REQUESTED } from '../constants/servers';
+import { EXPLORE_SERVERS_REQUESTED, JOIN_SERVER_REQUESTED, SERVER_DETAILS_REQUESTED } from '../constants/servers';
 import {
+  exploreServersFailed,
+  exploreServersSuccess,
   joinServerFailed, joinServerSucess, serverDetailsFailed, serverDetailsSuccess,
 } from '../redux/actions/servers';
 import { handleError } from '../utils/helperFunctions';
@@ -12,7 +14,7 @@ import { ServerApi } from '../utils/apiEndpoints';
 function* getServerDetails(actionData) {
   const { serverId } = actionData.payload;
   try {
-    const url = `${ServerApi.GET_SERVER_DETAILS}/${serverId}`;
+    const url = `${ServerApi.GET_SERVER}/${serverId}`;
     const response = yield call(axiosInstance.get, url);
     yield put(serverDetailsSuccess(response.data));
   } catch (err) {
@@ -39,9 +41,22 @@ function* joinServer(actionData) {
   }
 }
 
+function* getPublicServers() {
+  try {
+    const url = ServerApi.GET_SERVER;
+    const response = yield call(axiosInstance.get, url);
+    yield put(exploreServersSuccess(response.data));
+  } catch (err) {
+    yield put(
+      handleError(err, (error) => exploreServersFailed(error)),
+    );
+  }
+}
+
 export default function* serverSaga() {
   yield all([
     takeEvery(SERVER_DETAILS_REQUESTED, getServerDetails),
     takeLatest(JOIN_SERVER_REQUESTED, joinServer),
+    takeLatest(EXPLORE_SERVERS_REQUESTED, getPublicServers),
   ]);
 }

@@ -1,5 +1,5 @@
 import {
-  IsEnum, IsNotEmpty, IsString, Length, MaxLength,
+  IsEnum, IsNotEmpty, IsOptional, IsString, Length, MaxLength,
 } from 'class-validator';
 import {
   BaseEntity, Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
@@ -24,7 +24,8 @@ export default class Server extends BaseEntity {
     name: string;
 
     @Column({ length: 2000, nullable: true })
-    @MaxLength(2000)
+    @IsOptional()
+    @Length(0, 2000)
     description: string;
 
     @Column('uuid')

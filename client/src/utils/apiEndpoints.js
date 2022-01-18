@@ -10,7 +10,7 @@ export const UserApi = {
 };
 
 export const ServerApi = {
-  GET_SERVER_DETAILS: '/server',
+  GET_SERVER: '/server',
   JOIN_SERVER: '/server/join-server',
 };
 

@@ -59,7 +59,7 @@ export const exploreServersRequested = () => ({
 });
 
 export const exploreServersFailed = (error) => ({
-  type: C.EXPLORE_SERVERS_REQUESTED,
+  type: C.EXPLORE_SERVERS_FAILED,
   payload: { error },
 });
 
