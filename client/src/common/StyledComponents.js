@@ -19,3 +19,10 @@ export const Header = styled.header`
   display: flex;
   align-items: center;
 `;
+
+export const EllipsisDiv = styled.div`
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: ${({ linesCount }) => linesCount || '2'};
+`;

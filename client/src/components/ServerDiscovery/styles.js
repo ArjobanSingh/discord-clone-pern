@@ -16,4 +16,11 @@ export const DiscoveryContainer = styled.div`
   max-width: 93.75rem;
   display: flex;
   gap: 20px;
+
+  & > img {
+    display: none;
+    ${({ theme }) => theme.breakpoints.up('sm')} {
+      display: inline;
+    };
+  }
 `;

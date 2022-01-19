@@ -1,13 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Grid, GridTile } from './styles';
+import SingleServerTile from './SIngleServerTile';
 
 const PublicServersGrid = (props) => {
   const { servers } = props;
   return (
     <Grid>
       {servers.map((server) => (
-        <GridTile key={server.id}>{server.name}</GridTile>
+        <GridTile key={server.id}>
+          <SingleServerTile server={server} />
+        </GridTile>
       ))}
     </Grid>
   );
