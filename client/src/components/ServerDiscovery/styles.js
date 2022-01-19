@@ -5,7 +5,7 @@ export const Wrapper = styled.div`
   flex-direction: column;
   width: 100%;
   align-items: center;
-  overflow: auto;
+  // overflow: auto;
 `;
 
 export const DiscoveryContainer = styled.div`

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+// import { FixedSizeGrid } from 'react-window';
 import { Grid, GridTile } from './styles';
 import SingleServerTile from './SIngleServerTile';
 
