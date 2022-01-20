@@ -3,7 +3,6 @@ import {
   NavLink,
 } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { getCharacterName } from '../../utils/helperFunctions';
 import {
   AvatarWrapper,
   Bar,
@@ -14,11 +13,13 @@ import {
 } from './styles';
 import Logo from '../../common/Logo';
 import ChannelList from '../ChannelList';
-import { getAllServers } from '../../redux/reducers';
+import { getAllExploreServersData, getAllServers } from '../../redux/reducers';
 import Explore from '../../common/Explore';
+import ServersList from './ServersList';
 
 const AllServersDrawer = ({ isDiscoveryPage }) => {
   const servers = useSelector(getAllServers);
+  const exploreServers = useSelector(getAllExploreServersData);
 
   return (
     <SidebarContainer>
@@ -37,22 +38,9 @@ const AllServersDrawer = ({ isDiscoveryPage }) => {
           )}
         </NavLink>
 
+        <ServersList servers={exploreServers} />
         <Bar />
-        {Object.values(servers).map((server) => (
-          <NavLink to={`/channels/${server.id}`} key={server.id}>
-            {({ isActive }) => (
-              <AvatarWrapper>
-                <StyledAvatar
-                  src={server.avatar}
-                  selected={isActive}
-                >
-                  {getCharacterName(server.name)}
-                </StyledAvatar>
-                <VerticalBar selected={isActive} />
-              </AvatarWrapper>
-            )}
-          </NavLink>
-        ))}
+        <ServersList servers={servers} />
 
         <NavLink to="/guild-discovery">
           {({ isActive }) => (

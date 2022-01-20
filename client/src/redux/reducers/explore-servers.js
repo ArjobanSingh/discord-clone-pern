@@ -1,7 +1,8 @@
+import { combineReducers } from 'redux';
 import * as C from '../../constants/servers';
 
 // TODO: load more servers
-export default (state = { data: null, error: null, isLoading: false }, action) => {
+const publicServersList = (state = { data: null, error: null, isLoading: false }, action) => {
   switch (action.type) {
     case C.EXPLORE_SERVERS_REQUESTED:
       return {
@@ -29,3 +30,19 @@ export default (state = { data: null, error: null, isLoading: false }, action) =
       return state;
   }
 };
+
+const publicServersData = (state = {}, action) => {
+  switch (action.type) {
+    default:
+      return state;
+  }
+};
+
+export default combineReducers({
+  publicServersList,
+  publicServersData,
+});
+
+export const getExploreServersList = (state) => state.publicServersList;
+export const getAllExploreServersData = (state) => state.publicServersData;
+export const getExploreServerData = (state, serverId) => state.publicServersData[serverId];

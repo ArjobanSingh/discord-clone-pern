@@ -20,6 +20,7 @@ const Server = (props) => {
         dispatch(serverDetailsRequested(serverDetails.id));
       }
     }
+    // server not in user servers, means either no such server or user is checking any public server
   }, [serverDetails]);
 
   if (!serverDetails) {
@@ -32,8 +33,7 @@ const Server = (props) => {
   const { channels: [{ channelId: fistChannelId }] = dummyChannels } = serverDetails;
 
   if (serverDetails.error) return <div>Server fetch error</div>;
-  if (serverDetails.isFetchingData && !serverDetails.members) return <div>Server Loading...</div>;
-
+  if (serverDetails.isFetchingData || !serverDetails.members) return <div>Server Loading...</div>;
   if (params.channelId) return <Outlet />;
   return <Navigate replace to={`/channels/${serverDetails.id}/${fistChannelId}`} />;
 };

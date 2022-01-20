@@ -1,15 +1,14 @@
 import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { FlexDiv } from '../../common/StyledComponents';
 import { DISCOVER_SERVERS_BACKGROUND } from '../../constants/images';
 import { exploreServersRequested } from '../../redux/actions/servers';
-import { getExploreServers } from '../../redux/reducers';
+import { getExploreServersList } from '../../redux/reducers';
 import PublicServersGrid from '../PublicServersGrid';
 import { DiscoveryContainer, Wrapper } from './styles';
 
 const ServerDiscovery = (props) => {
-  const { data, error } = useSelector(getExploreServers);
+  const { data, error } = useSelector(getExploreServersList);
   const dispatch = useDispatch();
 
   useEffect(() => {

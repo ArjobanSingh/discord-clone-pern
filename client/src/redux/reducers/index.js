@@ -4,7 +4,7 @@ import auth, * as fromAuth from './auth';
 import user from './user';
 import servers, * as fromServers from './servers';
 import joinServers, * as fromJoinServer from './join-servers';
-import exploreServers from './explore-servers';
+import exploreServers, * as fromExploreServers from './explore-servers';
 
 const appReducer = combineReducers({
   auth,
@@ -38,4 +38,14 @@ export const getIsAuthenticated = (state) => fromAuth.getIsAuthenticated(state.a
 
 export const getUser = (state) => state.user;
 
-export const getExploreServers = (state) => state.exploreServers;
+export const getExploreServersList = (state) => (
+  fromExploreServers.getExploreServersList(state.exploreServers)
+);
+
+export const getAllExploreServersData = (state) => (
+  fromExploreServers.getAllExploreServersData(state.exploreServers)
+);
+
+export const getExploreServerData = (state, serverId) => (
+  fromExploreServers.getExploreServerData(state.exploreServers, serverId)
+);
