@@ -7,25 +7,28 @@ export const saveAllServers = (servers) => ({
   },
 });
 
-export const serverDetailsRequested = (serverId) => ({
+export const serverDetailsRequested = (serverId, isExploringServer) => ({
   type: C.SERVER_DETAILS_REQUESTED,
   payload: {
     serverId,
+    isExploringServer,
   },
 });
 
-export const serverDetailsFailed = (serverId, error) => ({
+export const serverDetailsFailed = (serverId, isExploringServer, error) => ({
   type: C.SERVER_DETAILS_FAILED,
   payload: {
     serverId,
+    isExploringServer,
     error,
   },
 });
 
-export const serverDetailsSuccess = (data) => ({
+export const serverDetailsSuccess = (data, isExploringServer) => ({
   type: C.SERVER_DETAILS_SUCCESS,
   payload: {
     data,
+    isExploringServer,
   },
 });
 
@@ -65,5 +68,10 @@ export const exploreServersFailed = (error) => ({
 
 export const exploreServersSuccess = (data) => ({
   type: C.EXPLORE_SERVERS_SUCCESS,
+  payload: { data },
+});
+
+export const exploreServerDataRequested = (data) => ({
+  type: C.EXPLORE_SERVER_DATA_REQUESTED,
   payload: { data },
 });

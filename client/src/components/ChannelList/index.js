@@ -12,10 +12,11 @@ import { getServerDetails } from '../../redux/reducers';
 import useUser from '../../customHooks/useUser';
 import { Roles } from '../../constants/serverMembers';
 import { ServerTypes } from '../../constants/servers';
+import useServerData from '../../customHooks/useServerData';
 
 const ChannelList = (props) => {
   const params = useParams();
-  const currentServer = useSelector((state) => getServerDetails(state, params.serverId));
+  const { validServerDetails: currentServer, noServerFound } = useServerData(params.serverId);
   const { user } = useUser();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
@@ -31,7 +32,7 @@ const ChannelList = (props) => {
     return <div>Me server list</div>;
   }
 
-  if (!currentServer) {
+  if (noServerFound) {
     return <div>No such server found</div>;
   }
 

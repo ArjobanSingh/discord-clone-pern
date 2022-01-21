@@ -33,6 +33,42 @@ const publicServersList = (state = { data: null, error: null, isLoading: false }
 
 const publicServersData = (state = {}, action) => {
   switch (action.type) {
+    case C.EXPLORE_SERVER_DATA_REQUESTED:
+      return {
+        [action.payload.data.id]: {
+          ...action.payload.data,
+          isFetchingData: false,
+          error: null,
+        },
+      };
+    case C.SERVER_DETAILS_REQUESTED: {
+      if (!action.payload.isExploringServer) return state;
+      return {
+        [action.payload.serverId]: {
+          ...state[action.payload.serverId],
+          isFetchingData: true,
+          error: null,
+        },
+      };
+    }
+    case C.SERVER_DETAILS_FAILED:
+      if (!action.payload.isExploringServer) return state;
+      return {
+        [action.payload.serverId]: {
+          ...state[action.payload.serverId],
+          isFetchingData: false,
+          error: action.payload.error,
+        },
+      };
+    case C.SERVER_DETAILS_SUCCESS:
+      if (!action.payload.isExploringServer) return state;
+      return {
+        [action.payload.data.id]: {
+          ...action.payload.data,
+          isFetchingData: false,
+          error: null,
+        },
+      };
     default:
       return state;
   }

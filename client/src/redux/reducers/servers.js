@@ -32,6 +32,7 @@ export default (state = {}, action) => {
       return newState;
     }
     case C.SERVER_DETAILS_REQUESTED: {
+      if (action.payload.isExploringServer) return state;
       const newState = { ...state };
       newState[action.payload.serverId] = {
         ...newState[action.payload.serverId],
@@ -41,6 +42,7 @@ export default (state = {}, action) => {
       return newState;
     }
     case C.SERVER_DETAILS_FAILED: {
+      if (action.payload.isExploringServer) return state;
       const newState = { ...state };
       newState[action.payload.serverId] = {
         ...newState[action.payload.serverId],
@@ -50,6 +52,7 @@ export default (state = {}, action) => {
       return newState;
     }
     case C.SERVER_DETAILS_SUCCESS: {
+      if (action.payload.isExploringServer) return state;
       const newState = { ...state };
       newState[action.payload.data.id] = {
         ...action.payload.data,

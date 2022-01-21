@@ -12,14 +12,19 @@ import { handleError } from '../utils/helperFunctions';
 import { ServerApi } from '../utils/apiEndpoints';
 
 function* getServerDetails(actionData) {
-  const { serverId } = actionData.payload;
+  const { serverId, isExploringServer } = actionData.payload;
   try {
     const url = `${ServerApi.GET_SERVER}/${serverId}`;
     const response = yield call(axiosInstance.get, url);
-    yield put(serverDetailsSuccess(response.data));
+    yield put(serverDetailsSuccess(response.data, isExploringServer));
   } catch (err) {
     yield put(
-      handleError(err, (error) => serverDetailsFailed(serverId, error)),
+      handleError(
+        err,
+        (error, { status: errStatus }) => (
+          serverDetailsFailed(serverId, isExploringServer, { ...error, errStatus })
+        ),
+      ),
     );
   }
 }
