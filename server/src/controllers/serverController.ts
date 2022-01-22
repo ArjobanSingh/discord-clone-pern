@@ -18,15 +18,16 @@ export const createServer = async (req: CustomRequest, res: Response, next: Next
     const { userId, body } = req;
 
     const user = await User.findOne(userId);
-    const { avatar, description } = body;
+    const { avatar, description, banner } = body;
 
     const newServer = new Server();
     newServer.name = body.name;
     newServer.owner = user;
     newServer.type = body.type || ServerTypeEnum.PUBLIC;
     newServer.memberCount = 1;
+    newServer.banner = banner;
+    newServer.description = description;
 
-    if (isString(description)) newServer.description = description;
     if (isString(avatar) && isURL(avatar)) newServer.avatar = avatar;
 
     const errors = await validate(newServer);

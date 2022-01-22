@@ -11,7 +11,7 @@ const SingleServerTile = (props) => {
   return (
     <ItemWrapper>
       <ImageWrapper>
-        <GridImage src={server.avatar || DEFAULT_SERVER_ICON} alt="server icon" />
+        <GridImage src={server.banner || DEFAULT_SERVER_ICON} alt="server icon" />
       </ImageWrapper>
       <ContentWrapper>
         <Typography
@@ -27,8 +27,7 @@ const SingleServerTile = (props) => {
             fontWeight="fontWeightRegular"
             color="text.secondary"
           >
-            Welcome to Discord Town Hall—the official place for general
-            conversation as well as hanging out with the community.
+            {server.description || 'Server owner has not set any description for this server. To know more about this server, click and explore.'}
           </Typography>
         </EllipsisDiv>
         <FlexDiv injectCss="margin-top: auto; justify-content: revert;">
@@ -51,8 +50,9 @@ const SingleServerTile = (props) => {
 SingleServerTile.propTypes = {
   server: PropTypes.shape({
     name: PropTypes.string.isRequired,
-    avatar: PropTypes.string,
+    banner: PropTypes.string,
     memberCount: PropTypes.number.isRequired,
+    description: PropTypes.string,
   }).isRequired,
 };
 

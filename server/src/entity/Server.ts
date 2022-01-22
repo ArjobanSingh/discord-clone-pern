@@ -1,5 +1,5 @@
 import {
-  IsEnum, IsNotEmpty, IsOptional, IsString, Length, MaxLength,
+  IsEnum, IsNotEmpty, IsOptional, IsString, IsUrl, Length, MaxLength,
 } from 'class-validator';
 import {
   BaseEntity, Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
@@ -25,6 +25,7 @@ export default class Server extends BaseEntity {
 
     @Column({ length: 2000, nullable: true })
     @IsOptional()
+    @IsString()
     @Length(0, 2000)
     description: string;
 
@@ -33,6 +34,11 @@ export default class Server extends BaseEntity {
 
     @Column({ nullable: true })
     avatar: string;
+
+    @Column({ nullable: true })
+    @IsOptional()
+    @IsUrl()
+    banner: string;
 
     // this class will store foreign id for User class
     @ManyToOne((type) => User, (user) => user.ownedServers, { onDelete: 'SET NULL' })

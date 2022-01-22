@@ -29,8 +29,8 @@ const useServerData = (serverId, makeApiRequest = false) => {
 
   useEffect(() => () => {
     if (isExploringServer) {
-      // if i was some public server, and changed route
-      // remove that server datat from explore server state
+      // if user was exploring some public server, and changed route
+      // remove that server data from explore server state
       dispatch(resetExploreServerData());
     }
   }, [serverId]);
