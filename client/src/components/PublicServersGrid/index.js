@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Grid, GridTile } from './styles';
 import SingleServerTile from './SIngleServerTile';
-import { exploreServerDataRequested } from '../../redux/actions/servers';
+import { addExploreServerData } from '../../redux/actions/servers';
 
 const PublicServersGrid = (props) => {
   const { servers } = props;
@@ -15,7 +15,7 @@ const PublicServersGrid = (props) => {
   const viewPublicServer = (e) => {
     const { index } = e.target.closest('.grid-tile').dataset;
     const requestedServer = servers[index];
-    dispatch(exploreServerDataRequested(requestedServer));
+    dispatch(addExploreServerData(requestedServer));
     navigate(`/channels/${requestedServer.id}`);
   };
 

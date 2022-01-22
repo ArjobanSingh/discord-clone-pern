@@ -33,7 +33,7 @@ const publicServersList = (state = { data: null, error: null, isLoading: false }
 
 const publicServersData = (state = {}, action) => {
   switch (action.type) {
-    case C.EXPLORE_SERVER_DATA_REQUESTED:
+    case C.ADD_EXPLORE_SERVER_DATA:
       return {
         [action.payload.data.id]: {
           ...action.payload.data,
@@ -69,6 +69,8 @@ const publicServersData = (state = {}, action) => {
           error: null,
         },
       };
+    case C.RESET_EXPLORE_SERVER:
+      return {};
     default:
       return state;
   }

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { exploreServerDataRequested, serverDetailsRequested } from '../redux/actions/servers';
+import { addExploreServerData, resetExploreServerData, serverDetailsRequested } from '../redux/actions/servers';
 import { getExploreServerData, getServerDetails } from '../redux/reducers';
 
 const useServerData = (serverId, makeApiRequest = false) => {
@@ -15,17 +15,25 @@ const useServerData = (serverId, makeApiRequest = false) => {
     if (!serverId || !makeApiRequest) return;
 
     if (serverDetails) {
-      if (!serverDetails.members && !serverDetails.isFetchingData) {
-        // if members not present or not yet fetching server details, fetch server details
+      if (!serverDetails.members && !serverDetails.isFetchingData && !serverDetails.error) {
+        // fetch only if not full server data and also not fetching or failed already
         dispatch(serverDetailsRequested(serverDetails.id, isExploringServer));
       }
       return;
     }
 
-    // exploreServerDetails is also undefined, user directly navigated to current route
+    // userServer and exploreServer details are undefined, user directly navigated to current route
     // we will see this as public server url, and will wait till api resolved
-    dispatch(exploreServerDataRequested({ id: serverId, name: '' }));
+    dispatch(addExploreServerData({ id: serverId, name: '' }));
   }, [serverDetails, makeApiRequest]);
+
+  useEffect(() => () => {
+    if (isExploringServer) {
+      // if i was some public server, and changed route
+      // remove that server datat from explore server state
+      dispatch(resetExploreServerData());
+    }
+  }, [serverId]);
 
   return {
     serverDetails: serverDetails || { isFetchingData: true, name: '', id: serverId },

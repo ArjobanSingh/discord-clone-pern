@@ -71,7 +71,11 @@ export const exploreServersSuccess = (data) => ({
   payload: { data },
 });
 
-export const exploreServerDataRequested = (data) => ({
-  type: C.EXPLORE_SERVER_DATA_REQUESTED,
+export const addExploreServerData = (data) => ({
+  type: C.ADD_EXPLORE_SERVER_DATA,
   payload: { data },
+});
+
+export const resetExploreServerData = () => ({
+  type: C.RESET_EXPLORE_SERVER,
 });
