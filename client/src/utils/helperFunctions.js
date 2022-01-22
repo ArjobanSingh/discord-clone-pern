@@ -21,6 +21,7 @@ export function stringToColor(string) {
 }
 
 export function getCharacterName(name) {
+  if (!name) return '';
   const [firstName, lastName] = name.split(' ');
   const [firstChar] = firstName;
   const secondChar = lastName ? lastName[0] : firstName[1];

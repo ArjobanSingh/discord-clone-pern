@@ -3,22 +3,21 @@ import { useDispatch, useSelector } from 'react-redux';
 import { exploreServerDataRequested, serverDetailsRequested } from '../redux/actions/servers';
 import { getExploreServerData, getServerDetails } from '../redux/reducers';
 
-const emptyServerData = { isFetchingData: true };
-
-const useServerData = (serverId) => {
-  const serverDetails = useSelector((state) => getServerDetails(state, serverId));
+const useServerData = (serverId, makeApiRequest = false) => {
+  const userServerDetails = useSelector((state) => getServerDetails(state, serverId));
   const exploreServerDetails = useSelector((state) => getExploreServerData(state, serverId));
   const dispatch = useDispatch();
 
-  const validServerDetails = serverDetails || exploreServerDetails;
+  const serverDetails = userServerDetails || exploreServerDetails;
   const isExploringServer = !!exploreServerDetails;
 
   useEffect(() => {
-    if (validServerDetails) {
-    // either server user is part of or exploring some new server
-      if (!validServerDetails.members && !validServerDetails.isFetchingData) {
+    if (!serverId || !makeApiRequest) return;
+
+    if (serverDetails) {
+      if (!serverDetails.members && !serverDetails.isFetchingData) {
         // if members not present or not yet fetching server details, fetch server details
-        dispatch(serverDetailsRequested(validServerDetails.id, isExploringServer));
+        dispatch(serverDetailsRequested(serverDetails.id, isExploringServer));
       }
       return;
     }
@@ -26,12 +25,12 @@ const useServerData = (serverId) => {
     // exploreServerDetails is also undefined, user directly navigated to current route
     // we will see this as public server url, and will wait till api resolved
     dispatch(exploreServerDataRequested({ id: serverId, name: '' }));
-  }, [validServerDetails]);
+  }, [serverDetails, makeApiRequest]);
 
   return {
-    validServerDetails: validServerDetails || emptyServerData,
+    serverDetails: serverDetails || { isFetchingData: true, name: '', id: serverId },
     isExploringServer,
-    noServerFound: validServerDetails.error?.errStatus === 404,
+    noServerFound: serverDetails?.error?.errStatus === 404,
   };
 };
 

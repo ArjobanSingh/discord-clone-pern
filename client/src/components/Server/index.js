@@ -7,7 +7,7 @@ const dummyChannels = [{ channelId: 'first-channel-id' }];
 // this component will only render, after we have fetched user details and server list
 const Server = (props) => {
   const params = useParams();
-  const { validServerDetails: serverDetails, noServerFound } = useServerData(params.serverId);
+  const { serverDetails, noServerFound } = useServerData(params.serverId, true);
 
   if (noServerFound) {
     return (

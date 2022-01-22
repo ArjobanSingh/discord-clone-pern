@@ -1,6 +1,5 @@
 // import PropTypes from 'prop-types';
 import { memo, useState, useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -8,7 +7,6 @@ import { Header } from '../../common/StyledComponents';
 import { ChannelListContainer, InviteSection, InviteSectionWrapper } from './styles';
 import TransitionModal from '../../common/TransitionModal';
 import InviteModal from '../InviteModal';
-import { getServerDetails } from '../../redux/reducers';
 import useUser from '../../customHooks/useUser';
 import { Roles } from '../../constants/serverMembers';
 import { ServerTypes } from '../../constants/servers';
@@ -16,13 +14,13 @@ import useServerData from '../../customHooks/useServerData';
 
 const ChannelList = (props) => {
   const params = useParams();
-  const { validServerDetails: currentServer, noServerFound } = useServerData(params.serverId);
+  const { serverDetails, noServerFound } = useServerData(params.serverId);
   const { user } = useUser();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   const serverMember = useMemo(() => (
-    currentServer?.members?.find((member) => member.userId === user.id)
-  ), [currentServer?.members]);
+    serverDetails?.members?.find((member) => member.userId === user.id)
+  ), [serverDetails?.members]);
 
   const toggleInviteModal = () => {
     setIsInviteModalOpen((prev) => !prev);
@@ -38,7 +36,7 @@ const ChannelList = (props) => {
 
   // TODO: correct loading when fetching server members
   const hideInvite = !serverMember
-    || (serverMember.role === Roles.USER && currentServer.type === ServerTypes.PRIVATE);
+    || (serverMember.role === Roles.USER && serverDetails.type === ServerTypes.PRIVATE);
 
   return (
     <>
@@ -55,7 +53,9 @@ const ChannelList = (props) => {
             overflow="hidden"
             sx={{ wordBreak: 'break-all' }}
           >
-            {`${currentServer.name[0].toUpperCase()}${currentServer.name.slice(1)}`}
+            {serverDetails.name
+              ? `${serverDetails.name[0].toUpperCase()}${serverDetails.name.slice(1)}`
+              : null}
           </Typography>
         </Header>
         {!hideInvite && (
@@ -92,9 +92,9 @@ const ChannelList = (props) => {
         >
           <div>
             <InviteModal
-              serverId={currentServer.id}
+              serverId={serverDetails.id}
               closeModal={toggleInviteModal}
-              inviteUrls={currentServer.inviteUrls}
+              inviteUrls={serverDetails.inviteUrls}
             />
           </div>
         </TransitionModal>
