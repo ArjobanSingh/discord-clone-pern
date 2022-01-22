@@ -17,14 +17,15 @@ export default (state = {}, action) => {
         return acc;
       }, {});
     case C.JOIN_SERVER_SUCCESS:
+    case C.CREATE_SERVER_SUCCESS:
       return {
-        ...state,
         [action.payload.serverId]: {
           ...action.payload.data,
           isFetchingData: false,
           error: null,
           inviteUrls: {},
         },
+        ...state,
       };
     case C.REMOVE_SERVER: {
       const newState = { ...state };

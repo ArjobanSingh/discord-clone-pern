@@ -10,6 +10,7 @@ import { logoutRequested } from './redux/actions/auth';
 import useIsAuthenticated from './customHooks/useIsAuthenticated';
 import AppRoutes from './containers/Routes';
 import BaseStyles from './BaseStyles';
+import GlobalNavigation from './components/GlobalNavigation';
 
 const Container = styled('div')(({ theme }) => `
   background-color: ${theme.palette.background.default};
@@ -61,6 +62,7 @@ function App() {
   return (
     <CustomThemeProvider>
       <BaseStyles />
+      <GlobalNavigation />
       <Container>
         <Child />
         <InnerWrapper>

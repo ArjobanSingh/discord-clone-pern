@@ -5,13 +5,17 @@ import user from './user';
 import servers, * as fromServers from './servers';
 import joinServers, * as fromJoinServer from './join-servers';
 import exploreServers, * as fromExploreServers from './explore-servers';
+import createServers from './create-servers';
+import navigate from './navigate';
 
 const appReducer = combineReducers({
   auth,
   user,
+  navigate,
   servers,
   joinServers,
   exploreServers,
+  createServers,
 });
 
 const rootReducer = (state, action) => {
@@ -49,3 +53,5 @@ export const getAllExploreServersData = (state) => (
 export const getExploreServerData = (state, serverId) => (
   fromExploreServers.getExploreServerData(state.exploreServers, serverId)
 );
+
+export const getNavigationState = (state) => state.navigate;

@@ -3,8 +3,6 @@ import styled from 'styled-components';
 import InputLabel from '@mui/material/InputLabel';
 import Typography from '@mui/material/Typography';
 
-const dummyThemeFunc = () => '';
-
 const Input = styled('input')`
   width: 100%;
   background: transparent;
@@ -15,7 +13,7 @@ const Input = styled('input')`
 `;
 
 const InputWrapper = styled.div(({
-  theme, width, error, injectCss = dummyThemeFunc,
+  theme, width, error, injectCss,
 }) => `
   width: ${width || ''};
   display: flex;
@@ -28,7 +26,7 @@ const InputWrapper = styled.div(({
   gap: 10px;
   align-items: center;
 
-  ${injectCss(theme)}
+  ${typeof injectCss === 'function' ? injectCss(theme) : injectCss}
 `);
 
 const ErrorDash = styled('span')`
@@ -70,7 +68,10 @@ StyledTextfield.propTypes = {
   label: PropTypes.node,
   isError: PropTypes.bool,
   errorMessage: PropTypes.string,
-  injectCss: PropTypes.func,
+  injectCss: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.func,
+  ]),
   startIcon: PropTypes.node,
   endIcon: PropTypes.node,
 };
@@ -79,7 +80,7 @@ StyledTextfield.defaultProps = {
   isError: false,
   errorMessage: null,
   label: null,
-  injectCss: dummyThemeFunc,
+  injectCss: '',
   startIcon: null,
   endIcon: null,
 };

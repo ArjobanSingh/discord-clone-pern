@@ -22,8 +22,12 @@ const ChannelList = (props) => {
     serverDetails?.members?.find((member) => member.userId === user.id)
   ), [serverDetails?.members]);
 
-  const toggleInviteModal = () => {
-    setIsInviteModalOpen((prev) => !prev);
+  const openInviteModal = () => {
+    setIsInviteModalOpen(true);
+  };
+
+  const closeInviteModal = () => {
+    setIsInviteModalOpen(false);
   };
 
   if (!params.serverId) {
@@ -76,7 +80,7 @@ const ChannelList = (props) => {
                 type="submit"
                 color="primary"
                 variant="contained"
-                onClick={toggleInviteModal}
+                onClick={openInviteModal}
               >
                 <div>Invite People</div>
               </Button>
@@ -87,13 +91,13 @@ const ChannelList = (props) => {
       {!hideInvite && (
         <TransitionModal
           open={isInviteModalOpen}
-          onClose={toggleInviteModal}
+          onClose={closeInviteModal}
           aria-labelledby="invite-modal-title"
         >
           <div>
             <InviteModal
               serverId={serverDetails.id}
-              closeModal={toggleInviteModal}
+              closeModal={closeInviteModal}
               inviteUrls={serverDetails.inviteUrls}
             />
           </div>

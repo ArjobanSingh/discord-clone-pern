@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Avatar from '@mui/material/Avatar';
+import StyledTooltip, { tooltipClasses } from '../../common/StyledToolTip';
 
 export const SidebarContainer = styled('aside')`
   width: 100%;
@@ -43,11 +44,17 @@ const getBackgroundColor = ({ theme, selected, explore }) => {
   return theme.palette.primary.main;
 };
 
+const getColor = ({ theme, selected, explore }) => {
+  if (selected) return theme.palette.text.primary;
+  if (explore) return theme.palette.success.light;
+  return theme.palette.text.primary;
+};
+
 export const StyledAvatar = styled(Avatar)(({
   theme, selected, fontSize, explore,
 }) => `
   background-color: ${getBackgroundColor({ theme, selected, explore })};
-  color: ${theme.palette.text.primary};
+  color: ${getColor({ theme, selected, explore })};
   width: 50px;
   height: 50px;
   transition: border-radius 0.2s, transform 0.2s;
@@ -59,6 +66,7 @@ export const StyledAvatar = styled(Avatar)(({
     border-radius: 30%;
     background-color: ${explore
     ? theme.palette.success.light : theme.palette.primary.main};
+    color: ${theme.palette.text.primary};
     cursor: pointer;
   };
 
@@ -88,4 +96,10 @@ export const AvatarWrapper = styled('div')(({ theme }) => `
   position: relative;
   display: flex;
   align-items: center;
+`);
+
+export const ServerListTooltip = styled(StyledTooltip)(({ theme }) => `
+  .${tooltipClasses.tooltip} {
+    font-size: ${theme.typography.subtitle1.fontSize};
+  }
 `);

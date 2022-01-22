@@ -5,6 +5,7 @@ export const FlexDiv = styled.div(({ theme, injectCss }) => `
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  width: 100%;
   ${typeof injectCss === 'function' ? injectCss(theme) : injectCss}
 `);
 
