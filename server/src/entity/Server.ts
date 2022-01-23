@@ -19,15 +19,15 @@ export default class Server extends BaseEntity {
 
     @Column({ length: 120 })
     @IsString()
-    @IsNotEmpty({ message: 'Server name cannot be empty' })
-    @MinLength(3, { message: 'Server name must be longer than or equal to 3 characters' })
-    @MaxLength(120, { message: 'Server name must be smaller than or equal to 120 characters' })
+    @IsNotEmpty({ message: 'Cannot be empty' })
+    @MinLength(3, { message: 'Must be longer than or equal to 3 characters' })
+    @MaxLength(120, { message: 'Must be smaller than or equal to 120 characters' })
     name: string;
 
     @Column({ length: 2000, nullable: true })
     @IsOptional()
     @IsString()
-    @MaxLength(2000, { message: 'Server description must be smaller than or equal to 2000 characters' })
+    @MaxLength(2000, { message: 'Must be smaller than or equal to 2000 characters' })
     description: string;
 
     @Column('uuid')

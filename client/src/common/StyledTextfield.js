@@ -26,6 +26,24 @@ const InputWrapper = styled.div(({
   gap: 10px;
   align-items: center;
 
+  &:focus-within {
+    border: 1px solid ${error ? theme.palette.error.light : theme.palette.primary.main};
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus input:-webkit-autofill,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+  border: none !important;
+  -webkit-text-fill-color:  ${theme.palette.text.secondary} !important;
+  -webkit-box-shadow: 0 0 0px 0px  ${theme.palette.input.background} inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
   ${typeof injectCss === 'function' ? injectCss(theme) : injectCss}
 `);
 

@@ -45,16 +45,21 @@ const CreateServerModal = (props) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const name = formData.get('server-name');
+    const description = formData.get('server-description');
     const isServerPublic = formData.get('server-type');
 
     const newErrorObj = {};
-    // if (!name?.trim()) {
-    //   newErrorObj.name = 'Server name cannot be empty';
-    // } else if (name.length < serverValidation.SERVER_NAME_MIN_LENGTH) {
-    //   newErrorObj.name = 'Server name must be longer than or equal to 3 characters';
-    // } else if (name.length > serverValidation.SERVER_NAME_MAX_LENGTH) {
-    //   newErrorObj.name = 'Server name must be smaller than or equal to 120 characters';
-    // }
+    if (!name?.trim()) {
+      newErrorObj.name = 'Cannot be empty';
+    } else if (name.length < serverValidation.SERVER_NAME_MIN_LENGTH) {
+      newErrorObj.name = `Must be longer than or equal to ${serverValidation.SERVER_NAME_MIN_LENGTH} characters`;
+    } else if (name.length > serverValidation.SERVER_NAME_MAX_LENGTH) {
+      newErrorObj.name = `Must be smaller than or equal to ${serverValidation.SERVER_NAME_MAX_LENGTH} characters`;
+    }
+
+    if (description && description.length > serverValidation.SERVER_DESCRIPTION_MAX_LENGTH) {
+      newErrorObj.description = `Must be smaller than or equal to ${serverValidation.SERVER_DESCRIPTION_MAX_LENGTH} characters`;
+    }
 
     if (!isEmpty(newErrorObj)) {
       setErrors(newErrorObj);
@@ -62,14 +67,32 @@ const CreateServerModal = (props) => {
     }
 
     setErrors({});
-    // TODO: add description
     const payload = {
       name,
       type: isServerPublic ? ServerTypes.PUBLIC : ServerTypes.PRIVATE,
     };
-    console.log({ payload });
     dispatch(createServerRequested(payload, Date.now()));
   };
+
+  const inputs = [{
+    id: 'server-name-input',
+    errorKey: 'name',
+    name: 'server-name',
+    label: 'Server name',
+    autoFocus: true,
+    minLength: serverValidation.SERVER_NAME_MIN_LENGTH,
+    maxLength: serverValidation.SERVER_NAME_MAX_LENGTH,
+    injectCss: 'margin-top: 5px;',
+  }, {
+    id: 'server-description-input',
+    errorKey: 'description',
+    name: 'server-description',
+    label: 'Server description',
+    maxLength: serverValidation.SERVER_DESCRIPTION_MAX_LENGTH,
+    as: 'textarea',
+    rows: 4,
+    injectCss: 'margin-top: 5px; textarea { resize: none; }',
+  }];
 
   return (
     <ModalContainer>
@@ -108,29 +131,30 @@ const CreateServerModal = (props) => {
         </FlexDiv>
 
         <Form onSubmit={handleSubmit} id="create-server-form">
-          <div>
-            <StyledTextfield
-              id="server-name-input"
-              label={(
-                <Typography
-                  variant="subtitle2"
-                  lineHeight="normal"
-                  color={errors.name ? 'error.light' : 'text.secondaryDark'}
-                  fontWeight="fontWeightBold"
-                  component="span"
-                >
-                  Server name
-                </Typography>
-              )}
-              injectCss="margin-top: 5px;"
-              autoFocus
-              name="server-name"
-              minLength={serverValidation.SERVER_NAME_MIN_LENGTH}
-              maxLength={serverValidation.SERVER_NAME_MAX_LENGTH}
-              isError={!!errors.name}
-              errorMessage={errors.name}
-            />
-          </div>
+          {inputs.map(({
+            errorKey, id, label, ...rest
+          }) => (
+            <div key={id}>
+              <StyledTextfield
+                id={id}
+                label={(
+                  <Typography
+                    variant="subtitle2"
+                    lineHeight="normal"
+                    color={errors[errorKey] ? 'error.light' : 'text.secondaryDark'}
+                    fontWeight="fontWeightBold"
+                    component="span"
+                  >
+                    {label}
+                  </Typography>
+                )}
+                isError={!!errors[errorKey]}
+                errorMessage={errors[errorKey]}
+                {...rest}
+              />
+            </div>
+          ))}
+
           <SwitchLabel
             name="server-type"
             control={<Switch defaultChecked size="small" />}

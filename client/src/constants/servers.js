@@ -19,6 +19,7 @@ export const ServerTypes = {
 export const serverValidation = {
   SERVER_NAME_MIN_LENGTH: 3,
   SERVER_NAME_MAX_LENGTH: 120,
+  SERVER_DESCRIPTION_MAX_LENGTH: 2000,
 };
 
 export const EXPLORE_SERVERS_REQUESTED = 'EXPLORE_SERVERS_REQUESTED';
