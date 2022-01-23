@@ -69,6 +69,10 @@ const publicServersData = (state = {}, action) => {
           error: null,
         },
       };
+    case C.JOIN_SERVER_SUCCESS: {
+      if (state[action.payload.serverId]) return {};
+      return state;
+    }
     case C.RESET_EXPLORE_SERVER:
       return {};
     default:

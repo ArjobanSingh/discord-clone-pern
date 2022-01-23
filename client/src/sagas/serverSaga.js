@@ -50,7 +50,12 @@ function* joinServer(actionData) {
 
     yield call(axiosInstance.post, url);
     yield put(joinServerSucess(serverId, server));
+    yield put(setNavigateState([`/channels/${serverId}`, { replace: !!inviteLink }]));
   } catch (err) {
+    if (!inviteLink) {
+      // joining server while exploring public server, so also show notification error
+      // TODO: add notification error
+    }
     yield put(
       handleError(err, (error) => joinServerFailed(serverId, error)),
     );
@@ -90,7 +95,7 @@ function* createServer(actionData) {
 export default function* serverSaga() {
   yield all([
     takeEvery(SERVER_DETAILS_REQUESTED, getServerDetails),
-    takeLatest(JOIN_SERVER_REQUESTED, joinServer),
+    takeEvery(JOIN_SERVER_REQUESTED, joinServer),
     takeLatest(EXPLORE_SERVERS_REQUESTED, getPublicServers),
     takeEvery(CREATE_SERVER_REQUESTED, createServer),
   ]);

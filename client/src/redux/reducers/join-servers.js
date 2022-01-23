@@ -5,7 +5,7 @@ export default (state = {}, action) => {
     case C.JOIN_SERVER_REQUESTED:
       return {
         ...state,
-        [action.payload.server.serverId]: {
+        [action.payload.server.id]: {
           isLoading: true, error: null,
         },
       };

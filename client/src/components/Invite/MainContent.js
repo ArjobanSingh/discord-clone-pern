@@ -11,7 +11,6 @@ import { getJoinServerApi, getServerDetails } from '../../redux/reducers';
 import { joinServerRequested } from '../../redux/actions/servers';
 import DotLoader from '../../common/DotLoader';
 import Error from '../../common/Error';
-import useDidUpdate from '../../customHooks/useDidUpdate';
 import Logo from '../../common/Logo';
 
 const MainContent = (props) => {
@@ -33,11 +32,6 @@ const MainContent = (props) => {
   };
 
   const { isLoading: isJoiningServer, error } = joinServerApi;
-
-  useDidUpdate(() => {
-    // after join server api success, savedServer will be present in reducer
-    if (savedServer) navigate(`/channels/${savedServer.id}`, { replace: true });
-  }, [savedServer]);
 
   return (
     <>
