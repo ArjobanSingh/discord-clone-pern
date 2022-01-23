@@ -3,11 +3,17 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import Switch from '@mui/material/Switch';
 import CloseIcon from '@mui/icons-material/Close';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 import {
   ContentWrapper,
-  FileInput, Form, IconWrapper, ModalContainer, ModalFooter, SwitchLabel, Upload,
+  FileInput,
+  Form,
+  IconWrapper,
+  ModalContainer,
+  ModalFooter,
+  SwitchLabel,
+  Upload,
 } from './styles';
 import { FlexDiv } from '../../common/StyledComponents';
 import { UPLOAD_FILE } from '../../constants/images';
@@ -15,11 +21,20 @@ import StyledTextfield from '../../common/StyledTextfield';
 import { createServerRequested } from '../../redux/actions/servers';
 import { ServerTypes, serverValidation } from '../../constants/servers';
 import { isEmpty } from '../../utils/validators';
+import { getServerCreationError } from '../../redux/reducers';
+import useDidUpdate from '../../customHooks/useDidUpdate';
+import Error from '../../common/Error';
 
 const CreateServerModal = (props) => {
   const { closeModal } = props;
   const dispatch = useDispatch();
+  const apiErrors = useSelector(getServerCreationError);
+
   const [errors, setErrors] = useState({});
+
+  useDidUpdate(() => {
+    if (!isEmpty(apiErrors)) setErrors(apiErrors);
+  }, [apiErrors]);
 
   // TODO: handle image upload
   const handleImageUpload = (e) => {
@@ -29,17 +44,17 @@ const CreateServerModal = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const serverName = formData.get('server-name');
+    const name = formData.get('server-name');
     const isServerPublic = formData.get('server-type');
 
     const newErrorObj = {};
-    if (!serverName?.trim()) {
-      newErrorObj.serverName = 'Server name cannot be empty';
-    } else if (serverName.length < serverValidation.SERVER_NAME_MIN_LENGTH) {
-      newErrorObj.serverName = 'Server name should be greater than 3 characters';
-    } else if (serverName.length > serverValidation.SERVER_NAME_MAX_LENGTH) {
-      newErrorObj.serverName = 'Server name should be less than 120 characters';
-    }
+    // if (!name?.trim()) {
+    //   newErrorObj.name = 'Server name cannot be empty';
+    // } else if (name.length < serverValidation.SERVER_NAME_MIN_LENGTH) {
+    //   newErrorObj.name = 'Server name must be longer than or equal to 3 characters';
+    // } else if (name.length > serverValidation.SERVER_NAME_MAX_LENGTH) {
+    //   newErrorObj.name = 'Server name must be smaller than or equal to 120 characters';
+    // }
 
     if (!isEmpty(newErrorObj)) {
       setErrors(newErrorObj);
@@ -49,7 +64,7 @@ const CreateServerModal = (props) => {
     setErrors({});
     // TODO: add description
     const payload = {
-      name: serverName,
+      name,
       type: isServerPublic ? ServerTypes.PUBLIC : ServerTypes.PRIVATE,
     };
     console.log({ payload });
@@ -100,7 +115,7 @@ const CreateServerModal = (props) => {
                 <Typography
                   variant="subtitle2"
                   lineHeight="normal"
-                  color={errors.serverName ? 'error.light' : 'text.secondaryDark'}
+                  color={errors.name ? 'error.light' : 'text.secondaryDark'}
                   fontWeight="fontWeightBold"
                   component="span"
                 >
@@ -112,8 +127,8 @@ const CreateServerModal = (props) => {
               name="server-name"
               minLength={serverValidation.SERVER_NAME_MIN_LENGTH}
               maxLength={serverValidation.SERVER_NAME_MAX_LENGTH}
-              isError={!!errors.serverName}
-              errorMessage={errors.serverName}
+              isError={!!errors.name}
+              errorMessage={errors.name}
             />
           </div>
           <SwitchLabel
@@ -132,6 +147,7 @@ const CreateServerModal = (props) => {
             labelPlacement="start"
           />
         </Form>
+        {!!errors.message && <Error>{errors.message}</Error>}
       </ContentWrapper>
       <ModalFooter>
         <Button

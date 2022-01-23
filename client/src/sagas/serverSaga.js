@@ -73,14 +73,16 @@ function* createServer(actionData) {
   const { data, uniqueIdentifier } = actionData.payload;
   try {
     const url = ServerApi.CREATE_SERVER;
-    console.log({ data, uniqueIdentifier });
     const response = yield call(axiosInstance.post, url, data);
     console.log({ response });
     yield put(createServerSuccess(response.data.id, response.data));
     yield put(setNavigateState([`/channels/${response.data.id}`]));
   } catch (err) {
     yield put(
-      handleError(err, (error) => createServerFailed(error, uniqueIdentifier)),
+      handleError(err, (error) => {
+        console.log('Error', uniqueIdentifier);
+        return createServerFailed(error, uniqueIdentifier);
+      }),
     );
   }
 }

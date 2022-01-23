@@ -1,5 +1,5 @@
 import {
-  IsEnum, IsNotEmpty, IsOptional, IsString, IsUrl, Length, MaxLength,
+  IsEnum, IsNotEmpty, IsOptional, IsString, IsUrl, MaxLength, MinLength,
 } from 'class-validator';
 import {
   BaseEntity, Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn,
@@ -18,15 +18,16 @@ export default class Server extends BaseEntity {
     id: string;
 
     @Column({ length: 120 })
-    @IsNotEmpty()
     @IsString()
-    @Length(3, 120)
+    @IsNotEmpty({ message: 'Server name cannot be empty' })
+    @MinLength(3, { message: 'Server name must be longer than or equal to 3 characters' })
+    @MaxLength(120, { message: 'Server name must be smaller than or equal to 120 characters' })
     name: string;
 
     @Column({ length: 2000, nullable: true })
     @IsOptional()
     @IsString()
-    @Length(0, 2000)
+    @MaxLength(2000, { message: 'Server description must be smaller than or equal to 2000 characters' })
     description: string;
 
     @Column('uuid')

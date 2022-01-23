@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import {
   NavLink, useParams,
 } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 import {
   AvatarWrapper,
@@ -22,10 +22,12 @@ import Add from '../../common/AddIcon';
 import TransitionModal from '../../common/TransitionModal';
 import CreateServerModal from '../CreateServerModal';
 import useDidUpdate from '../../customHooks/useDidUpdate';
+import { createServerReset } from '../../redux/actions/servers';
 
 const AllServersDrawer = ({ isDiscoveryPage }) => {
   const servers = useSelector(getAllServers);
   const exploreServers = useSelector(getAllExploreServersData);
+  const dispatch = useDispatch();
 
   const { serverId } = useParams();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -41,6 +43,10 @@ const AllServersDrawer = ({ isDiscoveryPage }) => {
   useDidUpdate(() => {
     closeCreateModal();
   }, [serverId]);
+
+  useDidUpdate(() => {
+    if (!isCreateModalOpen) dispatch(createServerReset());
+  }, [isCreateModalOpen]);
 
   return (
     <>

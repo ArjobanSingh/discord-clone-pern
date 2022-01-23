@@ -5,7 +5,7 @@ import user from './user';
 import servers, * as fromServers from './servers';
 import joinServers, * as fromJoinServer from './join-servers';
 import exploreServers, * as fromExploreServers from './explore-servers';
-import createServers from './create-servers';
+import createServers, * as fromCreateServers from './create-servers';
 import navigate from './navigate';
 
 const appReducer = combineReducers({
@@ -55,3 +55,7 @@ export const getExploreServerData = (state, serverId) => (
 );
 
 export const getNavigationState = (state) => state.navigate;
+
+export const getServerCreationError = (state) => (
+  fromCreateServers.getServerCreationError(state.createServers)
+);

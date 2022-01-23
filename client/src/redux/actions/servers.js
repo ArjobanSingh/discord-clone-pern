@@ -80,17 +80,21 @@ export const resetExploreServerData = () => ({
   type: C.RESET_EXPLORE_SERVER,
 });
 
-export const createServerRequested = (data, uniqueIndentifier) => ({
+export const createServerRequested = (data, uniqueIdentifier) => ({
   type: C.CREATE_SERVER_REQUESTED,
-  payload: { data, uniqueIndentifier },
+  payload: { data, uniqueIdentifier },
 });
 
-export const createServerFailed = (error, uniqueIndentifier) => ({
+export const createServerFailed = (error, uniqueIdentifier) => ({
   type: C.CREATE_SERVER_FAILED,
-  payload: { error, uniqueIndentifier },
+  payload: { error, uniqueIdentifier },
 });
 
 export const createServerSuccess = (serverId, data) => ({
   type: C.CREATE_SERVER_SUCCESS,
   payload: { data, serverId },
+});
+
+export const createServerReset = () => ({
+  type: C.CREATE_SERVER_RESET,
 });

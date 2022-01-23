@@ -3,7 +3,7 @@ import * as C from '../../constants/servers';
 const initialState = {
   isLoading: false,
   error: null,
-  uniqueIndentifier: null,
+  uniqueIdentifier: null,
 };
 
 export default (state = initialState, action) => {
@@ -12,16 +12,20 @@ export default (state = initialState, action) => {
       return {
         isLoading: true,
         error: null,
-        uniqueIndentifier: action.payload.uniqueIndentifier,
+        uniqueIdentifier: action.payload.uniqueIdentifier,
       };
     case C.CREATE_SERVER_FAILED:
-      if (action.payload.uniqueIndentifier !== state.uniqueIndentifier) return state;
+      if (action.payload.uniqueIdentifier !== state.uniqueIdentifier) return state;
       return {
         ...state,
         isLoading: false,
         error: action.payload.error,
       };
+    case C.CREATE_SERVER_RESET:
+      return initialState;
     default:
       return state;
   }
 };
+
+export const getServerCreationError = (state) => state.error;
