@@ -13,12 +13,14 @@ import axiosInstance from '../../utils/axiosConfig';
 import { InviteApi } from '../../utils/apiEndpoints';
 import { saveUrl } from '../../redux/actions/servers';
 import { handleError } from '../../utils/helperFunctions';
+import useIsMounted from '../../customHooks/useIsMounted';
 
 const readOnlyHandler = () => {};
 
 const InviteModal = (props) => {
   const { closeModal, inviteUrls, serverId } = props;
   const dispatch = useDispatch();
+  const isMounted = useIsMounted();
 
   const [expirationLimit, setExpirationLimit] = useState(sevenDaysInMinutes);
   const [joinUrl, setJoinUrl] = useState('');
@@ -26,16 +28,16 @@ const InviteModal = (props) => {
 
   // simple api request, easy to do here, than in redux-saga
   const getUrl = async () => {
-    const requestedServerId = serverId;
     try {
       setJoinUrl('Fetching Url...');
       setIsFetchError(false);
-      const payload = { serverId: requestedServerId, minutes: expirationLimit };
+      const payload = { serverId, minutes: expirationLimit };
       const response = await axiosInstance.post(InviteApi.CREATE_INVITE_URL, payload);
       dispatch(saveUrl(response.data));
     } catch (err) {
-      // if current opened Server and server whose url is requeted matches, than only show error
-      if (requestedServerId === serverId) {
+      // This will automatically prevent showing error, if Invite Modal
+      // is reopened in another server before first server's invite api responds
+      if (isMounted.current) {
         const sessionExpireError = handleError(err, (error) => {
           setIsFetchError(true);
           setJoinUrl(error.message || 'Something went wrong');
