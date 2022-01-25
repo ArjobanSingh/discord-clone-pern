@@ -7,6 +7,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import useServerData from '../../customHooks/useServerData';
 import { PreviewBar, ServerContainer, StyledButton } from './styles';
 import JoinPublicServer from './JoinPublicServer';
+import ServerHeader from '../ServerHeader';
 
 const dummyChannels = [{ channelId: 'first-channel-id' }];
 
@@ -56,6 +57,7 @@ const Server = (props) => {
             <JoinPublicServer server={serverDetails} />
           </PreviewBar>
         )}
+        <ServerHeader />
         <Outlet />
       </ServerContainer>
     );
