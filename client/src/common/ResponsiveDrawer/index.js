@@ -4,7 +4,7 @@ import Drawer from '@mui/material/Drawer';
 
 const ResponsiveDrawer = (props) => {
   const {
-    drawerWidth, children, mobileOpen, handleMobileDrawerToggle, boxProps, ...rest
+    drawerWidth, children, mobileOpen, closeDrawer, boxProps, ...rest
   } = props;
 
   return (
@@ -16,7 +16,7 @@ const ResponsiveDrawer = (props) => {
       <Drawer
         variant="temporary"
         open={mobileOpen}
-        onClose={handleMobileDrawerToggle}
+        onClose={closeDrawer}
         ModalProps={{
           keepMounted: true, // Better open performance on mobile.
         }}
@@ -48,7 +48,7 @@ ResponsiveDrawer.propTypes = {
   children: PropTypes.node.isRequired,
   drawerWidth: PropTypes.number,
   mobileOpen: PropTypes.bool.isRequired,
-  handleMobileDrawerToggle: PropTypes.func.isRequired,
+  closeDrawer: PropTypes.func.isRequired,
   boxProps: PropTypes.shape({}),
 };
 

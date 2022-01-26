@@ -3,10 +3,19 @@ import { useCallback, useState } from 'react';
 const useMobileDrawerState = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const toggleState = useCallback(() => {
-    setMobileOpen((prev) => !prev);
+  const openDrawer = useCallback(() => {
+    setMobileOpen(true);
   }, []);
-  return [mobileOpen, toggleState];
+
+  const closeDrawer = useCallback(() => {
+    setMobileOpen(false);
+  }, []);
+
+  return {
+    mobileOpen,
+    openDrawer,
+    closeDrawer,
+  };
 };
 
 export default useMobileDrawerState;

@@ -15,7 +15,11 @@ const Servers = () => {
 
   const isDiscoveryPage = location.pathname?.includes('guild-discovery');
 
-  const [mobileOpen, handleMobileDrawerToggle] = useMobileDrawerState();
+  const {
+    mobileOpen,
+    openDrawer,
+    closeDrawer,
+  } = useMobileDrawerState();
 
   if (error) return error.message;
 
@@ -25,20 +29,9 @@ const Servers = () => {
       width="100%"
       height="100%"
     >
-      <IconButton
-        color="inherit"
-        aria-label="open server list drawer"
-        edge="start"
-        onClick={handleMobileDrawerToggle}
-        sx={{
-          margin: 'auto', display: { sm: 'none' }, position: 'fixed',
-        }}
-      >
-        <MenuIcon />
-      </IconButton>
       <ResponsiveDrawer
         mobileOpen={mobileOpen}
-        handleMobileDrawerToggle={handleMobileDrawerToggle}
+        closeDrawer={closeDrawer}
         boxProps={{ 'aria-label': 'all servers' }}
         drawerWidth={isDiscoveryPage ? 74 : undefined}
       >
@@ -46,7 +39,9 @@ const Servers = () => {
           ? <div>Servers Drawer Loading Ui..</div>
           : <AllServersDrawer isDiscoveryPage={isDiscoveryPage} />}
       </ResponsiveDrawer>
-      {isLoading || !user ? <div>Children Outlet Loading Ui..</div> : <Outlet />}
+      {isLoading || !user
+        ? <div>Children Outlet Loading Ui..</div>
+        : <Outlet context={openDrawer} />}
     </Box>
   );
 };

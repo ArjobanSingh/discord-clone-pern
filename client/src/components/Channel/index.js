@@ -1,10 +1,17 @@
 // import PropTypes from 'prop-types';
 import { memo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useOutletContext, useParams } from 'react-router-dom';
 
 const Channel = (props) => {
   const params = useParams();
-  // console.log('channel id', props);
+  const {
+    closeMembersDrawer,
+    isMembersDrawerOpen,
+  } = useOutletContext();
+  console.log('channel id', {
+    closeMembersDrawer,
+    isMembersDrawerOpen,
+  });
   return (
     <div>
       Single channel messages

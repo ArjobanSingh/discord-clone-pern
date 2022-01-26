@@ -3,9 +3,13 @@ import styled from 'styled-components';
 export const Grid = styled('div')`
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fill,minmax(20.5rem, 1fr));
+  grid-template-columns: repeat(auto-fill,minmax(18.43rem, 1fr));
   place-items: center;
   grid-gap: 1rem;
+
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    grid-template-columns: repeat(auto-fill,minmax(20.5rem, 1fr));
+  };
 `;
 
 export const GridTile = styled('div')(({ theme }) => `

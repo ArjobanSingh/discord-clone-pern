@@ -1,13 +1,15 @@
 // import PropTypes from 'prop-types';
 import {
-  Navigate, Outlet, useNavigate, useParams,
+  Navigate, Outlet, useNavigate, useOutletContext, useParams,
 } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useMemo } from 'react';
 import useServerData from '../../customHooks/useServerData';
 import { PreviewBar, ServerContainer, StyledButton } from './styles';
 import JoinPublicServer from './JoinPublicServer';
 import ServerHeader from '../ServerHeader';
+import useMobileDrawerState from '../../customHooks/useMobileDrawerState';
 
 const dummyChannels = [{ channelId: 'first-channel-id' }];
 
@@ -15,6 +17,19 @@ const dummyChannels = [{ channelId: 'first-channel-id' }];
 const Server = (props) => {
   const params = useParams();
   const navigate = useNavigate();
+  const openServerListDrawer = useOutletContext();
+
+  const {
+    mobileOpen: isMembersDrawerOpen,
+    openDrawer: openMembersDrawer,
+    closeDrawer: closeMembersDrawer,
+  } = useMobileDrawerState();
+
+  const outletContextValue = useMemo(() => ({
+    closeMembersDrawer,
+    isMembersDrawerOpen,
+  }), [isMembersDrawerOpen, closeMembersDrawer]);
+
   const { serverDetails, noServerFound, isExploringServer } = useServerData(params.serverId, true);
 
   if (noServerFound) {
@@ -54,11 +69,17 @@ const Server = (props) => {
             >
               You are currently in preview mode. Join this server to start chatting
             </Typography>
-            <JoinPublicServer server={serverDetails} />
+            <JoinPublicServer
+              server={serverDetails}
+            />
           </PreviewBar>
         )}
-        <ServerHeader />
-        <Outlet />
+        <ServerHeader
+          serverName={serverDetails.name}
+          openServerListDrawer={openServerListDrawer}
+          openMembersDrawer={openMembersDrawer}
+        />
+        <Outlet context={outletContextValue} />
       </ServerContainer>
     );
   }
