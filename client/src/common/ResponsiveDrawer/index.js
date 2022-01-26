@@ -4,7 +4,13 @@ import Drawer from '@mui/material/Drawer';
 
 const ResponsiveDrawer = (props) => {
   const {
-    drawerWidth, children, mobileOpen, closeDrawer, boxProps, ...rest
+    drawerWidth,
+    children,
+    mobileOpen,
+    closeDrawer,
+    boxProps,
+    wideScreenDrawerProps,
+    ...rest
   } = props;
 
   return (
@@ -22,7 +28,10 @@ const ResponsiveDrawer = (props) => {
         }}
         sx={{
           display: { xs: 'block', sm: 'none' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          '& .MuiDrawer-paper': {
+            boxSizing: 'border-box',
+            width: drawerWidth,
+          },
         }}
         {...rest}
       >
@@ -32,11 +41,14 @@ const ResponsiveDrawer = (props) => {
         variant="permanent"
         sx={{
           display: { xs: 'none', sm: 'block' },
-          backgroundColor: 'background.paper',
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          '& .MuiDrawer-paper': {
+            boxSizing: 'border-box',
+            width: drawerWidth,
+          },
         }}
         open
         {...rest}
+        {...wideScreenDrawerProps}
       >
         {children}
       </Drawer>
@@ -50,11 +62,13 @@ ResponsiveDrawer.propTypes = {
   mobileOpen: PropTypes.bool.isRequired,
   closeDrawer: PropTypes.func.isRequired,
   boxProps: PropTypes.shape({}),
+  wideScreenDrawerProps: PropTypes.shape({}),
 };
 
 ResponsiveDrawer.defaultProps = {
   drawerWidth: 300,
   boxProps: {},
+  wideScreenDrawerProps: {},
 };
 
 export default ResponsiveDrawer;

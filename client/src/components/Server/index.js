@@ -4,12 +4,11 @@ import {
 } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import useServerData from '../../customHooks/useServerData';
-import { PreviewBar, ServerContainer, StyledButton } from './styles';
+import { PreviewBar, StyledButton } from './styles';
 import JoinPublicServer from './JoinPublicServer';
 import ServerHeader from '../ServerHeader';
-import useMobileDrawerState from '../../customHooks/useMobileDrawerState';
 
 const dummyChannels = [{ channelId: 'first-channel-id' }];
 
@@ -19,16 +18,16 @@ const Server = (props) => {
   const navigate = useNavigate();
   const openServerListDrawer = useOutletContext();
 
-  const {
-    mobileOpen: isMembersDrawerOpen,
-    openDrawer: openMembersDrawer,
-    closeDrawer: closeMembersDrawer,
-  } = useMobileDrawerState();
+  const [isMembersDrawerOpen, setIsMembersDrawerOpen] = useState(false);
+
+  const toggleDrawer = () => {
+    setIsMembersDrawerOpen((prev) => !prev);
+  };
 
   const outletContextValue = useMemo(() => ({
-    closeMembersDrawer,
+    closeMembersDrawer: () => { setIsMembersDrawerOpen(false); },
     isMembersDrawerOpen,
-  }), [isMembersDrawerOpen, closeMembersDrawer]);
+  }), [isMembersDrawerOpen]);
 
   const { serverDetails, noServerFound, isExploringServer } = useServerData(params.serverId, true);
 
@@ -77,7 +76,7 @@ const Server = (props) => {
         <ServerHeader
           serverName={serverDetails.name}
           openServerListDrawer={openServerListDrawer}
-          openMembersDrawer={openMembersDrawer}
+          openMembersDrawer={toggleDrawer}
         />
         <Outlet context={outletContextValue} />
       </>

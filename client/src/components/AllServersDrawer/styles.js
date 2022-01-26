@@ -7,6 +7,11 @@ export const SidebarContainer = styled('aside')`
   height: 100%;
   overflow: hidden;
   display: flex;
+
+  ${({ theme }) => theme.breakpoints.down('sm')} {
+    margin-top: 50px;
+    height: calc(100% - 50px);
+  }
 `;
 
 export const ServerIconList = styled('div')(({ theme }) => `
