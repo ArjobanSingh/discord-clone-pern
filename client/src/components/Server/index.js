@@ -49,7 +49,7 @@ const Server = (props) => {
   if (serverDetails.isFetchingData || !serverDetails.members) return <div>Server Loading...</div>;
   if (params.channelId) {
     return (
-      <ServerContainer>
+      <>
         {isExploringServer && (
           <PreviewBar>
             <StyledButton
@@ -80,7 +80,7 @@ const Server = (props) => {
           openMembersDrawer={openMembersDrawer}
         />
         <Outlet context={outletContextValue} />
-      </ServerContainer>
+      </>
     );
   }
   return <Navigate replace to={`/channels/${serverDetails.id}/${fistChannelId}`} />;

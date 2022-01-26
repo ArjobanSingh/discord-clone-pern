@@ -31,33 +31,44 @@ const ServerHeader = (props) => {
           >
             <MenuIcon />
           </IconButton>
-          <Tag />
-          <Typography
-            color="text.primary"
-            lineHeight="normal"
-            fontWeight="fontWeightBold"
-          >
-            {serverName}
-          </Typography>
+          {!!serverName && (
+            <>
+              <Tag />
+              <Typography
+                color="text.primary"
+                lineHeight="normal"
+                fontWeight="fontWeightBold"
+              >
+                {serverName}
+              </Typography>
+            </>
+          )}
         </Box>
-        <Box display="flex" gap="10px" alignItems="center">
-          <IconButton
-            color="inherit"
-            aria-label="open server members"
-            onClick={openMembersDrawer}
-          >
-            <PeopleAltIcon />
-          </IconButton>
-        </Box>
+        {!!openMembersDrawer && (
+          <Box display="flex" gap="10px" alignItems="center">
+            <IconButton
+              color="inherit"
+              aria-label="open server members"
+              onClick={openMembersDrawer}
+            >
+              <PeopleAltIcon />
+            </IconButton>
+          </Box>
+        )}
       </Box>
     </Header>
   );
 };
 
 ServerHeader.propTypes = {
-  serverName: PropTypes.string.isRequired,
+  serverName: PropTypes.string,
   openServerListDrawer: PropTypes.func.isRequired,
-  openMembersDrawer: PropTypes.func.isRequired,
+  openMembersDrawer: PropTypes.func,
+};
+
+ServerHeader.defaultProps = {
+  openMembersDrawer: null,
+  serverName: null,
 };
 
 export default ServerHeader;

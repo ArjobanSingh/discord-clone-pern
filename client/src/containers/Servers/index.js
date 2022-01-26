@@ -1,12 +1,11 @@
 import PropTypes from 'prop-types';
 import { Outlet, useLocation } from 'react-router-dom';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import Box from '@mui/material/Box';
 import ResponsiveDrawer from '../../common/ResponsiveDrawer';
 import useUser from '../../customHooks/useUser';
 import useMobileDrawerState from '../../customHooks/useMobileDrawerState';
 import AllServersDrawer from '../../components/AllServersDrawer';
+import { ServerContainer } from '../../components/Server/styles';
 
 // This wrapper will be used for two global routes /channels/ and /guild-discovery
 const Servers = () => {
@@ -41,7 +40,7 @@ const Servers = () => {
       </ResponsiveDrawer>
       {isLoading || !user
         ? <div>Children Outlet Loading Ui..</div>
-        : <Outlet context={openDrawer} />}
+        : <ServerContainer><Outlet context={openDrawer} /></ServerContainer>}
     </Box>
   );
 };

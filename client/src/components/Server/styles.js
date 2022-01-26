@@ -4,6 +4,7 @@ import Button from '@mui/material/Button';
 export const ServerContainer = styled.div`
   flex: 1;
   height: 100%;
+  overflow: hidden;
 `;
 
 export const PreviewBar = styled.div`

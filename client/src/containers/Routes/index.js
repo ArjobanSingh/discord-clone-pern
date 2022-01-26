@@ -28,6 +28,7 @@ const AppRoutes = (props) => (
       )}
       >
         <Route index element={<ServerDiscovery />} />
+        <Route path="*" element={<Navigate replace to="/guild-discovery" />} />
       </Route>
       <Route
         path="/invite/:inviteId"
