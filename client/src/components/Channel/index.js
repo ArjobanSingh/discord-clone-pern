@@ -14,6 +14,7 @@ import {
 import ResponsiveDrawer from '../../common/ResponsiveDrawer';
 import Logo from '../../common/Logo';
 import { isEmpty } from '../../utils/validators';
+import { ServerMemberRoles } from '../../constants/servers';
 
 // TODO: maybe change drawers logic in future
 const Channel = (props) => {
@@ -27,10 +28,10 @@ const Channel = (props) => {
 
   const membersInHierarchy = useMemo(() => {
     const result = {
-      OWNER: [],
-      ADMIN: [],
-      MODERATOR: [],
-      USER: [],
+      [ServerMemberRoles.OWNER]: [],
+      [ServerMemberRoles.ADMIN]: [],
+      [ServerMemberRoles.MODERATOR]: [],
+      [ServerMemberRoles.USER]: [],
     };
     members.forEach((member) => {
       result[member.role].push(member);

@@ -16,6 +16,20 @@ export const ServerTypes = {
   PUBLIC: 'public',
 };
 
+export const ServerMemberRoles = {
+  OWNER: 'OWNER',
+  ADMIN: 'ADMIN',
+  MODERATOR: 'MODERATOR',
+  USER: 'USER',
+};
+
+export const ServerMemberScores = {
+  [ServerMemberRoles.USER]: 0,
+  [ServerMemberRoles.MODERATOR]: 1,
+  [ServerMemberRoles.ADMIN]: 2,
+  [ServerMemberRoles.OWNER]: 3,
+};
+
 export const serverValidation = {
   SERVER_NAME_MIN_LENGTH: 3,
   SERVER_NAME_MAX_LENGTH: 120,

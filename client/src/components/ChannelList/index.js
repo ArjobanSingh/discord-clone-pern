@@ -2,21 +2,28 @@
 import { memo, useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import Box from '@mui/material/Box';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Button from '@mui/material/Button';
 import { Header } from '../../common/StyledComponents';
-import { ChannelListContainer, InviteSection, InviteSectionWrapper } from './styles';
+import {
+  ChannelListContainer, InviteSection, InviteSectionWrapper, StyledMenu,
+} from './styles';
 import TransitionModal from '../../common/TransitionModal';
 import InviteModal from '../InviteModal';
 import useUser from '../../customHooks/useUser';
 import { Roles } from '../../constants/serverMembers';
 import { ServerTypes } from '../../constants/servers';
 import useServerData from '../../customHooks/useServerData';
+import ServerSettingsMenu from '../ServerSettingsMenu';
 
 const ChannelList = (props) => {
   const params = useParams();
   const { serverDetails, noServerFound } = useServerData(params.serverId);
   const { user } = useUser();
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
   const serverMember = useMemo(() => (
     serverDetails?.members?.find((member) => member.userId === user.id)
@@ -30,6 +37,10 @@ const ChannelList = (props) => {
     setIsInviteModalOpen(false);
   };
 
+  const closeSettingsMenu = () => {
+    setMenuAnchorEl(null);
+  };
+
   if (!params.serverId) {
     return <div>Me server list</div>;
   }
@@ -39,30 +50,52 @@ const ChannelList = (props) => {
   }
 
   // TODO: correct loading when fetching server members
-  const hideInvite = !serverMember
+  const hideOptions = !serverMember
     || (serverMember.role === Roles.USER && serverDetails.type === ServerTypes.PRIVATE);
 
   return (
     <>
       <ChannelListContainer>
         <Header>
-          <Typography
-            variant="h1"
+          <Box
+            display="flex"
+            width="100%"
+            justify-content="space-between"
+            alignItems="center"
             color="text.primary"
-            fontSize="subtitle1.fontSize"
-            fontWeight="fontWeightBold"
-            flex={1}
-            textOverflow="ellipsis"
-            whiteSpace="nowrap"
-            overflow="hidden"
-            sx={{ wordBreak: 'break-all' }}
           >
-            {serverDetails.name
-              ? `${serverDetails.name[0].toUpperCase()}${serverDetails.name.slice(1)}`
-              : null}
-          </Typography>
+            <Typography
+              variant="h1"
+              color="text.primary"
+              fontSize="subtitle1.fontSize"
+              fontWeight="fontWeightBold"
+              flex={1}
+              textOverflow="ellipsis"
+              whiteSpace="nowrap"
+              overflow="hidden"
+              sx={{ wordBreak: 'break-all' }}
+            >
+              {serverDetails.name
+                ? `${serverDetails.name[0].toUpperCase()}${serverDetails.name.slice(1)}`
+                : null}
+            </Typography>
+            {!hideOptions && (
+              <IconButton
+                color="inherit"
+                aria-label="open server settings"
+                size="small"
+                sx={{ marginRight: '-10px' }}
+                onClick={(e) => {
+                  setMenuAnchorEl(e.currentTarget);
+                }}
+              >
+                <KeyboardArrowDownIcon />
+              </IconButton>
+            )}
+          </Box>
         </Header>
-        {!hideInvite && (
+
+        {!hideOptions && (
           <InviteSectionWrapper>
             <InviteSection>
               {['An adventure begins.', 'Let\'s add some friends!'].map((text) => (
@@ -73,7 +106,6 @@ const ChannelList = (props) => {
                   fontWeight="fontWeightLight"
                 >
                   {text}
-
                 </Typography>
               ))}
               <Button
@@ -88,7 +120,7 @@ const ChannelList = (props) => {
           </InviteSectionWrapper>
         )}
       </ChannelListContainer>
-      {!hideInvite && (
+      {!hideOptions && (
         <TransitionModal
           open={isInviteModalOpen}
           onClose={closeInviteModal}
@@ -103,6 +135,23 @@ const ChannelList = (props) => {
           </div>
         </TransitionModal>
       )}
+      <StyledMenu
+        open={!!menuAnchorEl}
+        anchorEl={menuAnchorEl}
+        onClose={closeSettingsMenu}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        {!hideOptions && (
+          <ServerSettingsMenu currentRole={serverMember.role} />
+        )}
+      </StyledMenu>
     </>
   );
 };

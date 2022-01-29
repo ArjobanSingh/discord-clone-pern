@@ -35,3 +35,11 @@ export function handleError(err, callback) {
   if (status === 401) return logoutSuccess();
   return callback(data.error, err);
 }
+
+export function handleEnter(callback) {
+  return (e) => {
+    if (e.key === 'Enter') {
+      callback(e);
+    }
+  };
+}

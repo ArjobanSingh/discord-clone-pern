@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import Menu, { menuClasses } from '@mui/material/Menu';
 import { INVITE_USERS_ICON } from '../../constants/images';
 
 export const ChannelListContainer = styled.div`
@@ -24,3 +25,39 @@ export const InviteSection = styled.div`
     margin: 1rem auto 0;
   }
 `;
+
+export const StyledMenu = styled(Menu)(({ theme }) => `
+  .${menuClasses.paper} {
+    border-radius: ${theme.shape.borderRadius}px;
+    color: ${theme.palette.text.primary};
+    background-color: ${theme.palette.background.darker};
+    padding: ${theme.spacing(0.5)};
+  }
+
+  .server-settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: ${theme.typography.subtitle2.fontSize};
+    font-weight: normal;
+    color: ${theme.palette.text.secondary};
+    padding: ${theme.spacing(1)};
+    border-radius: ${theme.shape.borderRadius}px;
+    min-width: 200px;
+
+    &:hover {
+      color: ${theme.palette.text.primary};
+      background-color: ${theme.palette.primary.main};
+      cursor: pointer;
+    }
+  }
+
+  .leave-server {
+    color: ${theme.palette.error.dark};
+
+    &:hover {
+      color: ${theme.palette.text.primary};
+      background-color: ${theme.palette.error.main};
+    }
+  }
+`);
