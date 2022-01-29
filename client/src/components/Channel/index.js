@@ -1,16 +1,42 @@
 // import PropTypes from 'prop-types';
-import { memo } from 'react';
+import { memo, useMemo, Fragment } from 'react';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 import { useOutletContext, useParams } from 'react-router-dom';
-import { ChannelContainer, MainContent, membersDrawerWidth } from './styles';
+import {
+  ChannelContainer,
+  MainContent,
+  MemberListContainer,
+  membersDrawerWidth,
+  MemberWrapper,
+  StyledAvatar,
+} from './styles';
 import ResponsiveDrawer from '../../common/ResponsiveDrawer';
+import Logo from '../../common/Logo';
+import { isEmpty } from '../../utils/validators';
 
 // TODO: maybe change drawers logic in future
 const Channel = (props) => {
   const params = useParams();
+
   const {
     closeMembersDrawer,
     isMembersDrawerOpen,
+    members,
   } = useOutletContext();
+
+  const membersInHierarchy = useMemo(() => {
+    const result = {
+      OWNER: [],
+      ADMIN: [],
+      MODERATOR: [],
+      USER: [],
+    };
+    members.forEach((member) => {
+      result[member.role].push(member);
+    });
+    return result;
+  }, [members]);
 
   const wideScreenDrawerProps = {
     variant: 'persistent',
@@ -43,10 +69,47 @@ const Channel = (props) => {
         anchor="right"
         closeDrawer={closeMembersDrawer}
         wideScreenDrawerProps={wideScreenDrawerProps}
+        drawerWidth={membersDrawerWidth}
       >
-        <div style={{ marginTop: '50px' }}>
-          server members
-        </div>
+        <MemberListContainer>
+          {Object.entries(membersInHierarchy).map(([memberRole, currentRoleMembers]) => {
+            if (isEmpty(currentRoleMembers)) return null;
+            const heading = (
+              <Typography
+                variant="subtitle2"
+                color="text.secondaryDark"
+                lineHeight="1"
+              >
+                {memberRole}
+                {' '}
+                -
+                {' '}
+                {currentRoleMembers.length}
+              </Typography>
+            );
+            return (
+              <Fragment key={memberRole}>
+                <Box padding="10px 10px 0px">{heading}</Box>
+                {currentRoleMembers.map((member) => (
+                  <MemberWrapper key={member.userId}>
+                    <StyledAvatar src={member.profilePicture}>
+                      <Logo />
+                    </StyledAvatar>
+                    <Box display="flex" flexDirection="column">
+                      <Typography
+                        variant="subtitle2"
+                        color="text.secondary"
+                      >
+                        {member.userName}
+                      </Typography>
+                    </Box>
+                  </MemberWrapper>
+                ))}
+              </Fragment>
+            );
+          })}
+
+        </MemberListContainer>
       </ResponsiveDrawer>
     </ChannelContainer>
   );

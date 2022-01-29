@@ -1,6 +1,7 @@
 import styled from 'styled-components';
+import Avatar from '@mui/material/Avatar';
 
-export const membersDrawerWidth = 300;
+export const membersDrawerWidth = 250;
 
 export const ChannelContainer = styled.div`
   display: flex;
@@ -17,4 +18,36 @@ export const MainContent = styled.main(({ isDrawerOpen, theme }) => `
   ${theme.breakpoints.up('sm')} {
     margin-right: ${isDrawerOpen ? '0' : `-${membersDrawerWidth}px`};
   }
+`);
+
+export const MemberListContainer = styled.aside`
+  height: calc(100% - 50px);
+  width: 100%;
+  margin-top: 50px;
+  padding-inline: ${({ theme }) => theme.spacing(1)};
+  overflow: auto;
+`;
+
+export const MemberWrapper = styled.div`
+  width: 100%;
+  padding: ${({ padding }) => padding || '10px'};
+  align-items: center;
+  gap: 10px;
+  display: flex;
+  border-radius: ${({ theme }) => theme.shape.borderRadius}px;
+
+  &:hover {
+    background-color: ${({ theme }) => theme.palette.background.default};
+    // cursor: pointer; TODO: add clickable and view
+  }
+`;
+
+export const StyledAvatar = styled(Avatar)(({
+  theme, fontSize,
+}) => `
+  width: 35px;
+  height: 35px;
+  transition: border-radius 0.2s, transform 0.2s;
+  background-color: ${theme.palette.success.light};
+  color: ${theme.palette.text.primary}
 `);

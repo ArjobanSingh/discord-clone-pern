@@ -24,23 +24,23 @@ const Server = (props) => {
     setIsMembersDrawerOpen((prev) => !prev);
   };
 
+  const { serverDetails, noServerFound, isExploringServer } = useServerData(params.serverId, true);
+
   const outletContextValue = useMemo(() => ({
     closeMembersDrawer: () => { setIsMembersDrawerOpen(false); },
     isMembersDrawerOpen,
-  }), [isMembersDrawerOpen]);
+    members: serverDetails.members,
+  }), [isMembersDrawerOpen, serverDetails.members]);
 
-  const { serverDetails, noServerFound, isExploringServer } = useServerData(params.serverId, true);
+  const goBack = () => {
+    navigate(-1);
+  };
 
   if (noServerFound) {
     return (
       <div>No server found: 404</div>
     );
   }
-
-  const goBack = () => {
-    navigate(-1);
-  };
-
   // TODO: use real channels data, and remove this default dummyChannels
   const { channels: [{ channelId: fistChannelId }] = dummyChannels } = serverDetails;
 
