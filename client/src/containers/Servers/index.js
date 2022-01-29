@@ -32,7 +32,7 @@ const Servers = () => {
         mobileOpen={mobileOpen}
         closeDrawer={closeDrawer}
         boxProps={{ 'aria-label': 'all servers' }}
-        drawerWidth={isDiscoveryPage ? 74 : undefined}
+        drawerWidth={isDiscoveryPage ? 74 : 320}
       >
         {isLoading || !user
           ? <div>Servers Drawer Loading Ui..</div>

@@ -18,6 +18,16 @@ import { ServerTypes } from '../../constants/servers';
 import useServerData from '../../customHooks/useServerData';
 import ServerSettingsMenu from '../ServerSettingsMenu';
 
+const anchorOrigin = {
+  vertical: 'bottom',
+  horizontal: 'right',
+};
+
+const transformOrigin = {
+  vertical: 'top',
+  horizontal: 'right',
+};
+
 const ChannelList = (props) => {
   const params = useParams();
   const { serverDetails, noServerFound } = useServerData(params.serverId);
@@ -139,14 +149,8 @@ const ChannelList = (props) => {
         open={!!menuAnchorEl}
         anchorEl={menuAnchorEl}
         onClose={closeSettingsMenu}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
-        }}
-        transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
+        anchorOrigin={anchorOrigin}
+        transformOrigin={transformOrigin}
       >
         {!hideOptions && (
           <ServerSettingsMenu currentRole={serverMember.role} />

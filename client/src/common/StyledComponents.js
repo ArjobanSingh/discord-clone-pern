@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 export const FlexDiv = styled.div(({ theme, injectCss }) => `
   display: flex;
@@ -38,3 +39,30 @@ export const SimpleEllipsis = styled.div`
   ${({ injectCss, theme }) => (typeof injectCss === 'function'
     ? injectCss(theme) : injectCss)}
 `;
+
+export const ScreenWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+export const WidthWrapper = styled.div(({ theme }) => `
+  width: 100%;
+  height: 100%;
+  padding: ${theme.spacing(5)};
+  max-width: 93.75rem;
+`);
+
+export const MaxWidthWrapper = ({ children }) => (
+  <ScreenWrapper>
+    <WidthWrapper>
+      {children}
+    </WidthWrapper>
+  </ScreenWrapper>
+);
+
+MaxWidthWrapper.propTypes = {
+  children: PropTypes.node.isRequired,
+};

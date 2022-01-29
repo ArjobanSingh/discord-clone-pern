@@ -5,7 +5,7 @@ import { INVITE_USERS_ICON } from '../../constants/images';
 export const ChannelListContainer = styled.div`
   height: 100%;
   width: 100%;
-  max-width: 225px;
+  max-width: 245px;
   overflow-x: hidden;
 `;
 

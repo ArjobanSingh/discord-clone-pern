@@ -1,11 +1,14 @@
-import React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
+import Dialog from '@mui/material/Dialog';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Typography from '@mui/material/Typography';
+import Zoom from '@mui/material/Zoom';
 import { ServerMemberRoles } from '../../constants/servers';
 import { handleEnter } from '../../utils/helperFunctions';
+import ServerSettings from '../ServerSettings';
 
 const {
   OWNER,
@@ -40,7 +43,11 @@ const settings = [{
 const ServerSettingsMenu = (props) => {
   const { currentRole } = props;
 
-  const openServerSettings = () => {};
+  const [isServerDetailsOpen, setIsServerDetailsOpen] = useState(false);
+
+  const openServerSettings = () => {
+    setIsServerDetailsOpen(true);
+  };
   const createChannel = () => {};
   const leaveServer = () => {};
 
@@ -50,6 +57,11 @@ const ServerSettingsMenu = (props) => {
     [LEAVE_SERVER]: leaveServer,
   };
 
+  const closeServerSettings = () => {
+    setIsServerDetailsOpen(false);
+  };
+
+  const [serverSettings] = settings;
   return (
     <>
       {settings.map((setting) => {
@@ -78,7 +90,16 @@ const ServerSettingsMenu = (props) => {
           </div>
         );
       })}
-
+      {serverSettings.roles.includes(currentRole) && (
+      <Dialog
+        fullScreen
+        open={isServerDetailsOpen}
+        onClose={closeServerSettings}
+        TransitionComponent={Zoom}
+      >
+        <ServerSettings closeServerSettings={closeServerSettings} />
+      </Dialog>
+      )}
     </>
   );
 };
