@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import Drawer, { drawerClasses } from '@mui/material/Drawer';
 
 export const SettingsContainer = styled.div(({ theme }) => `
   width: 100%;
@@ -10,9 +11,13 @@ export const SettingsContainer = styled.div(({ theme }) => `
 export const ListContainer = styled.aside(({ theme }) => `
   flex: 0.9;
   background-color: ${theme.palette.background.paper};
-  display: flex;
+  display: none;
   justify-content: flex-end;
   overflow: hidden;
+
+  ${theme.breakpoints.up('md')} {
+    display: flex;
+  }
 `);
 
 export const MainContent = styled.main(({ theme }) => `
@@ -20,6 +25,7 @@ export const MainContent = styled.main(({ theme }) => `
   background-color: ${theme.palette.background.default};
   display: flex;
   padding: ${`${theme.spacing(7)} ${theme.spacing(2)}`};
+  position: relative;
 `);
 
 export const SettingsNav = styled.nav(({ theme }) => `
@@ -27,4 +33,17 @@ export const SettingsNav = styled.nav(({ theme }) => `
   height: 100%;
   padding: ${`${theme.spacing(7)} ${theme.spacing(2)}`};
   overflow: auto;
+`);
+
+export const ServerOptionsDrawer = styled(Drawer)(({ theme }) => `
+  display: block;
+  z-index: ${theme.zIndex.modal + 1};
+  .${drawerClasses.paper} {
+    width: 14rem;
+    box-sizing: border-box;
+  }
+
+  ${theme.breakpoints.up('md')} {
+    display: none;
+  }
 `);
