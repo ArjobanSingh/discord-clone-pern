@@ -97,7 +97,7 @@ const ServerSettingsMenu = (props) => {
         onClose={closeServerSettings}
         TransitionComponent={Zoom}
       >
-        <ServerSettings closeServerSettings={closeServerSettings} />
+        <ServerSettings currentRole={currentRole} closeServerSettings={closeServerSettings} />
       </Dialog>
       )}
     </>

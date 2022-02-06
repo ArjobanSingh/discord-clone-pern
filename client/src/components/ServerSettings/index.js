@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
@@ -8,14 +8,17 @@ import {
 } from './styles';
 import useMobileDrawerState from '../../customHooks/useMobileDrawerState';
 import ServerOptions from '../ServerOptions';
+import { ServerMemberRoles, SERVER_SETTINGS } from '../../constants/servers';
 
 const ServerSettings = (props) => {
-  const { closeServerSettings } = props;
+  const { closeServerSettings, currentRole } = props;
   const {
     mobileOpen,
     openDrawer,
     closeDrawer,
   } = useMobileDrawerState();
+
+  const [openedTab, setOpenedTab] = useState(SERVER_SETTINGS.OVERVIEW);
 
   return (
     <>
@@ -24,14 +27,22 @@ const ServerSettings = (props) => {
         onClose={closeDrawer}
       >
         <SettingsNav>
-          <ServerOptions />
+          <ServerOptions
+            setOpenedTab={setOpenedTab}
+            openedTab={openedTab}
+            currentRole={currentRole}
+          />
         </SettingsNav>
       </ServerOptionsDrawer>
 
       <SettingsContainer>
         <ListContainer>
           <SettingsNav>
-            <ServerOptions />
+            <ServerOptions
+              setOpenedTab={setOpenedTab}
+              openedTab={openedTab}
+              currentRole={currentRole}
+            />
           </SettingsNav>
         </ListContainer>
         <MainContent>
@@ -75,6 +86,7 @@ const ServerSettings = (props) => {
 
 ServerSettings.propTypes = {
   closeServerSettings: PropTypes.func.isRequired,
+  currentRole: PropTypes.oneOf(Object.keys(ServerMemberRoles)).isRequired,
 };
 
 export default ServerSettings;
