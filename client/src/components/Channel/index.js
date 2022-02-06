@@ -16,6 +16,19 @@ import Logo from '../../common/Logo';
 import { isEmpty } from '../../utils/validators';
 import { ServerMemberRoles } from '../../constants/servers';
 
+const wideScreenDrawerProps = {
+  variant: 'persistent',
+  sx: {
+    flexShrink: 0,
+    display: { xs: 'none', sm: 'block' },
+    width: membersDrawerWidth,
+    '& .MuiDrawer-paper': {
+      boxSizing: 'border-box',
+      width: membersDrawerWidth,
+    },
+  },
+};
+
 // TODO: maybe change drawers logic in future
 const Channel = (props) => {
   const params = useParams();
@@ -38,19 +51,6 @@ const Channel = (props) => {
     });
     return result;
   }, [members]);
-
-  const wideScreenDrawerProps = {
-    variant: 'persistent',
-    sx: {
-      flexShrink: 0,
-      display: { xs: 'none', sm: 'block' },
-      width: membersDrawerWidth,
-      '& .MuiDrawer-paper': {
-        boxSizing: 'border-box',
-        width: membersDrawerWidth,
-      },
-    },
-  };
 
   return (
     <ChannelContainer>

@@ -35,6 +35,9 @@ export const getServerDetails = (state, serverId) => (
   fromServers.getServerDetails(state.servers, serverId)
 );
 export const getAllServers = (state) => fromServers.getAllServers(state.servers);
+export const getUpdateServerData = (state, serverId) => (
+  fromServers.getUpdateServerData(state.servers, serverId)
+);
 
 export const getLoginAuthState = (state) => fromAuth.getLoginAuthState(state.auth);
 export const getRegisterAuthState = (state) => fromAuth.getRegisterAuthState(state.auth);

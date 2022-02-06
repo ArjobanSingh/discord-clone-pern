@@ -98,3 +98,27 @@ export const createServerSuccess = (serverId, data) => ({
 export const createServerReset = () => ({
   type: C.CREATE_SERVER_RESET,
 });
+
+export const updateServerRequested = (serverId, data) => ({
+  type: C.UPDATE_SERVER_REQUESTED,
+  payload: {
+    serverId,
+    data,
+  },
+});
+
+export const updateServerSuccess = (serverId, data) => ({
+  type: C.UPDATE_SERVER_SUCCESS,
+  payload: {
+    serverId,
+    data,
+  },
+});
+
+export const updateServerFailed = (serverId, error) => ({
+  type: C.UPDATE_SERVER_FAILED,
+  payload: {
+    serverId,
+    error,
+  },
+});

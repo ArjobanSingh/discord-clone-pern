@@ -47,3 +47,50 @@ export const ServerOptionsDrawer = styled(Drawer)(({ theme }) => `
     display: none;
   }
 `);
+
+export const OptionWrapper = styled.li(({ theme, selected }) => `
+  width: 100%;
+  padding: ${theme.spacing(1)};
+  border-radius: ${theme.shape.borderRadius}px;
+  background-color: ${selected
+    ? theme.palette.background.default
+    : theme.palette.background.paper};
+  color: ${selected
+    ? theme.palette.text.primary
+    : theme.palette.text.secondaryDark};
+
+  &:hover {
+    background-color: ${theme.palette.background.default};
+    color: ${theme.palette.text.primary};
+    cursor: pointer;
+  }
+`);
+
+export const OptionsList = styled.ul`
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(0.5)};
+`;
+
+export const OptionContentContainer = styled.div`
+  width: 100%;
+  max-width: 42rem;
+  height: 100%;
+  padding-inline: ${({ theme }) => theme.spacing(2)};
+
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing(2)};
+`;
+
+export const UnsavedWrapper = styled.div(({ theme }) => `
+  background-color: ${theme.palette.background.darker};
+  width: 600px;
+  opacity: 0.7;
+  padding: ${theme.spacing(2)};
+  border-radius: ${theme.shape.borderRadius}px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`);

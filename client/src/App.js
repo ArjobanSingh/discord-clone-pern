@@ -3,7 +3,7 @@ import {
 } from 'react';
 import './App.css';
 import { styled } from '@mui/material/styles';
-import { Button } from '@mui/material';
+import Button from '@mui/material/Button';
 import { useDispatch } from 'react-redux';
 import CustomThemeProvider, { ColorModeContext } from './providers/CustomThemeProvider';
 import { logoutRequested } from './redux/actions/auth';

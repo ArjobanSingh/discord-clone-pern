@@ -25,7 +25,7 @@ export function getCharacterName(name) {
   const [firstName, lastName] = name.split(' ');
   const [firstChar] = firstName;
   const secondChar = lastName ? lastName[0] : firstName[1];
-  return `${firstChar.toUpperCase()}${secondChar}`;
+  return `${firstChar.toUpperCase()}${secondChar.toLowerCase()}`;
 }
 
 export function handleError(err, callback) {

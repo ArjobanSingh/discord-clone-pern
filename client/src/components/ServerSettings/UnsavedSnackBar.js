@@ -1,0 +1,46 @@
+import React, { useContext } from 'react';
+import PropTypes from 'prop-types';
+import Snackbar from '@mui/material/Snackbar';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import { UnsavedWrapper } from './styles';
+import { useSnackbarValues } from './SnackbarProvider';
+
+const UnsavedSnackBar = ({ handleSubmit }) => {
+  const { isSnackbarOpen, setReset, setIsSnackbarOpen } = useSnackbarValues();
+  const handleReset = () => {
+    setReset(true);
+    setIsSnackbarOpen(false);
+  };
+
+  return (
+    <Snackbar
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      open={isSnackbarOpen}
+    >
+      <UnsavedWrapper>
+        <Typography
+          fontWeight="fontWeightBold"
+        >
+          Careful — you have unsaved changes!
+        </Typography>
+        <Box display="flex" gap={(theme) => theme.spacing(1)}>
+          <Button variant="text" color="info" onClick={handleReset}>
+            Reset
+          </Button>
+
+          <Button variant="contained" color="success" onClick={handleSubmit}>
+            Save Changes
+          </Button>
+        </Box>
+      </UnsavedWrapper>
+    </Snackbar>
+  );
+};
+
+UnsavedSnackBar.propTypes = {
+  handleSubmit: PropTypes.func.isRequired,
+};
+
+export default UnsavedSnackBar;

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 import { useParams } from 'react-router-dom';
 import { SERVER_SETTINGS, ServerMemberRoles } from '../../constants/servers';
 import { SimpleEllipsis } from '../../common/StyledComponents';

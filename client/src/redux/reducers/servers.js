@@ -1,7 +1,8 @@
+import { combineReducers } from 'redux';
 import * as C from '../../constants/servers';
 import { APP_URL } from '../../utils/axiosConfig';
 
-export default (state = {}, action) => {
+const allServers = (state = {}, action) => {
   switch (action.type) {
     case C.SAVE_ALL_SERVERS_LIST:
       return action.payload.servers.reduce((acc, server) => {
@@ -85,5 +86,40 @@ export default (state = {}, action) => {
   }
 };
 
-export const getAllServers = (state) => state;
-export const getServerDetails = (state, serverId) => state[serverId];
+const updateServers = (state = {}, action) => {
+  switch (action.type) {
+    case C.UPDATE_SERVER_REQUESTED:
+      return {
+        ...state,
+        [action.payload.serverId]: {
+          isLoading: true,
+          error: null,
+        },
+      };
+    case C.UPDATE_SERVER_SUCCESS: {
+      const newState = { ...state };
+      delete newState[action.payload.serverId];
+      return newState;
+    }
+    case C.UPDATE_SERVER_FAILED:
+      return {
+        ...state,
+        [action.payload.serverId]: {
+          isLoading: false,
+          error: action.payload.error,
+        },
+      };
+    default:
+      return state;
+  }
+};
+
+export default combineReducers({
+  allServers,
+  updateServers,
+});
+
+export const getAllServers = (state) => state.allServers;
+export const getServerDetails = (state, serverId) => state.allServers[serverId];
+
+export const getUpdateServerData = (state, serverId) => state.updateServers[serverId];

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
@@ -7,8 +7,10 @@ import {
   ListContainer, MainContent, ServerOptionsDrawer, SettingsContainer, SettingsNav,
 } from './styles';
 import useMobileDrawerState from '../../customHooks/useMobileDrawerState';
-import ServerOptions from '../ServerOptions';
+import ServerOptions from './ServerOptions';
 import { ServerMemberRoles, SERVER_SETTINGS } from '../../constants/servers';
+import OptionContent from './OptionContent';
+import SnackbarProvider from './SnackbarProvider';
 
 const ServerSettings = (props) => {
   const { closeServerSettings, currentRole } = props;
@@ -19,9 +21,18 @@ const ServerSettings = (props) => {
   } = useMobileDrawerState();
 
   const [openedTab, setOpenedTab] = useState(SERVER_SETTINGS.OVERVIEW);
+  const [reset, setReset] = useState(false);
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
+
+  const snackbarValue = useMemo(() => ({
+    isSnackbarOpen,
+    reset,
+    setIsSnackbarOpen,
+    setReset,
+  }), [isSnackbarOpen, reset]);
 
   return (
-    <>
+    <SnackbarProvider value={snackbarValue}>
       <ServerOptionsDrawer
         open={mobileOpen}
         onClose={closeDrawer}
@@ -46,7 +57,9 @@ const ServerSettings = (props) => {
           </SettingsNav>
         </ListContainer>
         <MainContent>
-          some main content
+          <OptionContent
+            openedTab={openedTab}
+          />
         </MainContent>
 
         <IconButton
@@ -80,7 +93,7 @@ const ServerSettings = (props) => {
           <CloseIcon />
         </IconButton>
       </SettingsContainer>
-    </>
+    </SnackbarProvider>
   );
 };
 
