@@ -26,7 +26,6 @@ import { useSnackbarValues } from '../SnackbarProvider';
 const ServerOverview = (props) => {
   const { reset, setReset, setIsSnackbarOpen } = useSnackbarValues();
   const { serverId } = useParams();
-  const ref = useRef();
 
   const { serverDetails } = useServerData(serverId, false);
   const { name, avatar, type } = serverDetails;
@@ -78,7 +77,7 @@ const ServerOverview = (props) => {
             flex="1"
           >
             <AvatarContainer>
-              <IconAvatar src={avatar} onClick={() => { ref.current.click(); }}>
+              <IconAvatar src={avatar}>
                 <Typography
                   variant="h6"
                   fontSize="2.5rem"
@@ -86,7 +85,7 @@ const ServerOverview = (props) => {
                   {getCharacterName(name)}
                 </Typography>
               </IconAvatar>
-              <FileInput ref={ref} type="file" accept="image/*" onChange={handleImageUpload} />
+              <FileInput type="file" accept="image/*" onChange={handleImageUpload} />
             </AvatarContainer>
             <div>
               <Typography
@@ -100,7 +99,7 @@ const ServerOverview = (props) => {
               >
                 <div>
                   Upload Image
-                  <FileInput ref={ref} type="file" accept="image/*" onChange={handleImageUpload} />
+                  <FileInput type="file" accept="image/*" onChange={handleImageUpload} />
                 </div>
               </UploadButton>
             </div>
