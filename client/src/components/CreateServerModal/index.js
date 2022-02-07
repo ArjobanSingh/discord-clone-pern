@@ -25,6 +25,7 @@ import { getServerCreationError } from '../../redux/reducers';
 import useDidUpdate from '../../customHooks/useDidUpdate';
 import Error from '../../common/Error';
 
+// TODO: add loader
 const CreateServerModal = (props) => {
   const { closeModal } = props;
   const dispatch = useDispatch();

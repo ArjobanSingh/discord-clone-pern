@@ -81,6 +81,14 @@ const allServers = (state = {}, action) => {
       };
       return newState;
     }
+    case C.UPDATE_SERVER_SUCCESS: {
+      const newState = { ...state };
+      newState[action.payload.serverId] = {
+        ...newState[action.payload.serverId],
+        ...action.payload.data,
+      };
+      return newState;
+    }
     default:
       return state;
   }

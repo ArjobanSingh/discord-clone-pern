@@ -13,7 +13,11 @@ import User from '../entity/User';
 import { AllServersQuery, ServerType } from '../types/ServerTypes';
 import { getServerForJoinLink } from '../utils/helperFunctions';
 
-export const createServer = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const createServer = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { userId, body } = req;
 
@@ -51,20 +55,26 @@ export const createServer = async (req: CustomRequest, res: Response, next: Next
 
     res.status(201).json({
       ...otherSeverProps,
-      members: [{
-        userName: user.name,
-        userId: user.id,
-        email: user.email,
-        profilePicture: user.profilePicture,
-        role: MemberRole.OWNER,
-      }],
+      members: [
+        {
+          userName: user.name,
+          userId: user.id,
+          email: user.email,
+          profilePicture: user.profilePicture,
+          role: MemberRole.OWNER,
+        },
+      ],
     });
   } catch (err) {
     next(err);
   }
 };
 
-export const joinServer = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const joinServer = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { userId, query } = req;
 
@@ -95,7 +105,9 @@ export const joinServer = async (req: CustomRequest, res: Response, next: NextFu
       }
     }
 
-    let serverMember = await ServerMember.findOne({ where: { userId, serverId: server.id } });
+    let serverMember = await ServerMember.findOne({
+      where: { userId, serverId: server.id },
+    });
     if (serverMember) {
       // user already in this group
       next(new CustomError('You are already part of this server', 400));
@@ -111,7 +123,9 @@ export const joinServer = async (req: CustomRequest, res: Response, next: NextFu
     // either save or fail both
     await getConnection().transaction(async (transactionEntityManager) => {
       await transactionEntityManager.insert(ServerMember, serverMember);
-      await transactionEntityManager.update(Server, server.id, { memberCount: () => '"memberCount" + 1' });
+      await transactionEntityManager.update(Server, server.id, {
+        memberCount: () => '"memberCount" + 1',
+      });
     });
 
     res.status(204).json();
@@ -120,7 +134,11 @@ export const joinServer = async (req: CustomRequest, res: Response, next: NextFu
   }
 };
 
-export const leaveServer = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const leaveServer = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { serverId } = req.params;
     if (!serverId || !isUUID(serverId)) {
@@ -138,13 +156,18 @@ export const leaveServer = async (req: CustomRequest, res: Response, next: NextF
 
     if (server.ownerId === req.userId) {
       // TODO: owner cannot leave server for now
-      next(new CustomError('Owner cannot leave it\'s own server', 403));
+      next(new CustomError("Owner cannot leave it's own server", 403));
       return;
     }
 
     await getConnection().transaction(async (transactionEntityManager) => {
-      await transactionEntityManager.delete(ServerMember, { serverId, userId: req.userId });
-      await transactionEntityManager.update(Server, serverId, { memberCount: () => '"memberCount" - 1' });
+      await transactionEntityManager.delete(ServerMember, {
+        serverId,
+        userId: req.userId,
+      });
+      await transactionEntityManager.update(Server, serverId, {
+        memberCount: () => '"memberCount" - 1',
+      });
     });
 
     res.status(204).json();
@@ -154,7 +177,11 @@ export const leaveServer = async (req: CustomRequest, res: Response, next: NextF
 };
 
 // TODO: make this paginated based on popularity or number of members in desc
-export const getAllServers = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getAllServers = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { cursor, limit = '50' } = req.query as AllServersQuery;
     const limitNumber = parseInt(limit, 10);
@@ -180,7 +207,11 @@ export const getAllServers = async (req: CustomRequest, res: Response, next: Nex
   }
 };
 
-export const getServerDetails = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getServerDetails = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { serverId } = req.params;
 
@@ -190,7 +221,8 @@ export const getServerDetails = async (req: CustomRequest, res: Response, next: 
     }
 
     // get server details and with all users which are part of this as members
-    const [server]: ServerType[] = await getConnection().query(`
+    const [server]: ServerType[] = await getConnection().query(
+      `
       SELECT s.*,
       json_agg(json_build_object(
         'userName', u.name, 'userId', u.id, 'profilePicture', u."profilePicture", 'role', sm.role
@@ -201,7 +233,9 @@ export const getServerDetails = async (req: CustomRequest, res: Response, next: 
       WHERE s.id = $1
       group by s.id
       limit 1;
-    `, [serverId]);
+    `,
+      [serverId],
+    );
 
     if (!server) {
       next(new CustomError('No server found', 404));
@@ -211,7 +245,9 @@ export const getServerDetails = async (req: CustomRequest, res: Response, next: 
     if (server.type === ServerTypeEnum.PRIVATE) {
       // if current server is private, and user in not part of server
       // throw error
-      const thisMember = server.members.find((member) => member.userId === req.userId);
+      const thisMember = server.members.find(
+        (member) => member.userId === req.userId,
+      );
       if (!thisMember) {
         next(new CustomError('Forbidden', 403));
         return;
@@ -223,9 +259,16 @@ export const getServerDetails = async (req: CustomRequest, res: Response, next: 
   }
 };
 
-export const updateServer = async (req: CustomRequest, res: Response, next: NextFunction) => {
+// TODO: add update raw query, to prevent extra get query on save
+export const updateServer = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const { serverId, type } = req.body;
+    const {
+      id: serverId, type, name, description, banner, avatar,
+    } = req.body;
 
     if (!serverId || !isUUID(serverId)) {
       next(new CustomError('Invalid serverId', 400));
@@ -243,15 +286,34 @@ export const updateServer = async (req: CustomRequest, res: Response, next: Next
       return;
     }
 
-    if (server.ownerId !== req.userId) {
-      next(new CustomError('Forbidden', 403));
+    const serverMember = await ServerMember.findOne({
+      where: { userId: req.userId, serverId },
+    });
+
+    if (!serverMember
+      || enumScore[serverMember.role] < enumScore[MemberRole.ADMIN]
+    ) {
+      next(new CustomError('You do not have required permission for this action', 403));
       return;
     }
 
-    if (server.type !== type) {
-      server.type = type;
-      await server.save();
+    server.type = type;
+    server.name = name;
+    server.description = description;
+
+    // TODO: test undefined, null logos
+    server.banner = banner;
+    server.avatar = avatar;
+
+    const errors = await validate(server);
+
+    if (errors.length) {
+      next(createValidationError(errors));
+      return;
     }
+
+    await server.save();
+
     // const [response, responseLength] = await getConnection().query(`
     //   update server s
     //   set "type" =
@@ -268,13 +330,17 @@ export const updateServer = async (req: CustomRequest, res: Response, next: Next
     //   return;
     // }
 
-    res.status(204).json();
+    res.json(server);
   } catch (err) {
     next(err);
   }
 };
 
-export const deleteServer = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const deleteServer = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { serverId } = req.params;
 
@@ -301,11 +367,20 @@ export const deleteServer = async (req: CustomRequest, res: Response, next: Next
   }
 };
 
-export const updateServerMemberRoles = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const updateServerMemberRoles = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { role, userId, serverId } = req.body;
 
-    if (!role || !isUUID(serverId) || !isUUID(userId) || !Object.values(MemberRole).includes(role)) {
+    if (
+      !role
+      || !isUUID(serverId)
+      || !isUUID(userId)
+      || !Object.values(MemberRole).includes(role)
+    ) {
       next(new CustomError('Invalid body', 400));
       return;
     }
@@ -357,7 +432,10 @@ export const updateServerMemberRoles = async (req: CustomRequest, res: Response,
     }
 
     if (requestedUser.role !== role) {
-      await ServerMember.update({ userId: requestedUser.userId, serverId }, { role });
+      await ServerMember.update(
+        { userId: requestedUser.userId, serverId },
+        { role },
+      );
     }
 
     res.status(204).json();

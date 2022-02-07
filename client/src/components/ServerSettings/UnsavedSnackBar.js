@@ -7,7 +7,8 @@ import Button from '@mui/material/Button';
 import { UnsavedWrapper } from './styles';
 import { useSnackbarValues } from './SnackbarProvider';
 
-const UnsavedSnackBar = ({ handleSubmit }) => {
+// TODO: add loader
+const UnsavedSnackBar = ({ handleSubmit, isSubmitting }) => {
   const { isSnackbarOpen, setReset, setIsSnackbarOpen } = useSnackbarValues();
   const handleReset = () => {
     setReset(true);
@@ -31,7 +32,7 @@ const UnsavedSnackBar = ({ handleSubmit }) => {
           </Button>
 
           <Button variant="contained" color="success" onClick={handleSubmit}>
-            Save Changes
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
           </Button>
         </Box>
       </UnsavedWrapper>
@@ -41,6 +42,7 @@ const UnsavedSnackBar = ({ handleSubmit }) => {
 
 UnsavedSnackBar.propTypes = {
   handleSubmit: PropTypes.func.isRequired,
+  isSubmitting: PropTypes.bool.isRequired,
 };
 
 export default UnsavedSnackBar;

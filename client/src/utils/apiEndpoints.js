@@ -13,6 +13,7 @@ export const ServerApi = {
   GET_SERVER: '/server',
   JOIN_SERVER: '/server/join-server',
   CREATE_SERVER: '/server/create-server',
+  UPDATE_SERVER: '/server/update-server',
 };
 
 export const InviteApi = {

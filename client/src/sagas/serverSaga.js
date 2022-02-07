@@ -1,5 +1,5 @@
 import {
-  all, call, put, takeEvery, takeLatest,
+  all, call, put, select, takeEvery, takeLatest,
 } from 'redux-saga/effects';
 import axiosInstance from '../utils/axiosConfig';
 import {
@@ -7,6 +7,7 @@ import {
   EXPLORE_SERVERS_REQUESTED,
   JOIN_SERVER_REQUESTED,
   SERVER_DETAILS_REQUESTED,
+  UPDATE_SERVER_REQUESTED,
 } from '../constants/servers';
 import {
   createServerFailed,
@@ -17,10 +18,13 @@ import {
   joinServerSucess,
   serverDetailsFailed,
   serverDetailsSuccess,
+  updateServerFailed,
+  updateServerSuccess,
 } from '../redux/actions/servers';
 import { handleError } from '../utils/helperFunctions';
 import { ServerApi } from '../utils/apiEndpoints';
 import { setNavigateState } from '../redux/actions/navigate';
+import { getServerDetails as getServerState } from '../redux/reducers';
 
 function* getServerDetails(actionData) {
   const { serverId, isExploringServer } = actionData.payload;
@@ -92,11 +96,30 @@ function* createServer(actionData) {
   }
 }
 
+function* updateServer(actionData) {
+  const { data, serverId } = actionData.payload;
+  try {
+    const url = ServerApi.UPDATE_SERVER;
+    const { _members, ...serverData } = yield select((state) => getServerState(state, serverId));
+    const content = {
+      ...serverData,
+      ...data,
+    };
+    const response = yield call(axiosInstance.put, url, content);
+    yield put(updateServerSuccess(serverId, response.data));
+  } catch (err) {
+    yield put(
+      handleError(err, (error) => updateServerFailed(serverId, error)),
+    );
+  }
+}
+
 export default function* serverSaga() {
   yield all([
     takeEvery(SERVER_DETAILS_REQUESTED, getServerDetails),
     takeEvery(JOIN_SERVER_REQUESTED, joinServer),
     takeLatest(EXPLORE_SERVERS_REQUESTED, getPublicServers),
     takeEvery(CREATE_SERVER_REQUESTED, createServer),
+    takeEvery(UPDATE_SERVER_REQUESTED, updateServer),
   ]);
 }

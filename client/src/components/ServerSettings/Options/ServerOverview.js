@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import debounce from 'lodash.debounce';
 import Typography from '@mui/material/Typography';
@@ -6,6 +6,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
 import { useParams } from 'react-router-dom';
 import Divider from '@mui/material/Divider';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   AvatarContainer,
   FileInput,
@@ -17,15 +18,22 @@ import {
 import useServerData from '../../../customHooks/useServerData';
 import { getCharacterName } from '../../../utils/helperFunctions';
 import StyledTextField from '../../../common/StyledTextfield';
-import { ServerTypes } from '../../../constants/servers';
+import { ServerTypes, serverValidation } from '../../../constants/servers';
 import useDidUpdate from '../../../customHooks/useDidUpdate';
 import UnsavedSnackBar from '../UnsavedSnackBar';
 import { useSnackbarValues } from '../SnackbarProvider';
+import { isEmpty } from '../../../utils/validators';
+import { updateServerRequested } from '../../../redux/actions/servers';
+import { getUpdateServerData } from '../../../redux/reducers';
 
 // TODO: handle file uploads
 const ServerOverview = (props) => {
   const { reset, setReset, setIsSnackbarOpen } = useSnackbarValues();
   const { serverId } = useParams();
+  const dispatch = useDispatch();
+  const { isLoading, error } = useSelector(
+    (state) => getUpdateServerData(state, serverId),
+  ) || { isLoading: false, error: null };
 
   const { serverDetails } = useServerData(serverId, false);
   const { name, avatar, type } = serverDetails;
@@ -60,7 +68,30 @@ const ServerOverview = (props) => {
 
   const handleImageUpload = () => {};
 
-  const updateServerDetails = () => {};
+  const updateServerDetails = () => {
+    const newErrorObj = {};
+    if (!serverName?.trim()) {
+      newErrorObj.serverName = 'Cannot be empty';
+    } else if (serverName.length < serverValidation.SERVER_NAME_MIN_LENGTH) {
+      newErrorObj.serverName = `Must be longer than or equal to ${serverValidation.SERVER_NAME_MIN_LENGTH} characters`;
+    } else if (serverName.length > serverValidation.SERVER_NAME_MAX_LENGTH) {
+      newErrorObj.serverName = `Must be smaller than or equal to ${serverValidation.SERVER_NAME_MAX_LENGTH} characters`;
+    }
+
+    if (!isEmpty(newErrorObj)) {
+      setErrors(newErrorObj);
+      return;
+    }
+
+    setErrors({});
+
+    // TODO: add description, logo and banner
+    const data = {
+      name: serverName,
+      type: serverType,
+    };
+    dispatch(updateServerRequested(serverId, data));
+  };
 
   return (
     <>
@@ -128,6 +159,8 @@ const ServerOverview = (props) => {
                 name="server-name"
                 isError={!!errors.serverName}
                 errorMessage={errors.serverName}
+                minLength={serverValidation.SERVER_NAME_MIN_LENGTH}
+                maxLength={serverValidation.SERVER_NAME_MAX_LENGTH}
                 injectCss={(theme) => `margin-top: ${theme.spacing(1)};`}
                 onKeyDown={(e) => {
                   // to prevent weired error of losing focus on typing s
@@ -150,11 +183,11 @@ const ServerOverview = (props) => {
                 SERVER TYPE
               </Typography>
               <TypeSelect
-                labelId="expiration-limit"
+                labelId="server-type"
                 value={serverType}
                 onChange={({ target: { value } }) => setServerType(value)}
                 displayEmpty
-                inputProps={{ 'aria-label': 'Expiration limit' }}
+                inputProps={{ 'aria-label': 'Server type' }}
               >
                 {Object.entries(ServerTypes).map(([title, value]) => (
                   <MenuItem key={value} value={value}>{title}</MenuItem>
@@ -166,7 +199,7 @@ const ServerOverview = (props) => {
         </Box>
         <Divider sx={{ backgroundColor: 'text.secondaryDark' }} />
       </OverviewContainer>
-      <UnsavedSnackBar handleSubmit={updateServerDetails} />
+      <UnsavedSnackBar handleSubmit={updateServerDetails} isSubmitting={isLoading} />
     </>
   );
 };
