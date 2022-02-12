@@ -2,14 +2,16 @@ import styled from 'styled-components';
 import Avatar from '@mui/material/Avatar';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
+import MenuItem from '@mui/material/MenuItem';
+import { grey } from '@mui/material/colors';
 
 export const IconAvatar = styled(Avatar)(({
   theme,
 }) => `
     background-color: ${theme.palette.primary.main};
     color: ${theme.palette.text.primary};
-    width: 100px;
-    height: 100px;
+    width: inherit;
+    height: inherit;
     box-shadow: ${theme.shadows[6]};
   
     &:hover {
@@ -20,6 +22,8 @@ export const IconAvatar = styled(Avatar)(({
 
 export const AvatarContainer = styled.div`
   position: relative;
+  height: 100px;
+  width: 100px;
 `;
 
 export const FileInput = styled.input`
@@ -68,3 +72,44 @@ export const OverviewContainer = styled.div`
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing(4)};
 `;
+
+export const MembersInfoBar = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 5px;
+  padding-bottom: ${({ theme }) => theme.spacing(2)};
+  border-bottom: 1px solid ${grey[700]};
+  flex-wrap: wrap;
+`;
+
+export const LineSelect = styled(Select)(({ theme }) => `
+  background: transparent;
+  box-shadow: none;
+  font-size: ${theme.typography.subtitle2.fontSize};
+
+  &:before,
+  &:after,
+  &:hover:after {
+    border: none;
+  }
+
+  & .MuiSelect-select:focus {
+    background: transparent;
+  }
+`);
+
+export const SelectOption = styled(MenuItem)(({ theme }) => `
+`);
+
+export const SearchInput = styled.input(({ theme }) => `
+  border: none;
+  outline: none;
+  background-color: ${theme.palette.background.darker};
+  border-radius: ${theme.shape.borderRadius}px;
+  color: ${theme.palette.text.secondary};
+  font-size: ${theme.typography.subtitle2.fontSize};
+  width: 180px;
+  padding: ${theme.spacing(0.7)};
+`);

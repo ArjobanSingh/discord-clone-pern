@@ -43,3 +43,5 @@ export function handleEnter(callback) {
     }
   };
 }
+
+export const stopPropagation = (e) => e.stopPropagation();

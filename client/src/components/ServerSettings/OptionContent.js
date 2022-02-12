@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import { SERVER_SETTINGS } from '../../constants/servers';
 import { OptionContentContainer } from './styles';
 import ServerOverview from './Options/ServerOverview';
+import ServerMembers from './Options/ServerMembers';
 
 const { OVERVIEW, MEMBERS, BANS } = SERVER_SETTINGS;
 
@@ -13,7 +14,7 @@ const data = {
     title: 'Server Overview',
   },
   [MEMBERS]: {
-    component: () => <div>MEMBERS</div>,
+    component: ServerMembers,
     title: 'Server Members',
   },
   [BANS]: {

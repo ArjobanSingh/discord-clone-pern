@@ -16,7 +16,7 @@ import {
   UploadButton,
 } from './styles';
 import useServerData from '../../../customHooks/useServerData';
-import { getCharacterName } from '../../../utils/helperFunctions';
+import { getCharacterName, stopPropagation } from '../../../utils/helperFunctions';
 import StyledTextField from '../../../common/StyledTextfield';
 import { ServerTypes, serverValidation } from '../../../constants/servers';
 import useDidUpdate from '../../../customHooks/useDidUpdate';
@@ -26,45 +26,63 @@ import { isEmpty } from '../../../utils/validators';
 import { updateServerRequested } from '../../../redux/actions/servers';
 import { getUpdateServerData } from '../../../redux/reducers';
 
+const isDescriptionChanged = (prevDesc, newDesc) => {
+  // if saved description was null, and current description is empty string,
+  // basically both are empty
+  if (!prevDesc && !newDesc) return false;
+  return prevDesc !== newDesc;
+};
+
 // TODO: handle file uploads
 const ServerOverview = (props) => {
   const { reset, setReset, setIsSnackbarOpen } = useSnackbarValues();
   const { serverId } = useParams();
   const dispatch = useDispatch();
+
   const { isLoading, error } = useSelector(
     (state) => getUpdateServerData(state, serverId),
   ) || { isLoading: false, error: null };
 
   const { serverDetails } = useServerData(serverId, false);
-  const { name, avatar, type } = serverDetails;
+  const {
+    name,
+    avatar,
+    type,
+    description,
+  } = serverDetails;
 
   const [serverName, setServerName] = useState(name);
   const [serverType, setServerType] = useState(type);
+  const [serverDescription, setServerDescription] = useState(description ?? '');
   const [errors, setErrors] = useState({});
 
   useDidUpdate(() => {
     if (reset) {
       setServerName(name);
       setServerType(type);
+      setServerDescription(description ?? '');
       setErrors({});
       setReset(false);
     }
-  }, [reset, name, type]);
+  }, [reset, name, type, description]);
 
   useDidUpdate(() => {
     // TODO: Handle socket update notification
-    const debouncedFunc = debounce(() => {
+    // maybe will debounce if face any problems
+    const debouncedFunc = () => {
       if (serverName !== name
-        || serverType !== type) {
+        || serverType !== type
+        || isDescriptionChanged(description, serverDescription)
+      ) {
         setIsSnackbarOpen(true);
         return;
       }
       setIsSnackbarOpen(false);
-    }, 300);
+    };
     debouncedFunc();
 
     return debouncedFunc.cancel;
-  }, [serverName, serverType, name, type]);
+  }, [serverName, serverType, serverDescription, name, type, description]);
 
   const handleImageUpload = () => {};
 
@@ -78,6 +96,14 @@ const ServerOverview = (props) => {
       newErrorObj.serverName = `Must be smaller than or equal to ${serverValidation.SERVER_NAME_MAX_LENGTH} characters`;
     }
 
+    if (serverDescription) {
+      if (!serverDescription?.trim()) {
+        newErrorObj.serverDescription = 'Cannot be only whitespace';
+      } else if (serverDescription.length > serverValidation.SERVER_DESCRIPTION_MAX_LENGTH) {
+        newErrorObj.serverDescription = `Must be smaller than or equal to ${serverValidation.SERVER_DESCRIPTION_MAX_LENGTH} characters`;
+      }
+    }
+
     if (!isEmpty(newErrorObj)) {
       setErrors(newErrorObj);
       return;
@@ -89,6 +115,7 @@ const ServerOverview = (props) => {
     const data = {
       name: serverName,
       type: serverType,
+      description: serverDescription,
     };
     dispatch(updateServerRequested(serverId, data));
   };
@@ -155,17 +182,13 @@ const ServerOverview = (props) => {
                     SERVER NAME
                   </Typography>
                 )}
-                id="server-name"
-                name="server-name"
+                id="edit-server-name"
                 isError={!!errors.serverName}
                 errorMessage={errors.serverName}
                 minLength={serverValidation.SERVER_NAME_MIN_LENGTH}
                 maxLength={serverValidation.SERVER_NAME_MAX_LENGTH}
                 injectCss={(theme) => `margin-top: ${theme.spacing(1)};`}
-                onKeyDown={(e) => {
-                  // to prevent weired error of losing focus on typing s
-                  e.stopPropagation();
-                }}
+                onKeyDown={stopPropagation} // to prevent weired error of losing focus on typing s
                 autoComplete="off"
                 value={serverName}
                 onChange={({ target: { value } }) => {
@@ -194,8 +217,34 @@ const ServerOverview = (props) => {
                 ))}
               </TypeSelect>
             </div>
-          </Box>
 
+            <div>
+              <StyledTextField
+                id="edit-server-description"
+                label={(
+                  <Typography
+                    variant="caption"
+                    color={errors.serverDescription ? 'error.light' : 'text.secondary'}
+                    component="span"
+                    fontWeight="fontWeightBold"
+                  >
+                    SERVER DESCRIPTION
+                  </Typography>
+                )}
+                value={serverDescription}
+                onChange={({ target }) => setServerDescription(target.value)}
+                isError={!!errors.serverDescription}
+                errorMessage={errors.serverDescription}
+                maxLength={serverValidation.SERVER_DESCRIPTION_MAX_LENGTH}
+                as="textarea"
+                rows={4}
+                onKeyDown={stopPropagation} // to prevent weired error of losing focus on typing s
+                injectCss={(theme) => `margin-top: ${theme.spacing(1)};
+                  textarea { resize: none; }
+                `}
+              />
+            </div>
+          </Box>
         </Box>
         <Divider sx={{ backgroundColor: 'text.secondaryDark' }} />
       </OverviewContainer>
