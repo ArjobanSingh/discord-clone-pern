@@ -1,8 +1,11 @@
 // import PropTypes from 'prop-types';
-import { memo, useMemo, Fragment } from 'react';
+import {
+  memo, useMemo, Fragment, useEffect,
+} from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { useOutletContext, useParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import {
   ChannelContainer,
   MainContent,
@@ -15,6 +18,7 @@ import ResponsiveDrawer from '../../common/ResponsiveDrawer';
 import Logo from '../../common/Logo';
 import { isEmpty } from '../../utils/validators';
 import { ServerMemberRoles } from '../../constants/servers';
+import { getChannelData } from '../../redux/reducers';
 
 const wideScreenDrawerProps = {
   variant: 'persistent',
@@ -32,8 +36,11 @@ const wideScreenDrawerProps = {
 // TODO: maybe change drawers logic in future
 const Channel = (props) => {
   const params = useParams();
+  const { serverId, channelId } = useParams();
+  const channel = useSelector((state) => getChannelData(state, serverId, channelId));
 
   const {
+    setOpenedChannel,
     closeMembersDrawer,
     isMembersDrawerOpen,
     members,
@@ -52,10 +59,22 @@ const Channel = (props) => {
     return result;
   }, [members]);
 
+  useEffect(() => {
+    if (channel?.name) {
+      setOpenedChannel(channel);
+      return;
+    }
+    setOpenedChannel({});
+  }, [channel?.name, channel?.type]);
+
+  if (!channel) {
+    return <div>TODO: NO such channel</div>;
+  }
+
   return (
     <ChannelContainer>
       <MainContent isDrawerOpen={isMembersDrawerOpen}>
-        Single channel messages
+        {channel.name}
         {' '}
         {params.channelId}
         {' '}

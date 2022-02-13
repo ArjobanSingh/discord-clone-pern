@@ -6,6 +6,7 @@ import servers, * as fromServers from './servers';
 import joinServers, * as fromJoinServer from './join-servers';
 import exploreServers, * as fromExploreServers from './explore-servers';
 import createServers, * as fromCreateServers from './create-servers';
+import channels, * as fromChannels from './channels';
 import navigate from './navigate';
 
 const appReducer = combineReducers({
@@ -16,6 +17,7 @@ const appReducer = combineReducers({
   joinServers,
   exploreServers,
   createServers,
+  channels,
 });
 
 const rootReducer = (state, action) => {
@@ -61,4 +63,12 @@ export const getNavigationState = (state) => state.navigate;
 
 export const getServerCreationError = (state) => (
   fromCreateServers.getServerCreationError(state.createServers)
+);
+
+export const getAllServerChannels = (state, serverId) => (
+  fromChannels.getAllServerChannels(state.channels, serverId)
+);
+
+export const getChannelData = (state, serverId, channelId) => (
+  fromChannels.getChannelData(state.channels, serverId, channelId)
 );

@@ -1,10 +1,6 @@
 import { NextFunction, Response } from 'express';
-import {
-  isString, isURL, isUUID, validate,
-} from 'class-validator';
-import {
-  FindManyOptions, getConnection, In, LessThan,
-} from 'typeorm';
+import { isString, isURL, isUUID, validate } from 'class-validator';
+import { FindManyOptions, getConnection, In, LessThan } from 'typeorm';
 import Server, { ServerTypeEnum } from '../entity/Server';
 import CustomRequest from '../interfaces/CustomRequest';
 import { createValidationError, CustomError } from '../utils/errors';
@@ -12,6 +8,7 @@ import ServerMember, { enumScore, MemberRole } from '../entity/ServerMember';
 import User from '../entity/User';
 import { AllServersQuery, ServerType } from '../types/ServerTypes';
 import { getServerForJoinLink } from '../utils/helperFunctions';
+import Channel from '../entity/Channel';
 
 export const createServer = async (
   req: CustomRequest,
@@ -29,6 +26,7 @@ export const createServer = async (
     newServer.owner = user;
     newServer.type = body.type || ServerTypeEnum.PUBLIC;
     newServer.memberCount = 1;
+    newServer.channelCount = 1;
     newServer.banner = banner;
     newServer.description = description;
 
@@ -46,12 +44,19 @@ export const createServer = async (
     serverMember.user = user;
     serverMember.server = newServer;
 
+    const generalChannel = new Channel();
+    generalChannel.name = 'general';
+    generalChannel.server = newServer;
+
     await getConnection().transaction(async (transactionEntityManager) => {
       await transactionEntityManager.save(newServer);
       await transactionEntityManager.save(serverMember);
+      await transactionEntityManager.save(generalChannel);
     });
 
+    console.log({ newServer, generalChannel });
     const { owner: _, ...otherSeverProps } = newServer;
+    const { server: _s, serverId: _sId, ...restChannelData } = generalChannel;
 
     res.status(201).json({
       ...otherSeverProps,
@@ -64,6 +69,7 @@ export const createServer = async (
           role: MemberRole.OWNER,
         },
       ],
+      channels: [restChannelData],
     });
   } catch (err) {
     next(err);
@@ -186,7 +192,8 @@ export const getAllServers = async (
     const { cursor, limit = '50' } = req.query as AllServersQuery;
     const limitNumber = parseInt(limit, 10);
 
-    const take = Number.isNaN(limitNumber) || limitNumber > 50 ? 50 : limitNumber;
+    const take =
+      Number.isNaN(limitNumber) || limitNumber > 50 ? 50 : limitNumber;
     const queryObj: FindManyOptions = {
       where: { type: ServerTypeEnum.PUBLIC },
       order: { createdAt: 'DESC' },
@@ -221,7 +228,7 @@ export const getServerDetails = async (
     }
 
     // get server details and with all users which are part of this as members
-    const [server]: ServerType[] = await getConnection().query(
+    const serverDetailsPromise = getConnection().query(
       `
       SELECT s.*,
       json_agg(json_build_object(
@@ -237,6 +244,17 @@ export const getServerDetails = async (
       [serverId],
     );
 
+    const getChannelsPromise = Channel.find({
+      where: { serverId },
+    });
+
+    const [serverData, serverChannels] = await Promise.all([
+      serverDetailsPromise,
+      getChannelsPromise,
+    ]);
+
+    const [server] = serverData;
+
     if (!server) {
       next(new CustomError('No server found', 404));
       return;
@@ -246,14 +264,14 @@ export const getServerDetails = async (
       // if current server is private, and user in not part of server
       // throw error
       const thisMember = server.members.find(
-        (member) => member.userId === req.userId,
+        (member: ServerMember) => member.userId === req.userId,
       );
       if (!thisMember) {
         next(new CustomError('Forbidden', 403));
         return;
       }
     }
-    res.json(server);
+    res.json({ ...server, channels: serverChannels });
   } catch (err) {
     next(err);
   }
@@ -266,9 +284,7 @@ export const updateServer = async (
   next: NextFunction,
 ) => {
   try {
-    const {
-      id: serverId, type, name, description, banner, avatar,
-    } = req.body;
+    const { id: serverId, type, name, description, banner, avatar } = req.body;
 
     if (!serverId || !isUUID(serverId)) {
       next(new CustomError('Invalid serverId', 400));
@@ -290,10 +306,16 @@ export const updateServer = async (
       where: { userId: req.userId, serverId },
     });
 
-    if (!serverMember
-      || enumScore[serverMember.role] < enumScore[MemberRole.ADMIN]
+    if (
+      !serverMember ||
+      enumScore[serverMember.role] < enumScore[MemberRole.ADMIN]
     ) {
-      next(new CustomError('You do not have required permission for this action', 403));
+      next(
+        new CustomError(
+          'You do not have required permission for this action',
+          403,
+        ),
+      );
       return;
     }
 
@@ -376,10 +398,10 @@ export const updateServerMemberRoles = async (
     const { role, userId, serverId } = req.body;
 
     if (
-      !role
-      || !isUUID(serverId)
-      || !isUUID(userId)
-      || !Object.values(MemberRole).includes(role)
+      !role ||
+      !isUUID(serverId) ||
+      !isUUID(userId) ||
+      !Object.values(MemberRole).includes(role)
     ) {
       next(new CustomError('Invalid body', 400));
       return;

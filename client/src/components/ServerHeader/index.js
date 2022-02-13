@@ -9,7 +9,7 @@ import { Header } from '../../common/StyledComponents';
 import Tag from '../../common/Tag';
 
 const ServerHeader = (props) => {
-  const { serverName, openServerListDrawer, openMembersDrawer } = props;
+  const { name, openServerListDrawer, openMembersDrawer } = props;
   return (
     <Header>
       <Box
@@ -31,7 +31,7 @@ const ServerHeader = (props) => {
           >
             <MenuIcon />
           </IconButton>
-          {!!serverName && (
+          {!!name && (
             <>
               <Tag />
               <Typography
@@ -39,7 +39,7 @@ const ServerHeader = (props) => {
                 lineHeight="normal"
                 fontWeight="fontWeightBold"
               >
-                {serverName}
+                {name}
               </Typography>
             </>
           )}
@@ -61,14 +61,14 @@ const ServerHeader = (props) => {
 };
 
 ServerHeader.propTypes = {
-  serverName: PropTypes.string,
+  name: PropTypes.string,
   openServerListDrawer: PropTypes.func.isRequired,
   openMembersDrawer: PropTypes.func,
 };
 
 ServerHeader.defaultProps = {
   openMembersDrawer: null,
-  serverName: null,
+  name: null,
 };
 
 export default ServerHeader;

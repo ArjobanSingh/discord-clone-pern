@@ -11,6 +11,7 @@ import { ServerMemberRoles, ServerMemberScores } from '../../../constants/server
 import { capitalize, handleEnter } from '../../../utils/helperFunctions';
 import { SimpleEllipsis } from '../../../common/StyledComponents';
 
+// TODO: user settings ui and logic
 const SingleMember = ({ loggedInMember, currentMember, setUpdateRoleMenuData }) => {
   const isUserRoleSuperior = ServerMemberScores[loggedInMember.role]
     > ServerMemberScores[currentMember.role];

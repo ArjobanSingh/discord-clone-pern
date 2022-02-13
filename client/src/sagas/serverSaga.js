@@ -27,12 +27,14 @@ import { handleError } from '../utils/helperFunctions';
 import { ServerApi } from '../utils/apiEndpoints';
 import { setNavigateState } from '../redux/actions/navigate';
 import { getServerDetails as getServerState } from '../redux/reducers';
+import { saveAllChannels } from '../redux/actions/channels';
 
 function* getServerDetails(actionData) {
   const { serverId, isExploringServer } = actionData.payload;
   try {
     const url = `${ServerApi.GET_SERVER}/${serverId}`;
     const response = yield call(axiosInstance.get, url);
+    yield put(saveAllChannels(serverId, response.data.channels ?? []));
     yield put(serverDetailsSuccess(response.data, isExploringServer));
   } catch (err) {
     yield put(

@@ -8,7 +8,7 @@ const MeServer = (props) => {
   return (
     <>
       <ServerHeader
-        serverName="ME"
+        name="ME"
         openServerListDrawer={openServerListDrawer}
       />
     </>

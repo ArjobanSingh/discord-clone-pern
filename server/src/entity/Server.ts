@@ -20,6 +20,7 @@ import {
 } from 'typeorm';
 import User from './User';
 import ServerMember from './ServerMember';
+import Channel from './Channel';
 
 export enum ServerTypeEnum {
   PUBLIC = 'public',
@@ -69,6 +70,9 @@ export default class Server extends BaseEntity {
 
   @OneToMany((type) => ServerMember, (serverMember) => serverMember.server)
   serverMembers: ServerMember[];
+
+  @OneToMany((type) => Channel, (channel) => channel.server)
+  channels: Channel[];
 
   @Column({
     default: 0,
