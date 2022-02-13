@@ -14,6 +14,7 @@ export const ServerApi = {
   JOIN_SERVER: '/server/join-server',
   CREATE_SERVER: '/server/create-server',
   UPDATE_SERVER: '/server/update-server',
+  UPDATE_ROLE: '/server/update-roles',
 };
 
 export const InviteApi = {

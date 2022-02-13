@@ -122,3 +122,24 @@ export const updateServerFailed = (serverId, error) => ({
     error,
   },
 });
+
+export const updateServerRoleRequested = (payload) => ({
+  type: C.UPDATE_SERVER_ROLE_REQUESTED,
+  payload,
+});
+
+export const updateServerRoleSuccess = (serverId, data) => ({
+  type: C.UPDATE_SERVER_ROLE_SUCCESS,
+  payload: {
+    serverId,
+    data,
+  },
+});
+
+// export const updateServerRoleFailed = (serverId, error) => ({
+//   type: C.UPDATE_SERVER_ROLE_FAILED,
+//   payload: {
+//     serverId,
+//     error,
+//   },
+// });

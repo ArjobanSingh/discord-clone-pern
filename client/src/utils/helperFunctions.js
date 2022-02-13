@@ -20,6 +20,10 @@ export function stringToColor(string) {
   return color;
 }
 
+export function capitalize(str) {
+  return `${str[0].toUpperCase()}${str.slice(1)?.toLowerCase()}`;
+}
+
 export function getCharacterName(name) {
   if (!name) return '';
   const [firstName, lastName] = name.split(' ');

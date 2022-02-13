@@ -37,7 +37,7 @@ const ChannelList = (props) => {
 
   const serverMember = useMemo(() => (
     serverDetails?.members?.find((member) => member.userId === user.id)
-  ), [serverDetails?.members]);
+  ), [serverDetails?.members, user.id]);
 
   const openInviteModal = () => {
     setIsInviteModalOpen(true);

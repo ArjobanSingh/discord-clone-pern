@@ -89,6 +89,23 @@ const allServers = (state = {}, action) => {
       };
       return newState;
     }
+    case C.UPDATE_SERVER_ROLE_SUCCESS: {
+      const newState = { ...state };
+      const thisServer = newState[action.payload.serverId];
+      newState[action.payload.serverId] = {
+        ...thisServer,
+        members: thisServer.members.map((member) => {
+          if (member.userId === action.payload.data.userId) {
+            return {
+              ...member,
+              role: action.payload.data.role,
+            };
+          }
+          return member;
+        }),
+      };
+      return newState;
+    }
     default:
       return state;
   }

@@ -8,6 +8,7 @@ import {
   JOIN_SERVER_REQUESTED,
   SERVER_DETAILS_REQUESTED,
   UPDATE_SERVER_REQUESTED,
+  UPDATE_SERVER_ROLE_REQUESTED,
 } from '../constants/servers';
 import {
   createServerFailed,
@@ -19,6 +20,7 @@ import {
   serverDetailsFailed,
   serverDetailsSuccess,
   updateServerFailed,
+  updateServerRoleSuccess,
   updateServerSuccess,
 } from '../redux/actions/servers';
 import { handleError } from '../utils/helperFunctions';
@@ -114,6 +116,21 @@ function* updateServer(actionData) {
   }
 }
 
+function* updateUserRoleInServer(actionData) {
+  const { serverId, userId, role } = actionData.payload;
+  try {
+    const url = ServerApi.UPDATE_ROLE;
+    yield call(axiosInstance.put, url, { role, userId, serverId });
+    yield put(updateServerRoleSuccess(serverId, { userId, role }));
+  } catch (err) {
+    // TODO: handle notification error
+    console.log('Update role error', err, err.message);
+    yield put(
+      handleError(err, (error) => updateServerFailed(serverId, error)),
+    );
+  }
+}
+
 export default function* serverSaga() {
   yield all([
     takeEvery(SERVER_DETAILS_REQUESTED, getServerDetails),
@@ -121,5 +138,6 @@ export default function* serverSaga() {
     takeLatest(EXPLORE_SERVERS_REQUESTED, getPublicServers),
     takeEvery(CREATE_SERVER_REQUESTED, createServer),
     takeEvery(UPDATE_SERVER_REQUESTED, updateServer),
+    takeEvery(UPDATE_SERVER_ROLE_REQUESTED, updateUserRoleInServer),
   ]);
 }

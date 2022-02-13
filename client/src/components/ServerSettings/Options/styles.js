@@ -3,6 +3,7 @@ import Avatar from '@mui/material/Avatar';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { grey } from '@mui/material/colors';
 
 export const IconAvatar = styled(Avatar)(({
@@ -80,8 +81,8 @@ export const MembersInfoBar = styled.div`
   align-items: center;
   gap: 5px;
   padding-bottom: ${({ theme }) => theme.spacing(2)};
-  border-bottom: 1px solid ${grey[700]};
-  flex-wrap: wrap;
+  border-bottom: 1px solid ${grey[800]};
+  // flex-wrap: wrap;
 `;
 
 export const LineSelect = styled(Select)(({ theme }) => `
@@ -112,4 +113,49 @@ export const SearchInput = styled.input(({ theme }) => `
   font-size: ${theme.typography.subtitle2.fontSize};
   width: 180px;
   padding: ${theme.spacing(0.7)};
+`);
+
+export const MemberSettingIcon = styled(MoreVertIcon)(({ theme }) => `
+  color: ${theme.palette.text.secondaryDark};
+  margin-left: auto;
+
+  &:hover {
+    color: ${theme.palette.text.primary};
+    cursor: pointer;
+  }
+`);
+
+export const MemberItem = styled.div(({ theme }) => `
+  width: 100%;
+  display: flex;
+  gap: ${theme.spacing(2)};
+  padding-block: ${theme.spacing(2)};
+  border-bottom: 1px solid ${grey[800]};
+  align-items: center;
+
+  & ${MemberSettingIcon} {
+    display: none;
+  }
+
+  &:hover {
+    & ${MemberSettingIcon} {
+      display: block;
+    }
+  }
+`);
+
+export const StyledAvatar = styled(Avatar)(({
+  theme,
+}) => `
+  width: 40px;
+  height: 40px;
+  background-color: ${theme.palette.primary.main};
+  color: ${theme.palette.text.primary}
+`);
+
+export const RoleChip = styled.div(({ theme, isUserRoleSuperior }) => `
+  background-color: ${theme.palette.background.darker};
+  padding: ${theme.spacing(0.5)} ${theme.spacing(1)};
+  border-radius: ${theme.shape.borderRadius}px;
+  cursor: ${isUserRoleSuperior ? 'pointer' : ''};
 `);
