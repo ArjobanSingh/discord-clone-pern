@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Menu, { menuClasses } from '@mui/material/Menu';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { INVITE_USERS_ICON } from '../../constants/images';
 
 export const ChannelListContainer = styled.div`
@@ -61,3 +62,36 @@ export const StyledMenu = styled(Menu)(({ theme }) => `
     }
   }
 `);
+
+export const ListContainer = styled.div(({ isInviteBoxVisible }) => `
+  height: ${isInviteBoxVisible ? 'calc(100% - 245px)' : 'calc(100% - 190px)'};
+  width: 100%;
+`);
+
+export const ExpandableIcon = styled(({ isExpanded, ...rest }) => <ArrowForwardIosIcon {...rest} />)`
+  transform: ${({ isExpanded }) => (isExpanded ? 'rotate(90deg)' : '')};
+  transition: transform .3s;
+  font-size: 0.75rem;
+  margin-right: ${({ theme }) => theme.spacing(1)}
+`;
+
+export const ChannelItem = styled.div(({ theme, isChannelOpened }) => `
+  padding: ${theme.spacing(1)};
+  margin-inline: ${theme.spacing(1)};
+  color: ${theme.palette.text.secondaryDark};
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing(1)};
+  background-color: ${isChannelOpened ? theme.palette.background.default : 'transparent'};
+  border-radius: ${theme.shape.borderRadius}px;
+
+  &:hover {
+    background-color: ${theme.palette.background.default};
+    cursor: pointer;
+  }
+`);
+
+export const ChannelTypeContainer = styled.div`
+  width: 100%;
+  margin-bottom: ${({ theme }) => theme.spacing(2)};
+`;

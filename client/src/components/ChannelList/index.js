@@ -1,14 +1,26 @@
 // import PropTypes from 'prop-types';
-import { memo, useState, useMemo } from 'react';
+import {
+  memo, useState, useMemo,
+} from 'react';
 import { useParams } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+import Collapse from '@mui/material/Collapse';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
 import Box from '@mui/material/Box';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Button from '@mui/material/Button';
 import { Header } from '../../common/StyledComponents';
 import {
-  ChannelListContainer, InviteSection, InviteSectionWrapper, StyledMenu,
+  ChannelItem,
+  ChannelListContainer,
+  ChannelTypeContainer,
+  ExpandableIcon,
+  InviteSection,
+  InviteSectionWrapper,
+  ListContainer,
+  StyledMenu,
 } from './styles';
 import TransitionModal from '../../common/TransitionModal';
 import InviteModal from '../InviteModal';
@@ -17,6 +29,8 @@ import { Roles } from '../../constants/serverMembers';
 import { ServerTypes } from '../../constants/servers';
 import useServerData from '../../customHooks/useServerData';
 import ServerSettingsMenu from '../ServerSettingsMenu';
+import Tag from '../../common/Tag';
+import { ChannelType } from '../../constants/channels';
 
 const anchorOrigin = {
   vertical: 'bottom',
@@ -32,12 +46,48 @@ const ChannelList = (props) => {
   const params = useParams();
   const { serverDetails, noServerFound } = useServerData(params.serverId);
   const { user } = useUser();
+
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const [isTextChannelsCollapsed, setIsTextChannelsCollapsed] = useState(false);
+  const [isAudioChannelsCollapsed, setIsAudioChannelsCollapsed] = useState(false);
 
   const serverMember = useMemo(() => (
     serverDetails?.members?.find((member) => member.userId === user.id)
   ), [serverDetails?.members, user.id]);
+
+  const channelListData = useMemo(() => {
+    const textChannels = [];
+    const audioChannels = [];
+    serverDetails?.channels?.forEach((channel) => {
+      if (channel.type === ChannelType.TEXT) {
+        textChannels.push(channel);
+        return;
+      }
+      audioChannels.push(channel);
+    });
+    return {
+      text: {
+        title: 'Text Channels',
+        channels: textChannels,
+      },
+      audio: {
+        title: 'Audio Channels',
+        channels: audioChannels,
+      },
+    };
+  }, [serverDetails?.channels]);
+
+  const channelsState = {
+    text: {
+      isExpanded: !isTextChannelsCollapsed,
+      onChange: () => setIsTextChannelsCollapsed((prev) => !prev),
+    },
+    audio: {
+      isExpanded: !isAudioChannelsCollapsed,
+      onChange: () => setIsAudioChannelsCollapsed((prev) => !prev),
+    },
+  };
 
   const openInviteModal = () => {
     setIsInviteModalOpen(true);
@@ -129,6 +179,29 @@ const ChannelList = (props) => {
             </InviteSection>
           </InviteSectionWrapper>
         )}
+        <ListContainer isInviteBoxVisible={!hideOptions}>
+          {Object.entries(channelListData).map(([key, data]) => (
+            <ChannelTypeContainer key={key}>
+              <ListItemButton onClick={channelsState[key].onChange}>
+                <ExpandableIcon isExpanded={channelsState[key].isExpanded} />
+                <ListItemText primary={data.title} />
+              </ListItemButton>
+
+              <Collapse in={channelsState[key].isExpanded} timeout="auto" unmountOnExit>
+                {data.channels.map((channel) => (
+                  <ChannelItem key={channel.id} isChannelOpened={channel.id === params.channelId}>
+                    <Tag />
+                    <Typography>
+                      {channel.name}
+                    </Typography>
+                  </ChannelItem>
+                ))}
+              </Collapse>
+            </ChannelTypeContainer>
+          ))}
+
+        </ListContainer>
+
       </ChannelListContainer>
       {!hideOptions && (
         <TransitionModal

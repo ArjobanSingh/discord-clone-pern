@@ -77,10 +77,6 @@ const Channel = (props) => {
         {channel.name}
         {' '}
         {params.channelId}
-        {' '}
-        and some extra stuff and what not again testing and again and some
-        random text, lets see how far it can go and again some messages and let
-        see how far it can go
       </MainContent>
 
       <ResponsiveDrawer
