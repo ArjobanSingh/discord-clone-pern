@@ -11,6 +11,7 @@ import useIsAuthenticated from './customHooks/useIsAuthenticated';
 import AppRoutes from './containers/Routes';
 import BaseStyles from './BaseStyles';
 import GlobalNavigation from './components/GlobalNavigation';
+import SocketHandler from './containers/SocketHandler';
 
 const Container = styled('div')(({ theme }) => `
   background-color: ${theme.palette.background.default};
@@ -61,14 +62,16 @@ const Child = () => {
 function App() {
   return (
     <CustomThemeProvider>
-      <BaseStyles />
-      <GlobalNavigation />
-      <Container>
-        <Child />
-        <InnerWrapper>
-          <AppRoutes />
-        </InnerWrapper>
-      </Container>
+      <SocketHandler>
+        <BaseStyles />
+        <GlobalNavigation />
+        <Container>
+          <Child />
+          <InnerWrapper>
+            <AppRoutes />
+          </InnerWrapper>
+        </Container>
+      </SocketHandler>
     </CustomThemeProvider>
   );
 }
