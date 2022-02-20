@@ -87,7 +87,7 @@ function* createServer(actionData) {
   try {
     const url = ServerApi.CREATE_SERVER;
     const response = yield call(axiosInstance.post, url, data);
-    console.log({ response });
+    yield put(saveAllChannels(response.data.id, response.data.channels ?? []));
     yield put(createServerSuccess(response.data.id, response.data));
     yield put(setNavigateState([`/channels/${response.data.id}`]));
   } catch (err) {

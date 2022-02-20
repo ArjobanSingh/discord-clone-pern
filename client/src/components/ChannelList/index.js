@@ -49,8 +49,8 @@ const ChannelList = (props) => {
 
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
-  const [isTextChannelsCollapsed, setIsTextChannelsCollapsed] = useState(false);
-  const [isAudioChannelsCollapsed, setIsAudioChannelsCollapsed] = useState(false);
+  const [isTextChannelExpanded, setIsTextChannelExpanded] = useState(true);
+  const [isAudioChannelExpanded, setIsAudioChannelExpanded] = useState(true);
 
   const serverMember = useMemo(() => (
     serverDetails?.members?.find((member) => member.userId === user.id)
@@ -80,12 +80,12 @@ const ChannelList = (props) => {
 
   const channelsState = {
     text: {
-      isExpanded: !isTextChannelsCollapsed,
-      onChange: () => setIsTextChannelsCollapsed((prev) => !prev),
+      isExpanded: isTextChannelExpanded,
+      onChange: () => setIsTextChannelExpanded((prev) => !prev),
     },
     audio: {
-      isExpanded: !isAudioChannelsCollapsed,
-      onChange: () => setIsAudioChannelsCollapsed((prev) => !prev),
+      isExpanded: isAudioChannelExpanded,
+      onChange: () => setIsAudioChannelExpanded((prev) => !prev),
     },
   };
 

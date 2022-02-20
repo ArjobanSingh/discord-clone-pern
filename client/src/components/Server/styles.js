@@ -17,6 +17,7 @@ export const PreviewBar = styled.div`
   position: relative;
   gap: 10px;
   padding-left: 90px;
+  z-index: ${({ theme }) => theme.zIndex.drawer + 1};
 `;
 
 export const StyledButton = styled(Button)(({ theme, back }) => `

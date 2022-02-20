@@ -6,6 +6,7 @@ import {
   logoutSuccess,
   registrationFailed, registrationSuccess, signInFailed, signInSuccess,
 } from '../redux/actions/auth';
+import { setNavigateState } from '../redux/actions/navigate';
 import { saveAllServers } from '../redux/actions/servers';
 import { userSuccess } from '../redux/actions/user';
 import { AuthApi } from '../utils/apiEndpoints';
@@ -46,6 +47,7 @@ function* logoutUser() {
     yield fork(axiosInstance.delete, AuthApi.LOGOUT, { headers: authHeaders });
     removeTokens();
     yield put(logoutSuccess());
+    // yield put(setNavigateState(['/login', { replace: true }]));
   } catch (err) {
     // console.log(err.message);
   }

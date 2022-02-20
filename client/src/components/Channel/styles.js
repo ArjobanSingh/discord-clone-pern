@@ -21,9 +21,9 @@ export const MainContent = styled.main(({ isDrawerOpen, theme }) => `
 `);
 
 export const MemberListContainer = styled.aside`
-  height: calc(100% - 50px);
+  height: ${({ isExploringServer }) => (isExploringServer ? 'calc(100% - 88.75px)' : 'calc(100% - 50px)')};
   width: 100%;
-  margin-top: 50px;
+  margin-top: ${({ isExploringServer }) => (isExploringServer ? '88.75px' : '50px')};
   padding-inline: ${({ theme }) => theme.spacing(1)};
   overflow: auto;
 `;

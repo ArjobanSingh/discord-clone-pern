@@ -11,7 +11,9 @@ const GlobalNavigation = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('outer', { navigateState });
     if (navigateState) {
+      console.log('inner', { navigateState });
       navigate(...navigateState);
       dispatch(resetNavigationState());
     }

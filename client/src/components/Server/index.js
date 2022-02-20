@@ -30,12 +30,13 @@ const Server = (props) => {
   const outletContextValue = useMemo(() => ({
     closeMembersDrawer: () => { setIsMembersDrawerOpen(false); },
     setOpenedChannel,
+    isExploringServer,
     isMembersDrawerOpen,
     members: serverDetails.members,
   }), [isMembersDrawerOpen, serverDetails.members]);
 
   const goBack = () => {
-    navigate(-1);
+    navigate('/guild-discovery');
   };
 
   if (noServerFound) {
@@ -71,11 +72,11 @@ const Server = (props) => {
   </PreviewBar>
   );
 
-  const serverHeaderUi = (
+  const serverHeaderUi = (isEmptyChannels) => (
     <ServerHeader
       name={openedChannel.name}
       openServerListDrawer={openServerListDrawer}
-      openMembersDrawer={toggleDrawer}
+      openMembersDrawer={isEmptyChannels ? undefined : toggleDrawer}
     />
   );
 
@@ -86,7 +87,7 @@ const Server = (props) => {
     return (
       <>
         {previewBarUI}
-        {serverHeaderUi}
+        {serverHeaderUi(true)}
         <NoChannels setOpenedChannel={setOpenedChannel} />
       </>
     );
@@ -98,7 +99,7 @@ const Server = (props) => {
     return (
       <>
         {previewBarUI}
-        {serverHeaderUi}
+        {serverHeaderUi(false)}
         <Outlet context={outletContextValue} />
       </>
     );

@@ -42,6 +42,7 @@ const Channel = (props) => {
   const {
     setOpenedChannel,
     closeMembersDrawer,
+    isExploringServer,
     isMembersDrawerOpen,
     members,
   } = useOutletContext();
@@ -87,7 +88,7 @@ const Channel = (props) => {
         wideScreenDrawerProps={wideScreenDrawerProps}
         drawerWidth={membersDrawerWidth}
       >
-        <MemberListContainer>
+        <MemberListContainer isExploringServer={isExploringServer}>
           {Object.entries(membersInHierarchy).map(([memberRole, currentRoleMembers]) => {
             if (isEmpty(currentRoleMembers)) return null;
             const heading = (
