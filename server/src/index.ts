@@ -7,6 +7,7 @@ import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import { Server as SocketIoServer } from 'socket.io';
 import apiRouter from './routes';
+import * as C from '../../common/socket-io-constants';
 
 const corsOptions = {
   origin: 'http://localhost:3000',
@@ -57,7 +58,12 @@ createConnection()
     );
 
     io.on('connection', (socket) => {
-      console.log('Socket', socket);
+      socket.on(C.CONNECT_ALL_SERVERS, (data, callback) => {
+        socket.join(data);
+
+        console.log('joined rooms', socket.rooms);
+        callback('done');
+      });
     });
 
     httpServer.listen(PORT, () => `Listening on port ${PORT}`);

@@ -1,6 +1,10 @@
 import { NextFunction, Response } from 'express';
-import { isString, isURL, isUUID, validate } from 'class-validator';
-import { FindManyOptions, getConnection, In, LessThan } from 'typeorm';
+import {
+  isString, isURL, isUUID, validate,
+} from 'class-validator';
+import {
+  FindManyOptions, getConnection, In, LessThan,
+} from 'typeorm';
 import Server, { ServerTypeEnum } from '../entity/Server';
 import CustomRequest from '../interfaces/CustomRequest';
 import { createValidationError, CustomError } from '../utils/errors';
@@ -54,7 +58,6 @@ export const createServer = async (
       await transactionEntityManager.save(generalChannel);
     });
 
-    console.log({ newServer, generalChannel });
     const { owner: _, ...otherSeverProps } = newServer;
     const { server: _s, serverId: _sId, ...restChannelData } = generalChannel;
 
@@ -192,8 +195,7 @@ export const getAllServers = async (
     const { cursor, limit = '50' } = req.query as AllServersQuery;
     const limitNumber = parseInt(limit, 10);
 
-    const take =
-      Number.isNaN(limitNumber) || limitNumber > 50 ? 50 : limitNumber;
+    const take = Number.isNaN(limitNumber) || limitNumber > 50 ? 50 : limitNumber;
     const queryObj: FindManyOptions = {
       where: { type: ServerTypeEnum.PUBLIC },
       order: { createdAt: 'DESC' },
@@ -284,7 +286,9 @@ export const updateServer = async (
   next: NextFunction,
 ) => {
   try {
-    const { id: serverId, type, name, description, banner, avatar } = req.body;
+    const {
+      id: serverId, type, name, description, banner, avatar,
+    } = req.body;
 
     if (!serverId || !isUUID(serverId)) {
       next(new CustomError('Invalid serverId', 400));
@@ -307,8 +311,8 @@ export const updateServer = async (
     });
 
     if (
-      !serverMember ||
-      enumScore[serverMember.role] < enumScore[MemberRole.ADMIN]
+      !serverMember
+      || enumScore[serverMember.role] < enumScore[MemberRole.ADMIN]
     ) {
       next(
         new CustomError(
@@ -398,10 +402,10 @@ export const updateServerMemberRoles = async (
     const { role, userId, serverId } = req.body;
 
     if (
-      !role ||
-      !isUUID(serverId) ||
-      !isUUID(userId) ||
-      !Object.values(MemberRole).includes(role)
+      !role
+      || !isUUID(serverId)
+      || !isUUID(userId)
+      || !Object.values(MemberRole).includes(role)
     ) {
       next(new CustomError('Invalid body', 400));
       return;
