@@ -1,10 +1,27 @@
-import * as C from '../constants/socket-io';
+import { io } from 'socket.io-client';
+import { getAuthTokens } from '../utils/axiosConfig';
 
-export const connectServers = (socket, serverIds) => {
-  console.log('called how many times!!!!!!!!!!!!!!!!!!!!');
-  socket.emit(C.CONNECT_ALL_SERVERS, serverIds, (res) => {
-    console.log('Socket response: ', res);
-  });
-};
+const URL = 'http://localhost:5000';
+const socket = io(URL, { autoConnect: false });
 
-export const disconnectSingleServer = (socket, serverId) => {};
+class SocketHandler {
+  constructor() {
+    this.socket = socket;
+    this.emitEvent = this.emitEvent.bind(this);
+    this.getSocket = this.getSocket.bind(this);
+  }
+
+  emitEvent(...args) {
+    const [accessToken, refreshToken] = getAuthTokens();
+    const auth = { accessToken, refreshToken };
+    this.socket.emit(auth, ...args);
+  }
+
+  getSocket() {
+    return this.socket;
+  }
+}
+
+const socketHandler = new SocketHandler();
+
+export default socketHandler;

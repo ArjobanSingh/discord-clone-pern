@@ -8,6 +8,7 @@ import cors from 'cors';
 import { Server as SocketIoServer } from 'socket.io';
 import apiRouter from './routes';
 import * as C from '../../common/socket-io-constants';
+import { isTokensValidForSocket } from './utils/helperFunctions';
 
 const corsOptions = {
   origin: 'http://localhost:3000',
@@ -57,10 +58,28 @@ createConnection()
       },
     );
 
-    io.on('connection', (socket) => {
-      socket.on(C.CONNECT_ALL_SERVERS, (data, callback) => {
-        socket.join(data);
+    // if we want we can use userId to join room for personal notifications meant for user
+    // or for private messaging in future
+    io.use(async (socket, next) => {
+      const { accessToken, refreshToken } = socket.handshake.auth;
 
+      const isTokenValid = await isTokensValidForSocket({ accessToken, refreshToken });
+
+      if (isTokenValid) {
+        next();
+        return;
+      }
+
+      next(new Error('Not authenticated'));
+    });
+
+    io.on('connection', (socket) => {
+      console.log('New user connected: ', socket.id);
+      socket.on(C.CONNECT_ALL_SERVERS, async (auth, data, callback) => {
+        const isTokenValid = await isTokensValidForSocket(auth);
+        if (!isTokenValid) throw new Error('Not authenticated');
+
+        socket.join(data);
         console.log('joined rooms', socket.rooms);
         callback('done');
       });

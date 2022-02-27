@@ -72,6 +72,32 @@ const getServerForJoinLink = async (inviteLink: string): Promise<Server> => {
   return server;
 };
 
+const isTokensValidForSocket = async (tokens: { accessToken: string, refreshToken: string }) => {
+  const { accessToken: bearerAccessToken, refreshToken } = tokens;
+
+  if (bearerAccessToken) {
+    const [, accessToken] = bearerAccessToken.split(' ');
+
+    try {
+      await verfifyToken(accessToken);
+      return true;
+    } catch (err) {
+      console.log('Access token verification error in socket', err);
+    }
+  }
+
+  // error in verifying access token, verify refresh token below
+  if (refreshToken) {
+    try {
+      await verfifyToken(refreshToken, false);
+      return true;
+    } catch (err) {
+      console.log('Refresh token verification error in socket', err);
+    }
+  }
+  return false;
+};
+
 export {
   createAccessToken,
   createRefreshToken,
@@ -79,4 +105,5 @@ export {
   decodeJWT,
   createLoginData,
   getServerForJoinLink,
+  isTokensValidForSocket,
 };

@@ -62,16 +62,15 @@ const Child = () => {
 function App() {
   return (
     <CustomThemeProvider>
-      <SocketHandler>
-        <BaseStyles />
-        <GlobalNavigation />
-        <Container>
-          <Child />
-          <InnerWrapper>
-            <AppRoutes />
-          </InnerWrapper>
-        </Container>
-      </SocketHandler>
+      <SocketHandler />
+      <BaseStyles />
+      <GlobalNavigation />
+      <Container>
+        <Child />
+        <InnerWrapper>
+          <AppRoutes />
+        </InnerWrapper>
+      </Container>
     </CustomThemeProvider>
   );
 }

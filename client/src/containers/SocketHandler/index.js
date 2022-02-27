@@ -1,41 +1,48 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { io } from 'socket.io-client';
+import { useDispatch } from 'react-redux';
 import useIsAuthenticated from '../../customHooks/useIsAuthenticated';
-import SocketClientProvider from './SocketClientProvider';
+import socketClient from '../../services/socket-client';
+import { getAuthTokens } from '../../utils/axiosConfig';
+import { logoutSuccess } from '../../redux/actions/auth';
 
-const SocketHandler = ({ children }) => {
+const socket = socketClient.getSocket();
+
+const SocketHandler = () => {
   const isAuthenticated = useIsAuthenticated();
-
-  const [socketClient, setSocketClient] = useState(() => io('http://localhost:5000'));
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (isAuthenticated) {
-      socketClient.connect();
+      const [accessToken, refreshToken] = getAuthTokens();
+      socket.auth = { accessToken, refreshToken };
+      socket.connect();
 
-      socketClient.on('connect', (socket) => {
-        console.log('Connected: ', socketClient.id);
+      socket.on('connect', () => {
+        console.log('Connected: ', socket.id, socket.connected);
       });
 
-      socketClient.on('disconnect', () => {
-        console.log('Disconnected: ', socketClient.id);
-        socketClient.removeAllListeners();
+      socket.on('disconnect', () => {
+        console.log('Disconnected');
+        socket.removeAllListeners();
+      });
+
+      socket.on('connect_error', (err) => {
+        if (err.message === 'Not authenticated') {
+          console.log('Not authenticated');
+          dispatch(logoutSuccess());
+        }
       });
       return;
     }
 
-    socketClient.disconnect();
-  }, [isAuthenticated, socketClient]);
+    socketClient.disconnect('Some custom');
+  }, [isAuthenticated]);
 
-  return (
-    <SocketClientProvider value={socketClient}>
-      {children}
-    </SocketClientProvider>
-  );
+  return null;
 };
 
 SocketHandler.propTypes = {
-  children: PropTypes.node.isRequired,
 };
 
 export default SocketHandler;

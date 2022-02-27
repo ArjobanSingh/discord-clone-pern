@@ -4,7 +4,7 @@ import {
 } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  useEffect, useMemo, useRef, useState,
+  useState,
 } from 'react';
 import {
   AvatarWrapper,
@@ -15,7 +15,6 @@ import {
   StyledAvatar,
   VerticalBar,
 } from './styles';
-import { useSocketClient } from '../../containers/SocketHandler/SocketClientProvider';
 import Logo from '../../common/Logo';
 import ChannelList from '../ChannelList';
 import { getAllExploreServersData, getAllServers } from '../../redux/reducers';
@@ -26,34 +25,32 @@ import TransitionModal from '../../common/TransitionModal';
 import CreateServerModal from '../CreateServerModal';
 import useDidUpdate from '../../customHooks/useDidUpdate';
 import { createServerReset } from '../../redux/actions/servers';
-import { isEmpty } from '../../utils/validators';
-import { connectServers } from '../../services/socket-client';
 
 const AllServersDrawer = ({ isDiscoveryPage }) => {
   const servers = useSelector(getAllServers);
-  const socket = useSocketClient();
+  // const socket = useSocketClient();
   const exploreServers = useSelector(getAllExploreServersData);
   const dispatch = useDispatch();
 
-  const previousServersIds = useRef([]);
+  // const previousServersIds = useRef([]);
 
-  const uniqueServerIds = useMemo(() => {
-    const serverIds = Object.keys(servers);
-    if (serverIds.length !== previousServersIds.length) {
-      previousServersIds.current = serverIds;
-      return serverIds;
-    }
+  // const uniqueServerIds = useMemo(() => {
+  //   const serverIds = Object.keys(servers);
+  //   if (serverIds.length !== previousServersIds.length) {
+  //     previousServersIds.current = serverIds;
+  //     return serverIds;
+  //   }
 
-    // if new server's object, does not have any previous server id, means changes done
-    const isChangesDone = previousServersIds.current.some((sId) => !servers[sId]);
+  //   // if new server's object, does not have any previous server id, means changes done
+  //   const isChangesDone = previousServersIds.current.some((sId) => !servers[sId]);
 
-    if (isChangesDone) {
-      previousServersIds.current = serverIds;
-      return serverIds;
-    }
+  //   if (isChangesDone) {
+  //     previousServersIds.current = serverIds;
+  //     return serverIds;
+  //   }
 
-    return previousServersIds.current;
-  }, [servers]);
+  //   return previousServersIds.current;
+  // }, [servers]);
 
   const { serverId } = useParams();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -69,12 +66,6 @@ const AllServersDrawer = ({ isDiscoveryPage }) => {
   useDidUpdate(() => {
     closeCreateModal();
   }, [serverId]);
-
-  useEffect(() => {
-    if (!isEmpty(uniqueServerIds)) {
-      connectServers(socket, uniqueServerIds);
-    }
-  }, [socket, uniqueServerIds]);
 
   useDidUpdate(() => {
     if (!isCreateModalOpen) dispatch(createServerReset());
