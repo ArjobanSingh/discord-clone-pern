@@ -36,7 +36,7 @@ const SocketHandler = () => {
       return;
     }
 
-    socketClient.disconnect('Some custom');
+    socket.disconnect();
   }, [isAuthenticated]);
 
   return null;

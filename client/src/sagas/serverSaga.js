@@ -28,6 +28,7 @@ import { ServerApi } from '../utils/apiEndpoints';
 import { setNavigateState } from '../redux/actions/navigate';
 import { getServerDetails as getServerState } from '../redux/reducers';
 import { saveAllChannels } from '../redux/actions/channels';
+import socketClient from '../services/socket-client';
 
 function* getServerDetails(actionData) {
   const { serverId, isExploringServer } = actionData.payload;
@@ -37,14 +38,9 @@ function* getServerDetails(actionData) {
     yield put(saveAllChannels(serverId, response.data.channels ?? []));
     yield put(serverDetailsSuccess(response.data, isExploringServer));
   } catch (err) {
-    yield put(
-      handleError(
-        err,
-        (error, { status: errStatus }) => (
-          serverDetailsFailed(serverId, isExploringServer, { ...error, errStatus })
-        ),
-      ),
-    );
+    yield put(handleError(err, (error, { status: errStatus }) => (
+      serverDetailsFailed(serverId, isExploringServer, { ...error, errStatus })
+    )));
   }
 }
 
@@ -59,6 +55,7 @@ function* joinServer(actionData) {
     yield call(axiosInstance.post, url);
     yield put(joinServerSucess(serverId, server));
     yield put(setNavigateState([`/channels/${serverId}`, { replace: !!inviteLink }]));
+    socketClient.connectSingleServer(serverId);
   } catch (err) {
     if (!inviteLink) {
       // joining server while exploring public server, so also show notification error
@@ -90,6 +87,7 @@ function* createServer(actionData) {
     yield put(saveAllChannels(response.data.id, response.data.channels ?? []));
     yield put(createServerSuccess(response.data.id, response.data));
     yield put(setNavigateState([`/channels/${response.data.id}`]));
+    socketClient.connectSingleServer(response.data.id);
   } catch (err) {
     yield put(
       handleError(err, (error) => {

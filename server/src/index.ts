@@ -75,13 +75,41 @@ createConnection()
 
     io.on('connection', (socket) => {
       console.log('New user connected: ', socket.id);
-      socket.on(C.CONNECT_ALL_SERVERS, async (auth, data, callback) => {
+
+      socket.on(C.CONNECT_ALL_SERVERS, async (auth, data) => {
         const isTokenValid = await isTokensValidForSocket(auth);
         if (!isTokenValid) throw new Error('Not authenticated');
 
         socket.join(data);
         console.log('joined rooms', socket.rooms);
-        callback('done');
+      });
+
+      socket.on(C.CONNECT_SINGLE_SERVER, async (auth, serverId) => {
+        const isTokenValid = await isTokensValidForSocket(auth);
+        if (!isTokenValid) throw new Error('Not authenticated');
+
+        socket.join(serverId);
+        console.log('joined another new room', socket.rooms);
+      });
+
+      socket.on(C.DISCONNECT_SINGLE_SERVER, async (auth, serverId) => {
+        const isTokenValid = await isTokensValidForSocket(auth);
+        if (!isTokenValid) throw new Error('Not authenticated');
+
+        socket.leave(serverId);
+        console.log('Left room: ', socket.rooms);
+      });
+
+      socket.on('send-message', async (auth, { message, serverId }, cb) => {
+        const isTokenValid = await isTokensValidForSocket(auth);
+        if (!isTokenValid) throw new Error('Not authenticated');
+
+        cb();
+        socket.broadcast.to(serverId).emit('receive-message', { message, serverId });
+      });
+
+      socket.on('disconnect', () => {
+        console.log('User disconnected: ', socket.id);
       });
     });
 

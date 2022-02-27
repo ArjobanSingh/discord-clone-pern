@@ -7,6 +7,7 @@ import { userFailed, userSuccess } from '../redux/actions/user';
 import { UserApi } from '../utils/apiEndpoints';
 import axiosInstance from '../utils/axiosConfig';
 import { handleError } from '../utils/helperFunctions';
+import socketClient from '../services/socket-client';
 
 function* fetchCurrentUser() {
   try {
@@ -14,6 +15,7 @@ function* fetchCurrentUser() {
     const { servers, ...restUserData } = response.data;
     yield put(saveAllServers(servers));
     yield put(userSuccess(restUserData));
+    socketClient.connectAllServers(servers.map((server) => server.serverId));
   } catch (err) {
     console.log('User error', err.response, err.message);
     yield put(

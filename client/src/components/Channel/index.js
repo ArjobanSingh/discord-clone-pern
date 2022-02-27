@@ -19,6 +19,8 @@ import Logo from '../../common/Logo';
 import { isEmpty } from '../../utils/validators';
 import { ServerMemberRoles } from '../../constants/servers';
 import { getChannelData } from '../../redux/reducers';
+import socketHandler from '../../services/socket-client';
+import useUser from '../../customHooks/useUser';
 
 const wideScreenDrawerProps = {
   variant: 'persistent',
@@ -37,6 +39,7 @@ const wideScreenDrawerProps = {
 const Channel = (props) => {
   const params = useParams();
   const { serverId, channelId } = useParams();
+  const { user: { id } } = useUser();
   const channel = useSelector((state) => getChannelData(state, serverId, channelId));
 
   const {
@@ -68,6 +71,18 @@ const Channel = (props) => {
     setOpenedChannel({});
   }, [channel?.name, channel?.type]);
 
+  const sendMessage = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const value = formData.get('message-input');
+
+    if (value.trim()) {
+      socketHandler.emitEvent('send-message', { message: value, serverId }, () => {
+        console.log('Message sent by this user', value, serverId, id);
+      });
+    }
+  };
+
   if (!channel) {
     return <div>TODO: NO such channel</div>;
   }
@@ -78,6 +93,9 @@ const Channel = (props) => {
         {channel.name}
         {' '}
         {params.channelId}
+        <form onSubmit={sendMessage}>
+          <input name="message-input" />
+        </form>
       </MainContent>
 
       <ResponsiveDrawer

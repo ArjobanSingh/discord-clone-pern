@@ -6,11 +6,12 @@ import {
   logoutSuccess,
   registrationFailed, registrationSuccess, signInFailed, signInSuccess,
 } from '../redux/actions/auth';
-import { setNavigateState } from '../redux/actions/navigate';
+// import { setNavigateState } from '../redux/actions/navigate';
 import { saveAllServers } from '../redux/actions/servers';
 import { userSuccess } from '../redux/actions/user';
 import { AuthApi } from '../utils/apiEndpoints';
 import axiosInstance, { getAuthTokens, removeTokens, setTokens } from '../utils/axiosConfig';
+import socketClient from '../services/socket-client';
 
 function* loginUser(actionData) {
   const { payload } = actionData;
@@ -23,6 +24,7 @@ function* loginUser(actionData) {
     const { servers, ...restUserData } = user;
     yield put(saveAllServers(servers));
     yield put(userSuccess(restUserData));
+    socketClient.connectAllServers(servers.map((server) => server.serverId));
   } catch (err) {
     console.log('Login error', err.response, err.message);
     if (err.response?.data) {
