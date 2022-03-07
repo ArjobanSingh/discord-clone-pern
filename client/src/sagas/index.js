@@ -6,6 +6,7 @@ import authSaga from './authSaga';
 import userSaga from './userSaga';
 import serverSaga from './serverSaga';
 import socketSaga from './socket';
+import channelSaga from './channelSaga';
 
 export default function* main() {
   // this will automatically start/restart saga as needed
@@ -15,6 +16,7 @@ export default function* main() {
       fork(userSaga),
       fork(serverSaga),
       fork(socketSaga),
+      fork(channelSaga),
     ]);
 
     // wait for the user to sign out

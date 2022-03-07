@@ -100,12 +100,13 @@ createConnection()
         console.log('Left room: ', socket.rooms);
       });
 
-      socket.on('send-message', async (auth, { message, serverId }, cb) => {
+      socket.on(C.SEND_CHANNEL_MESSAGE, async (auth, messageContent, cb) => {
         const isTokenValid = await isTokensValidForSocket(auth);
         if (!isTokenValid) throw new Error('Not authenticated');
 
-        cb();
-        socket.broadcast.to(serverId).emit('receive-message', { message, serverId });
+        const { serverId } = messageContent;
+        cb(null, messageContent);
+        socket.broadcast.to(serverId).emit(C.NEW_CHANNEL_MESSAGE, messageContent);
       });
 
       socket.on('disconnect', () => {

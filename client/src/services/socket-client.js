@@ -8,10 +8,6 @@ const socket = io(URL, { autoConnect: false });
 class SocketHandler {
   constructor() {
     this.socket = socket;
-    this.emitEvent = this.emitEvent.bind(this);
-    this.getSocket = this.getSocket.bind(this);
-    this.connectAllServers = this.connectAllServers.bind(this);
-    this.connectSingleServer = this.connectSingleServer.bind(this);
   }
 
   emitEvent(event, ...args) {

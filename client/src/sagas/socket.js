@@ -3,6 +3,7 @@ import {
 } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import socketHandler from '../services/socket-client';
+import { NEW_CHANNEL_MESSAGE } from '../constants/socket-io';
 
 function createSocketChannel(socket) {
   return eventChannel((emit) => {
@@ -24,7 +25,8 @@ function* handleSocketEvents(socketEvent) {
   const [payload] = args;
 
   switch (event) {
-    case 'receive-message':
+    case NEW_CHANNEL_MESSAGE:
+      console.log('New message received: ', payload);
       break;
     default:
       break;

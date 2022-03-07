@@ -5,7 +5,7 @@ import {
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { useOutletContext, useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   ChannelContainer,
   MainContent,
@@ -19,8 +19,8 @@ import Logo from '../../common/Logo';
 import { isEmpty } from '../../utils/validators';
 import { ServerMemberRoles } from '../../constants/servers';
 import { getChannelData } from '../../redux/reducers';
-import socketHandler from '../../services/socket-client';
-import useUser from '../../customHooks/useUser';
+import Chat from '../Chat';
+import { sendChannelMessageRequested } from '../../redux/actions/channels';
 
 const wideScreenDrawerProps = {
   variant: 'persistent',
@@ -37,10 +37,10 @@ const wideScreenDrawerProps = {
 
 // TODO: maybe change drawers logic in future
 const Channel = (props) => {
-  const params = useParams();
+  // const params = useParams();
   const { serverId, channelId } = useParams();
-  const { user: { id } } = useUser();
   const channel = useSelector((state) => getChannelData(state, serverId, channelId));
+  const dispatch = useDispatch();
 
   const {
     setOpenedChannel,
@@ -71,31 +71,18 @@ const Channel = (props) => {
     setOpenedChannel({});
   }, [channel?.name, channel?.type]);
 
-  const sendMessage = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const value = formData.get('message-input');
-
-    if (value.trim()) {
-      socketHandler.emitEvent('send-message', { message: value, serverId }, () => {
-        console.log('Message sent by this user', value, serverId, id);
-      });
-    }
-  };
-
   if (!channel) {
     return <div>TODO: NO such channel</div>;
   }
 
+  const sendMessage = (content) => {
+    dispatch(sendChannelMessageRequested(serverId, channelId, content));
+  };
+
   return (
     <ChannelContainer>
       <MainContent isDrawerOpen={isMembersDrawerOpen}>
-        {channel.name}
-        {' '}
-        {params.channelId}
-        <form onSubmit={sendMessage}>
-          <input name="message-input" />
-        </form>
+        <Chat sendMessage={sendMessage} />
       </MainContent>
 
       <ResponsiveDrawer
