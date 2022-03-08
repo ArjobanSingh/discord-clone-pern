@@ -2,8 +2,8 @@ import { ServerTypeEnum } from '../entity/Server';
 import { MemberRole } from '../entity/ServerMember';
 
 export type AllServersQuery = {
-    cursor?: string;
-    limit?: string;
+  cursor?: string;
+  limit?: string;
 }
 
 export type ServerMemberType = {

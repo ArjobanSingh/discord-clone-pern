@@ -9,6 +9,9 @@ import { Server as SocketIoServer } from 'socket.io';
 import apiRouter from './routes';
 import * as C from '../../common/socket-io-constants';
 import { isTokensValidForSocket } from './utils/helperFunctions';
+import isSocketAuthenticated from './middlewarres/isSocketAuthenticated';
+// import { sendChannelMessage } from './controllers/channelController';
+import ChannelMessageInput, { ChannelMessageDoneCallback } from './types/ChannelMessageInput';
 
 const corsOptions = {
   origin: 'http://localhost:3000',
@@ -40,6 +43,7 @@ createConnection()
     //   console.log(timeInMicroseconds, Date.now(), new Date());
     // })
     app.use('/api', apiRouter);
+    app.set('io', io);
 
     app.use(
       (err: CustomError, req: Request, res: Response, next: NextFunction) => {
@@ -63,7 +67,7 @@ createConnection()
     io.use(async (socket, next) => {
       const { accessToken, refreshToken } = socket.handshake.auth;
 
-      const isTokenValid = await isTokensValidForSocket({ accessToken, refreshToken });
+      const [isTokenValid] = await isTokensValidForSocket({ accessToken, refreshToken });
 
       if (isTokenValid) {
         next();
@@ -76,38 +80,40 @@ createConnection()
     io.on('connection', (socket) => {
       console.log('New user connected: ', socket.id);
 
-      socket.on(C.CONNECT_ALL_SERVERS, async (auth, data) => {
-        const isTokenValid = await isTokensValidForSocket(auth);
-        if (!isTokenValid) throw new Error('Not authenticated');
+      // socket.use((event, next) => {
+      //   console.log('SOcket event in middleware: ', event);
+      //   next();
+      // });
 
+      socket.on(C.CONNECT_ALL_SERVERS, isSocketAuthenticated((_userId: string, data: string[]) => {
         socket.join(data);
         console.log('joined rooms', socket.rooms);
-      });
+      }));
 
-      socket.on(C.CONNECT_SINGLE_SERVER, async (auth, serverId) => {
-        const isTokenValid = await isTokensValidForSocket(auth);
-        if (!isTokenValid) throw new Error('Not authenticated');
-
+      socket.on(C.CONNECT_SINGLE_SERVER, isSocketAuthenticated((_userId: string, serverId: string) => {
         socket.join(serverId);
         console.log('joined another new room', socket.rooms);
-      });
+      }));
 
-      socket.on(C.DISCONNECT_SINGLE_SERVER, async (auth, serverId) => {
-        const isTokenValid = await isTokensValidForSocket(auth);
-        if (!isTokenValid) throw new Error('Not authenticated');
-
+      socket.on(C.DISCONNECT_SINGLE_SERVER, isSocketAuthenticated((_userId: string, serverId: string) => {
         socket.leave(serverId);
         console.log('Left room: ', socket.rooms);
-      });
+      }));
 
-      socket.on(C.SEND_CHANNEL_MESSAGE, async (auth, messageContent, cb) => {
-        const isTokenValid = await isTokensValidForSocket(auth);
-        if (!isTokenValid) throw new Error('Not authenticated');
-
-        const { serverId } = messageContent;
-        cb(null, messageContent);
-        socket.broadcast.to(serverId).emit(C.NEW_CHANNEL_MESSAGE, messageContent);
-      });
+      // socket.on(C.SEND_CHANNEL_MESSAGE, isSocketAuthenticated(
+      //   (userId: string, channelMessageInput: ChannelMessageInput, doneCallback: ChannelMessageDoneCallback) => {
+      //     const content = {
+      //       socket,
+      //       userId,
+      //       channelMessageInput,
+      //       doneCallback,
+      //     };
+      //     sendChannelMessage(content);
+      //   // const { serverId } = messageContent;
+      //   // doneCallback(null, messageContent);
+      //   // socket.broadcast.to(serverId).emit(C.NEW_CHANNEL_MESSAGE, messageContent);
+      //   },
+      // ));
 
       socket.on('disconnect', () => {
         console.log('User disconnected: ', socket.id);

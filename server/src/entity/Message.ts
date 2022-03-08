@@ -2,6 +2,7 @@ import { IsEnum, IsString } from 'class-validator';
 import {
   BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
+import Channel from './Channel';
 import User from './User';
 
 export enum MessageTypeEnum {
@@ -36,6 +37,12 @@ export default class Message extends BaseEntity {
   })
   @IsEnum(MessageTypeEnum)
   type: MessageTypeEnum
+
+  @ManyToOne(() => Channel)
+  channel: Channel;
+
+  @Column('uuid')
+  channelId: string;
 
   @OneToOne(() => Message)
   referenceMessage: Message

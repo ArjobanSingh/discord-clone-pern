@@ -79,8 +79,8 @@ const isTokensValidForSocket = async (tokens: { accessToken: string, refreshToke
     const [, accessToken] = bearerAccessToken.split(' ');
 
     try {
-      await verfifyToken(accessToken);
-      return true;
+      const { userId } = await verfifyToken(accessToken);
+      return [true, userId];
     } catch (err) {
       console.log('Access token verification error in socket', err);
     }
@@ -89,13 +89,13 @@ const isTokensValidForSocket = async (tokens: { accessToken: string, refreshToke
   // error in verifying access token, verify refresh token below
   if (refreshToken) {
     try {
-      await verfifyToken(refreshToken, false);
-      return true;
+      const { userId } = await verfifyToken(refreshToken, false);
+      return [true, userId];
     } catch (err) {
       console.log('Refresh token verification error in socket', err);
     }
   }
-  return false;
+  return [false];
 };
 
 export {

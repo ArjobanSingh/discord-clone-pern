@@ -2,6 +2,10 @@ import { all, call, takeEvery } from 'redux-saga/effects';
 import { SEND_CHANNEL_MESSAGE_REQUESTED } from '../constants/channels';
 import { SEND_CHANNEL_MESSAGE } from '../constants/socket-io';
 import socketHandler from '../services/socket-client';
+import { ChannelApi } from '../utils/apiEndpoints';
+import axiosInstance from '../utils/axiosConfig';
+
+const socket = socketHandler.getSocket();
 
 const sendMessageAsync = (content) => new Promise((resolve, reject) => {
   socketHandler.emitEvent(SEND_CHANNEL_MESSAGE, content, (error, response) => {
@@ -16,7 +20,8 @@ const sendMessageAsync = (content) => new Promise((resolve, reject) => {
 function* sendChannelMessage(actionData) {
 //   const { serverId, channelId, messageData } = actionData;
   try {
-    const response = yield call(sendMessageAsync, actionData.payload);
+    const url = ChannelApi.SEND_CHANNEL_MESSAGE;
+    const response = yield call(axiosInstance.post, url, { ...actionData.payload, sid: socket.id });
     console.log('Chat message response: ', response);
   } catch (err) {
     console.log('Message sending error: ', err, err.message);

@@ -21,3 +21,7 @@ export const InviteApi = {
   CREATE_INVITE_URL: '/invite',
   VERIFY_INVITE_URL: '/invite',
 };
+
+export const ChannelApi = {
+  SEND_CHANNEL_MESSAGE: '/channel/send-message',
+};
