@@ -1,7 +1,9 @@
 import { validate } from 'class-validator';
 import { NextFunction, Response } from 'express';
 import { Server as SocketServer } from 'socket.io';
-import { FindManyOptions, getConnection, LessThan } from 'typeorm';
+import {
+  createQueryBuilder, FindManyOptions, getConnection, getRepository, LessThan,
+} from 'typeorm';
 import * as C from '../../../common/socket-io-constants';
 import Channel from '../entity/Channel';
 import Message from '../entity/Message';
@@ -38,7 +40,7 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
     }
 
     const serverMemberPromise = getConnection().query(`
-      SELECT u.name as "userName", u.id as "userId", u."profilePicture"
+      SELECT u.name, u.id, u."profilePicture"
       FROM users "u"
       INNER JOIN server_member "sm" ON u.id = sm."userId"
       WHERE sm."userId" = $1 AND sm."serverId" = $2
@@ -100,19 +102,19 @@ export const getChannelMessages = async (req: CustomRequest, res: Response, next
     const { cursor } = req.query;
     const { serverId, channelId } = req.params;
 
-    const querObj: FindManyOptions<Message> = {
-      where: { serverId, channelId },
-      order: { createdAt: 'DESC' },
-      take: 50,
-    };
-
-    if (cursor) {
-      querObj.where = {
-        serverId,
-        channelId,
-        createdAt: LessThan(decodeURIComponent(`${cursor}`)),
-      };
-    }
+    const messagesPromise = getRepository(Message)
+      .createQueryBuilder('message')
+      .select(['message', 'user.name', 'user.id', 'user.profilePicture',
+        'refMsg', 'refMsgUser.name', 'refMsgUser.id', 'refMsgUser.profilePicture'])
+      .innerJoin('message.user', 'user')
+      .leftJoin('message.referenceMessage', 'refMsg')
+      .leftJoin('refMsg.user', 'refMsgUser')
+      .where('message.serverId = :serverId', { serverId })
+      .andWhere('message.channelId = :channelId', { channelId })
+      .andWhere(cursor ? 'message.createdAt < :cursor' : '1=1', { cursor: decodeURIComponent(`${cursor}`) })
+      .orderBy('message.createdAt', 'DESC')
+      .limit(50)
+      .getMany();
 
     const serverPromise = getConnection().query(`
       SELECT s.type, s.id as "serverId", ch.id as "channelId"
@@ -127,7 +129,6 @@ export const getChannelMessages = async (req: CustomRequest, res: Response, next
       serverId,
       userId: req.userId,
     });
-    const messagesPromise = Message.find(querObj);
 
     const [[server], serverMember, messages] = await Promise.all(
       [serverPromise, serverMemberPromise, messagesPromise],

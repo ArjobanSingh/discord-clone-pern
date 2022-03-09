@@ -10,7 +10,7 @@ import CustomRequest from '../interfaces/CustomRequest';
 import { createValidationError, CustomError } from '../utils/errors';
 import ServerMember, { enumScore, MemberRole } from '../entity/ServerMember';
 import User from '../entity/User';
-import { AllServersQuery, ServerType } from '../types/ServerTypes';
+import { AllServersQuery } from '../types/ServerTypes';
 import { getServerForJoinLink } from '../utils/helperFunctions';
 import Channel from '../entity/Channel';
 
@@ -196,7 +196,7 @@ export const getAllServers = async (
     const limitNumber = parseInt(limit, 10);
 
     const take = Number.isNaN(limitNumber) || limitNumber > 50 ? 50 : limitNumber;
-    const queryObj: FindManyOptions = {
+    const queryObj: FindManyOptions<Server> = {
       where: { type: ServerTypeEnum.PUBLIC },
       order: { createdAt: 'DESC' },
       take,

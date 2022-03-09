@@ -1,6 +1,6 @@
 import { IsEnum, IsString } from 'class-validator';
 import {
-  BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn,
+  BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import Channel from './Channel';
 import Server from './Server';
@@ -52,6 +52,7 @@ export default class Message extends BaseEntity {
   serverId: string;
 
   @OneToOne(() => Message)
+  @JoinColumn()
   referenceMessage: Message
 
   @Column('uuid', { nullable: true })
