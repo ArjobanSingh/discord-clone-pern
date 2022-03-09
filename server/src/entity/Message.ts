@@ -3,6 +3,7 @@ import {
   BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import Channel from './Channel';
+import Server from './Server';
 import User from './User';
 
 export enum MessageTypeEnum {
@@ -25,7 +26,7 @@ export default class Message extends BaseEntity {
   @Column({ default: 'SENT' })
   status: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   user: User
 
   @Column('uuid')
@@ -38,11 +39,17 @@ export default class Message extends BaseEntity {
   @IsEnum(MessageTypeEnum)
   type: MessageTypeEnum
 
-  @ManyToOne(() => Channel)
+  @ManyToOne(() => Channel, { onDelete: 'CASCADE' })
   channel: Channel;
 
   @Column('uuid')
   channelId: string;
+
+  @ManyToOne(() => Server, { onDelete: 'CASCADE' })
+  server: Server;
+
+  @Column('uuid')
+  serverId: string;
 
   @OneToOne(() => Message)
   referenceMessage: Message

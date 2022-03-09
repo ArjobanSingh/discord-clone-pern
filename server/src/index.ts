@@ -10,8 +10,6 @@ import apiRouter from './routes';
 import * as C from '../../common/socket-io-constants';
 import { isTokensValidForSocket } from './utils/helperFunctions';
 import isSocketAuthenticated from './middlewarres/isSocketAuthenticated';
-// import { sendChannelMessage } from './controllers/channelController';
-import ChannelMessageInput, { ChannelMessageDoneCallback } from './types/ChannelMessageInput';
 
 const corsOptions = {
   origin: 'http://localhost:3000',
@@ -67,9 +65,11 @@ createConnection()
     io.use(async (socket, next) => {
       const { accessToken, refreshToken } = socket.handshake.auth;
 
-      const [isTokenValid] = await isTokensValidForSocket({ accessToken, refreshToken });
+      const [isTokenValid, userId] = await isTokensValidForSocket({ accessToken, refreshToken });
 
       if (isTokenValid) {
+        // make user join room of his/her userId
+        socket.join(userId);
         next();
         return;
       }
@@ -99,21 +99,6 @@ createConnection()
         socket.leave(serverId);
         console.log('Left room: ', socket.rooms);
       }));
-
-      // socket.on(C.SEND_CHANNEL_MESSAGE, isSocketAuthenticated(
-      //   (userId: string, channelMessageInput: ChannelMessageInput, doneCallback: ChannelMessageDoneCallback) => {
-      //     const content = {
-      //       socket,
-      //       userId,
-      //       channelMessageInput,
-      //       doneCallback,
-      //     };
-      //     sendChannelMessage(content);
-      //   // const { serverId } = messageContent;
-      //   // doneCallback(null, messageContent);
-      //   // socket.broadcast.to(serverId).emit(C.NEW_CHANNEL_MESSAGE, messageContent);
-      //   },
-      // ));
 
       socket.on('disconnect', () => {
         console.log('User disconnected: ', socket.id);
