@@ -7,6 +7,7 @@ import joinServers, * as fromJoinServer from './join-servers';
 import exploreServers, * as fromExploreServers from './explore-servers';
 import createServers, * as fromCreateServers from './create-servers';
 import channels, * as fromChannels from './channels';
+import channelsChat, * as fromChannelsChat from './channels-chat';
 import navigate from './navigate';
 
 const appReducer = combineReducers({
@@ -18,6 +19,7 @@ const appReducer = combineReducers({
   exploreServers,
   createServers,
   channels,
+  channelsChat,
 });
 
 const rootReducer = (state, action) => {
@@ -71,4 +73,8 @@ export const getAllServerChannels = (state, serverId) => (
 
 export const getChannelData = (state, serverId, channelId) => (
   fromChannels.getChannelData(state.channels, serverId, channelId)
+);
+
+export const getChannelMessagesData = (state, channelId) => (
+  fromChannelsChat.getChannelMessagesData(state.channelsChat, channelId)
 );

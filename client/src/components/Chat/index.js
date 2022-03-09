@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 import { nanoid } from 'nanoid';
 import {
@@ -6,13 +5,21 @@ import {
 } from './styles';
 import InputEditor from '../InputEditor';
 import { MessageStatus, MessageType } from '../../constants/Message';
+import { isEmpty } from '../../utils/validators';
 
 // chat component should be independent of channel/server logic
 // to support personal messages in future
 const Chat = (props) => {
   const {
     sendMessage,
+    messagesData,
   } = props;
+
+  const {
+    data,
+    isLoading,
+    error,
+  } = messagesData;
 
   const prepareMessage = (message, type = MessageType.TEXT) => {
     // nanoid will work as temporary id, till message is sent
@@ -24,10 +31,20 @@ const Chat = (props) => {
     });
   };
 
+  const mainJSX = () => {
+    if (isLoading) return <div>Fetching messages...</div>;
+    if (error) return <div>Error fetching messages...Retry</div>; // TODO
+    if (isEmpty(data)) return <div>No messages in this channel yet</div>;
+
+    return data.map((msg) => (
+      <div key={msg.id}>{msg.content}</div>
+    ));
+  };
+
   return (
     <ChatContainer>
       <MessagesContainer>
-        messages will be here
+        {mainJSX()}
       </MessagesContainer>
       <InputContainer>
         <InputEditor prepareMessage={prepareMessage} />
@@ -38,6 +55,12 @@ const Chat = (props) => {
 
 Chat.propTypes = {
   sendMessage: PropTypes.func.isRequired,
+  messagesData: PropTypes.shape({
+    data: PropTypes.arrayOf(PropTypes.object),
+    hasMore: PropTypes.bool.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+    error: PropTypes.shape({}),
+  }).isRequired,
 };
 
 export default Chat;

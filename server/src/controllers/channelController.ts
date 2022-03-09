@@ -109,7 +109,7 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
       user: serverMember,
     };
 
-    res.json(messageObj);
+    res.status(201).json(messageObj);
 
     currentSocket.broadcast.to(serverId).emit(C.NEW_CHANNEL_MESSAGE, messageObj);
   } catch (err) {

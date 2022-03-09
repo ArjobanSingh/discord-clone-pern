@@ -18,9 +18,9 @@ import ResponsiveDrawer from '../../common/ResponsiveDrawer';
 import Logo from '../../common/Logo';
 import { isEmpty } from '../../utils/validators';
 import { ServerMemberRoles } from '../../constants/servers';
-import { getChannelData } from '../../redux/reducers';
+import { getChannelData, getChannelMessagesData } from '../../redux/reducers';
 import Chat from '../Chat';
-import { sendChannelMessageRequested } from '../../redux/actions/channels';
+import { channelMessagesRequested, sendChannelMessageRequested } from '../../redux/actions/channels';
 
 const wideScreenDrawerProps = {
   variant: 'persistent',
@@ -35,11 +35,20 @@ const wideScreenDrawerProps = {
   },
 };
 
+const emptyChannel = {
+  error: null,
+  data: null,
+  isLoading: true,
+  hasMore: true,
+};
+
 // TODO: maybe change drawers logic in future
 const Channel = (props) => {
   // const params = useParams();
   const { serverId, channelId } = useParams();
   const channel = useSelector((state) => getChannelData(state, serverId, channelId));
+  const messagesData = useSelector((state) => getChannelMessagesData(state, channelId))
+    ?? emptyChannel;
   const dispatch = useDispatch();
 
   const {
@@ -49,6 +58,13 @@ const Channel = (props) => {
     isMembersDrawerOpen,
     members,
   } = useOutletContext();
+
+  useEffect(() => {
+    if (serverId && channelId) {
+      // whenever these change, fetch messages
+      dispatch(channelMessagesRequested(serverId, channelId));
+    }
+  }, [serverId, channelId]);
 
   const membersInHierarchy = useMemo(() => {
     const result = {
@@ -82,7 +98,7 @@ const Channel = (props) => {
   return (
     <ChannelContainer>
       <MainContent isDrawerOpen={isMembersDrawerOpen}>
-        <Chat sendMessage={sendMessage} />
+        <Chat messagesData={messagesData} sendMessage={sendMessage} />
       </MainContent>
 
       <ResponsiveDrawer

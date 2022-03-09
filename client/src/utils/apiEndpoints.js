@@ -24,4 +24,5 @@ export const InviteApi = {
 
 export const ChannelApi = {
   SEND_CHANNEL_MESSAGE: '/channel/send-message',
+  GET_CHANNEL_MESSAGES: '/channel',
 };
