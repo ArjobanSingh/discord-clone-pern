@@ -1,13 +1,15 @@
 import { validate } from 'class-validator';
 import { NextFunction, Response } from 'express';
-import { Server } from 'socket.io';
-import { getConnection } from 'typeorm';
+import { Server as SocketServer } from 'socket.io';
+import { FindManyOptions, getConnection, LessThan } from 'typeorm';
 import * as C from '../../../common/socket-io-constants';
 import Channel from '../entity/Channel';
 import Message from '../entity/Message';
 import CustomRequest from '../interfaces/CustomRequest';
 import { createValidationError, CustomError } from '../utils/errors';
 import MessageData from '../types/ChannelMessageInput';
+import { ServerTypeEnum } from '../entity/Server';
+import ServerMember from '../entity/ServerMember';
 
 export const sendChannelMessageRest = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
@@ -23,7 +25,7 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
       messageData: MessageData;
     } = req.body;
 
-    const io: Server = req.app.get('io');
+    const io: SocketServer = req.app.get('io');
     const currentSocket = io.sockets.sockets.get(sid);
 
     // if current socket has it's userId as one of it's room,
@@ -93,4 +95,57 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
   }
 };
 
-export function updateChannelMessage() {}
+export const getChannelMessages = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { cursor } = req.query;
+    const { serverId, channelId } = req.params;
+
+    const querObj: FindManyOptions<Message> = {
+      where: { serverId, channelId },
+      order: { createdAt: 'DESC' },
+      take: 50,
+    };
+
+    if (cursor) {
+      querObj.where = {
+        serverId,
+        channelId,
+        createdAt: LessThan(decodeURIComponent(`${cursor}`)),
+      };
+    }
+
+    const serverPromise = getConnection().query(`
+      SELECT s.type, s.id as "serverId", ch.id as "channelId"
+      FROM server "s"
+      INNER JOIN channel "ch"
+      ON ch."serverId" = s.id
+      where s.id = $1 and ch.id = $2
+      limit 1;
+    `, [serverId, channelId]);
+
+    const serverMemberPromise = ServerMember.findOne({
+      serverId,
+      userId: req.userId,
+    });
+    const messagesPromise = Message.find(querObj);
+
+    const [[server], serverMember, messages] = await Promise.all(
+      [serverPromise, serverMemberPromise, messagesPromise],
+    );
+
+    if (!server) {
+      next(new CustomError('Server or Channel not found', 404));
+      return;
+    }
+
+    if (server.type === ServerTypeEnum.PRIVATE && !serverMember) {
+      // if server is private, and user is not part of server throw err
+      next(new CustomError('You do not have access to this channel', 401));
+      return;
+    }
+
+    res.json({ messages });
+  } catch (err) {
+    next(err);
+  }
+};
