@@ -2,7 +2,7 @@ import { validate } from 'class-validator';
 import { NextFunction, Response } from 'express';
 import { Server as SocketServer } from 'socket.io';
 import {
-  createQueryBuilder, FindManyOptions, getConnection, getRepository, LessThan,
+  getConnection, getRepository,
 } from 'typeorm';
 import * as C from '../../../common/socket-io-constants';
 import Channel from '../entity/Channel';
@@ -39,6 +39,8 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
       return;
     }
 
+    const promisesArray = [];
+
     const serverMemberPromise = getConnection().query(`
       SELECT u.name, u.id, u."profilePicture"
       FROM users "u"
@@ -47,14 +49,20 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
       limit 1;
     `,
     [req.userId, serverId]);
+    promisesArray.push(serverMemberPromise);
 
     // this will autmatically validate if channel is present
     // and that channel is in the server, user trying to send message
     const channelPromise = Channel.findOne({
       where: { id: channelId, serverId },
     });
+    promisesArray.push(channelPromise);
 
-    const [[serverMember], channel] = await Promise.all([serverMemberPromise, channelPromise]);
+    if (messageData.referenceMessageId) {
+      promisesArray.push(Message.findOne(messageData.referenceMessageId));
+    }
+
+    const [[serverMember], channel, referenceMessage] = await Promise.all(promisesArray);
 
     if (!serverMember) {
       next(new CustomError('You are not part of this server', 401));
@@ -66,6 +74,13 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
       return;
     }
 
+    // if user is replying to some other(reference) message
+    // and we did not found reference message, throw error
+    if (promisesArray.length === 3 && !referenceMessage) {
+      next(new CustomError('Reference message not found', 404));
+      return;
+    }
+
     const { content, type } = messageData;
 
     const message = new Message();
@@ -74,6 +89,11 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
     message.userId = req.userId;
     message.channelId = channelId;
     message.serverId = serverId;
+
+    if (referenceMessage) {
+      message.referenceMessageId = referenceMessage.id;
+      message.referenceMessage = referenceMessage;
+    }
 
     const errors = await validate(message);
 
