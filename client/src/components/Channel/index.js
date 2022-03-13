@@ -108,6 +108,12 @@ const Channel = (props) => {
         closeDrawer={closeMembersDrawer}
         wideScreenDrawerProps={wideScreenDrawerProps}
         drawerWidth={membersDrawerWidth}
+        boxProps={{
+          sx: {
+            transform: isMembersDrawerOpen ? '' : `translateX(${membersDrawerWidth}px)`,
+            transition: 'transform 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
+          },
+        }}
       >
         <MemberListContainer isExploringServer={isExploringServer}>
           {Object.entries(membersInHierarchy).map(([memberRole, currentRoleMembers]) => {

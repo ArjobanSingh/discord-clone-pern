@@ -12,6 +12,7 @@ export const ChatContainer = styled.div`
 
 export const MessagesContainer = styled.div`
   flex: 1;
+  position: relative;
 `;
 
 export const InputContainer = styled.div`

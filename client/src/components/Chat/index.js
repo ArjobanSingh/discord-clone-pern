@@ -6,6 +6,7 @@ import {
 import InputEditor from '../InputEditor';
 import { MessageStatus, MessageType } from '../../constants/Message';
 import { isEmpty } from '../../utils/validators';
+import Messages from '../Messages';
 
 // chat component should be independent of channel/server logic
 // to support personal messages in future
@@ -35,10 +36,7 @@ const Chat = (props) => {
     if (isLoading) return <div>Fetching messages...</div>;
     if (error) return <div>Error fetching messages...Retry</div>; // TODO
     if (isEmpty(data)) return <div>No messages in this channel yet</div>;
-
-    return data.map((msg) => (
-      <div key={msg.id}>{msg.content}</div>
-    ));
+    return <Messages messages={data} />;
   };
 
   return (
