@@ -1,6 +1,8 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Container, MessagesWrapper } from './styles';
+import Message from '../Message';
+import { sameDay } from '../../utils/helperFunctions';
 
 const Messages = (props) => {
   const { messages } = props;
@@ -9,9 +11,28 @@ const Messages = (props) => {
   return (
     <Container ref={containerRef}>
       <MessagesWrapper>
-        {messages.map((msg) => (
-          <div key={msg.id}>{msg.content}</div>
-        ))}
+        {messages.map((currentMessage, index) => {
+          const previousMessage = messages[index - 1];
+
+          // check if two messages are sent by same user
+          const isSameUser = index === 0
+            ? false
+            : currentMessage.user.id === previousMessage.user.id;
+
+          // is two messages sent same day
+          const isSameDay = index === 0
+            ? false
+            : sameDay(currentMessage.createdAt, previousMessage.createdAt);
+
+          return (
+            <Message
+              key={currentMessage.id}
+              isSameUser={isSameUser}
+              isSameDay={isSameDay}
+              message={currentMessage}
+            />
+          );
+        })}
       </MessagesWrapper>
     </Container>
   );

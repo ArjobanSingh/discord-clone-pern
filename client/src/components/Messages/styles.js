@@ -15,4 +15,5 @@ export const MessagesWrapper = styled.div`
   flex-direction: column;
   justify-content: flex-end;
   align-items: stretch;
+  /* gap: 16px; */
 `;

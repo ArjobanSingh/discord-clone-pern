@@ -49,3 +49,19 @@ export function handleEnter(callback) {
 }
 
 export const stopPropagation = (e) => e.stopPropagation();
+
+export const formatDate = (date) => {
+  const today = new Date(date);
+  const yyyy = today.getFullYear();
+  let mm = today.getMonth() + 1; // Months start at 0!
+  let dd = today.getDate();
+
+  if (dd < 10) dd = `0${dd}`;
+  if (mm < 10) mm = `0${mm}`;
+
+  return `${dd}/${mm}/${yyyy}`;
+};
+
+export const sameDay = (d1, d2) => d1.getFullYear() === d2.getFullYear()
+    && d1.getMonth() === d2.getMonth()
+    && d1.getDate() === d2.getDate();
