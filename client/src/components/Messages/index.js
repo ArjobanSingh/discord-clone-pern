@@ -1,15 +1,25 @@
-import React, { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Container, MessagesWrapper } from './styles';
 import Message from '../Message';
-import { sameDay } from '../../utils/helperFunctions';
+import { reachedThresholdTop, sameDay, scrollToBottom } from '../../utils/helperFunctions';
 
 const Messages = (props) => {
-  const { messages } = props;
+  const { messages, getMoreMessages } = props;
   const containerRef = useRef();
 
+  useEffect(() => {
+    scrollToBottom(containerRef.current);
+  }, []);
+
+  const handleScroll = (e) => {
+    if (reachedThresholdTop(e, 50)) {
+      getMoreMessages();
+    }
+  };
+
   return (
-    <Container ref={containerRef}>
+    <Container ref={containerRef} onScroll={handleScroll}>
       <MessagesWrapper>
         {messages.map((currentMessage, index) => {
           const previousMessage = messages[index - 1];
@@ -40,6 +50,7 @@ const Messages = (props) => {
 
 Messages.propTypes = {
   messages: PropTypes.arrayOf(PropTypes.object).isRequired,
+  getMoreMessages: PropTypes.func.isRequired,
 };
 
 export default Messages;

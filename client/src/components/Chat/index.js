@@ -20,6 +20,7 @@ const Chat = (props) => {
     data,
     isLoading,
     error,
+    hasMore,
   } = messagesData;
 
   const prepareMessage = (message, type = MessageType.TEXT) => {
@@ -32,11 +33,20 @@ const Chat = (props) => {
     });
   };
 
+  const getMoreMessages = () => {
+    console.log('Has more messages: ', hasMore);
+    if (!hasMore) {
+      // TODO: show no message notficition;
+      return;
+    }
+    let todo;
+  };
+
   const mainJSX = () => {
     if (isLoading) return <div>Fetching messages...</div>;
     if (error) return <div>Error fetching messages...Retry</div>; // TODO
     if (isEmpty(data)) return <div>No messages in this channel yet</div>;
-    return <Messages messages={data} />;
+    return <Messages messages={data} getMoreMessages={getMoreMessages} />;
   };
 
   return (

@@ -85,3 +85,15 @@ export const getTime = (date) => {
   const slicedTime = time.slice(0, time.lastIndexOf(':'));
   return `${slicedTime} ${meridiem}`;
 };
+
+export const scrollToBottom = (element) => {
+  // eslint-disable-next-line no-param-reassign
+  element.scrollTop = element.scrollHeight;
+};
+
+export const reachedThresholdTop = (event, threshold = 0) => {
+  const { scrollTop } = event.target;
+
+  if (scrollTop <= threshold) return true;
+  return false;
+};
