@@ -62,6 +62,26 @@ export const formatDate = (date) => {
   return `${dd}/${mm}/${yyyy}`;
 };
 
-export const sameDay = (d1, d2) => d1.getFullYear() === d2.getFullYear()
+export const sameDay = (date1, date2) => {
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+  return d1.getFullYear() === d2.getFullYear()
     && d1.getMonth() === d2.getMonth()
     && d1.getDate() === d2.getDate();
+};
+
+export const formatDateWithMonth = (date) => {
+  const formattedDate = new Date(date)
+    .toLocaleDateString({},
+      {
+        month: 'long', day: '2-digit', year: 'numeric', // timeZone: 'UTC',
+      });
+  return formattedDate;
+};
+
+export const getTime = (date) => {
+  const timeString = new Date(date).toLocaleTimeString();
+  const [time, meridiem] = timeString.split(' ');
+  const slicedTime = time.slice(0, time.lastIndexOf(':'));
+  return `${slicedTime} ${meridiem}`;
+};

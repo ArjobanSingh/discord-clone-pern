@@ -6,7 +6,8 @@ import { MessageType } from '../../constants/Message';
 import { MessageContainer, StyledAvatar } from './styles';
 import Logo from '../../common/Logo';
 import useUser from '../../customHooks/useUser';
-import { formatDate } from '../../utils/helperFunctions';
+import { formatDate, getTime, sameDay } from '../../utils/helperFunctions';
+import DateMessage from '../MessageTypes/DateMessage';
 
 const Message = (props) => {
   const { message, isSameUser, isSameDay } = props;
@@ -16,10 +17,12 @@ const Message = (props) => {
     type, content, id, user, createdAt,
   } = message;
 
-  const isMessageByCurrentUser = user.id === currentUser.id;
+  const isMessageSentToday = sameDay(Date.now(), message.createdAt);
+
+  //   const isMessageByCurrentUser = user.id === currentUser.id;
 
   const getMessageBody = () => {
-    if (isSameUser) {
+    if (isSameUser && isSameDay) {
       return (
         <Typography
           variant="subtitle1"
@@ -56,7 +59,9 @@ const Message = (props) => {
               color="text.secondaryDark"
               lineHeight="1"
             >
-              {formatDate(createdAt)}
+              {isMessageSentToday
+                ? getTime(createdAt)
+                : formatDate(createdAt)}
             </Typography>
           </Box>
           <Typography
@@ -72,9 +77,14 @@ const Message = (props) => {
   };
 
   return (
-    <MessageContainer isSameUser={isSameUser} id={id}>
-      {getMessageBody()}
-    </MessageContainer>
+    <>
+      {!isSameDay && (
+        <DateMessage date={message.createdAt} />
+      )}
+      <MessageContainer hideMargin={isSameUser && isSameDay} id={id}>
+        {getMessageBody()}
+      </MessageContainer>
+    </>
   );
 };
 

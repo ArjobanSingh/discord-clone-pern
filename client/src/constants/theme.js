@@ -30,7 +30,7 @@ export const LIGHT_THEME_OPTIONS = {
   typography: {
     fontWeightBold: 600,
     fontWeightBolder: 700,
-    fontFamily: "'Raleway', sans-serif",
+    fontFamily: "'Open Sans', sans-serif",
     button: {
       textTransform: 'none',
     },
@@ -64,7 +64,7 @@ export const DARK_THEME_OPTIONS = {
   typography: {
     fontWeightBold: 600,
     fontWeightBolder: 700,
-    fontFamily: "'Raleway', sans-serif",
+    fontFamily: "'Open Sans', sans-serif",
     button: {
       textTransform: 'none',
     },

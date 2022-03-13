@@ -4,7 +4,7 @@ import Avatar from '@mui/material/Avatar';
 export const MessageContainer = styled.div`
   width: 100%;
   padding: ${({ theme }) => `${theme.spacing(0.5)} ${theme.spacing(2)}`};
-  margin-top: ${({ theme, isSameUser }) => (isSameUser ? '' : theme.spacing(2))};
+  margin-top: ${({ theme, hideMargin }) => (hideMargin ? '' : theme.spacing(2))};
   
   &:hover {
     background-color: ${({ theme }) => theme.palette.background.paper};
