@@ -37,7 +37,7 @@ const wideScreenDrawerProps = {
 
 const emptyChannel = {
   error: null,
-  data: null,
+  data: [],
   isLoading: true,
   hasMore: true,
 };

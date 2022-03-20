@@ -7,6 +7,7 @@ import InputEditor from '../InputEditor';
 import { MessageStatus, MessageType } from '../../constants/Message';
 import { isEmpty } from '../../utils/validators';
 import Messages from '../Messages';
+import useUser from '../../customHooks/useUser';
 
 // chat component should be independent of channel/server logic
 // to support personal messages in future
@@ -23,13 +24,23 @@ const Chat = (props) => {
     hasMore,
   } = messagesData;
 
+  // const messageContainerRef = useRef();
+  const { user } = useUser();
+
   const prepareMessage = (message, type = MessageType.TEXT) => {
-    // nanoid will work as temporary id, till message is sent
+    // nanoid and createdAt will work as temporary id and
+    // temporart createdAt, till message is sent
     sendMessage({
       content: message,
       type,
       id: nanoid(),
       status: MessageStatus.SENDING,
+      createdAt: new Date().toString(),
+      user: {
+        name: user.name,
+        id: user.id,
+        profilePicture: user.profilePicture,
+      },
     });
   };
 
@@ -43,20 +54,24 @@ const Chat = (props) => {
   };
 
   const mainJSX = () => {
-    if (isLoading) return <div>Fetching messages...</div>;
-    if (error) return <div>Error fetching messages...Retry</div>; // TODO
+    if (isLoading) return <div>TODO: Fetching messages...</div>;
+    if (error) return <div>TODO: Error fetching messages...Retry</div>; // TODO
     if (isEmpty(data)) return <div>No messages in this channel yet</div>;
-    return <Messages messages={data} getMoreMessages={getMoreMessages} />;
+    return (
+      <>
+        <MessagesContainer>
+          <Messages messages={data} getMoreMessages={getMoreMessages} />
+        </MessagesContainer>
+        <InputContainer>
+          <InputEditor prepareMessage={prepareMessage} />
+        </InputContainer>
+      </>
+    );
   };
 
   return (
     <ChatContainer>
-      <MessagesContainer>
-        {mainJSX()}
-      </MessagesContainer>
-      <InputContainer>
-        <InputEditor prepareMessage={prepareMessage} />
-      </InputContainer>
+      {mainJSX()}
     </ChatContainer>
   );
 };

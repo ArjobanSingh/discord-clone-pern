@@ -1,4 +1,5 @@
 import * as C from '../../constants/channels';
+import { MessageStatus } from '../../constants/Message';
 import { isEmpty } from '../../utils/validators';
 
 const channelsChat = (state = {}, action) => {
@@ -11,7 +12,7 @@ const channelsChat = (state = {}, action) => {
           [action.payload.channelId]: {
             isLoading: true,
             error: null,
-            data: null,
+            data: [],
             hasMore: true,
           },
         };
@@ -24,7 +25,7 @@ const channelsChat = (state = {}, action) => {
         [action.payload.channelId]: {
           isLoading: false,
           error: action.payload.error,
-          data: null,
+          data: [],
           hasMore: true,
         },
       };
@@ -39,6 +40,46 @@ const channelsChat = (state = {}, action) => {
           hasMore: !(action.payload.data.length < 50),
         },
       };
+    case C.SEND_CHANNEL_MESSAGE_REQUESTED: {
+      const { channelId, messageData } = action.payload;
+      return {
+        ...state,
+        [channelId]: {
+          ...state[channelId],
+          data: [...state[channelId].data, messageData],
+        },
+      };
+    }
+    case C.SEND_CHANNEL_MESSAGE_SUCCESS: {
+      const { channelId, messageData, tempMessageId } = action.payload;
+      const data = state[channelId].data.map((message) => {
+        if (message.id === tempMessageId) return messageData;
+        return message;
+      });
+      return {
+        ...state,
+        [channelId]: {
+          ...state[channelId],
+          data,
+        },
+      };
+    }
+    case C.SEND_CHANNEL_MESSAGE_FAILED: {
+      const { channelId, error, tempMessageId } = action.payload;
+      const data = state[channelId].data.map((message) => {
+        if (message.id === tempMessageId) {
+          return { ...message, status: MessageStatus.FAILED, errorMessage: error.message };
+        }
+        return message;
+      });
+      return {
+        ...state,
+        [channelId]: {
+          ...state[channelId],
+          data,
+        },
+      };
+    }
     default:
       return state;
   }

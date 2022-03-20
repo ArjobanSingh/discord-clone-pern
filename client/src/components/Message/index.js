@@ -1,10 +1,10 @@
 import {
-  memo, useRef, useState,
+  memo, useEffect, useRef, useState,
 } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { MessageType, MessageUserPropType } from '../../constants/Message';
+import { MessageStatus, MessageType, MessageUserPropType } from '../../constants/Message';
 import {
   AvatarMessageContainer,
   HoverableTime,
@@ -27,6 +27,7 @@ const Message = (props) => {
     isSameUser,
     isSameDay,
     scrollToReferenceMessage,
+    scrollToContainerBottom,
   } = props;
   const { user: currentUser } = useUser();
   const [shouldHighlight, setShouldHighlight] = useState(false);
@@ -38,7 +39,15 @@ const Message = (props) => {
     user,
     createdAt,
     referenceMessage,
+    status,
   } = message;
+
+  useEffect(() => {
+    if (status === MessageStatus.SENDING) {
+      // we just sent this new message, scroll container to bottom
+      scrollToContainerBottom();
+    }
+  }, [status]);
 
   const elementRef = useRef();
   const isMessageSentToday = sameDay(Date.now(), message.createdAt);
@@ -151,6 +160,7 @@ Message.propTypes = {
     type: PropTypes.oneOf(Object.keys(MessageType)).isRequired,
     content: PropTypes.string,
     id: PropTypes.string,
+    status: PropTypes.oneOf(Object.keys(MessageStatus)).isRequired,
     createdAt: PropTypes.string,
     user: PropTypes.shape(MessageUserPropType).isRequired,
     referenceMessage: PropTypes.shape({
@@ -164,6 +174,7 @@ Message.propTypes = {
   scrollToReferenceMessage: PropTypes.func.isRequired,
   isScrollToReference: PropTypes.bool.isRequired,
   setReferenceMessageId: PropTypes.func.isRequired,
+  scrollToContainerBottom: PropTypes.func.isRequired,
 };
 
 export default memo(Message);

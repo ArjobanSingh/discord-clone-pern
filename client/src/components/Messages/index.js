@@ -12,8 +12,10 @@ const Messages = (props) => {
 
   const [referenceMessageId, setReferenceMessageId] = useState(null);
 
+  const scrollToContainerBottom = useCallback(() => scrollToBottom(containerRef.current), []);
+
   useEffect(() => {
-    scrollToBottom(containerRef.current);
+    scrollToContainerBottom();
   }, []);
 
   const handleScroll = (e) => {
@@ -56,6 +58,7 @@ const Messages = (props) => {
               scrollToReferenceMessage={scrollToReferenceMessage}
               isScrollToReference={referenceMessageId === currentMessage.id}
               setReferenceMessageId={setReferenceMessageId}
+              scrollToContainerBottom={scrollToContainerBottom}
             />
           );
         })}

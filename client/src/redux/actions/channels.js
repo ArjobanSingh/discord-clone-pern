@@ -25,20 +25,22 @@ export const sendChannelMessageRequested = (serverId, channelId, messageData) =>
   },
 });
 
-export const sendChannelMessageFailed = (serverId, channelId, error) => ({
+export const sendChannelMessageFailed = (serverId, channelId, tempMessageId, error) => ({
   type: C.SEND_CHANNEL_MESSAGE_FAILED,
   payload: {
     serverId,
     channelId,
+    tempMessageId,
     error,
   },
 });
 
-export const sendChannelMessageSent = (serverId, channelId, messageData) => ({
+export const sendChannelMessageSent = (serverId, channelId, tempMessageId, messageData) => ({
   type: C.SEND_CHANNEL_MESSAGE_SUCCESS,
   payload: {
     serverId,
     channelId,
+    tempMessageId,
     messageData,
   },
 });

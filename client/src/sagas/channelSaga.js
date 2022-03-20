@@ -2,7 +2,9 @@ import {
   all, call, put, select, takeEvery,
 } from 'redux-saga/effects';
 import { CHANNEL_MESSAGES_REQUESTED, SEND_CHANNEL_MESSAGE_REQUESTED } from '../constants/channels';
-import { channelMessagesFailed, channelMessagesSuccess } from '../redux/actions/channels';
+import {
+  channelMessagesFailed, channelMessagesSuccess, sendChannelMessageFailed, sendChannelMessageSent,
+} from '../redux/actions/channels';
 import { getChannelMessagesData } from '../redux/reducers';
 import socketHandler from '../services/socket-client';
 import { ChannelApi } from '../utils/apiEndpoints';
@@ -31,13 +33,17 @@ function* getChannelMessages(actionData) {
 }
 
 function* sendChannelMessage(actionData) {
-//   const { serverId, channelId, messageData } = actionData;
+  const { serverId, channelId, messageData } = actionData.payload;
   try {
     const url = ChannelApi.SEND_CHANNEL_MESSAGE;
     const response = yield call(axiosInstance.post, url, { ...actionData.payload, sid: socket.id });
+    yield put(sendChannelMessageSent(serverId, channelId, messageData.id, response.data));
     console.log('Chat message response: ', response);
   } catch (err) {
     console.log('Message sending error: ', err, err.message);
+    yield put(handleError(err, (error) => (
+      sendChannelMessageFailed(serverId, channelId, messageData.id, error)
+    )));
   }
 }
 
