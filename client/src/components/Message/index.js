@@ -1,5 +1,5 @@
 import {
-  memo, useEffect, useRef, useState,
+  memo, useCallback, useEffect, useRef, useState,
 } from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
@@ -18,6 +18,7 @@ import { formatDate, getTime, sameDay } from '../../utils/helperFunctions';
 import DateMessage from '../MessageTypes/DateMessage';
 import ReferenceMessage from '../MessageTypes/ReferenceMessage';
 import useDidUpdate from '../../customHooks/useDidUpdate';
+import useIntersectionObserver from '../../customHooks/useIntersectionObserver';
 
 const Message = (props) => {
   const {
@@ -28,9 +29,20 @@ const Message = (props) => {
     isSameDay,
     scrollToReferenceMessage,
     scrollToContainerBottom,
+    isLastMessage,
+    isLastMessageVisibleOnScreen,
   } = props;
   const { user: currentUser } = useUser();
   const [shouldHighlight, setShouldHighlight] = useState(false);
+
+  const intersectionObserverCallback = useCallback((observedEntry) => {
+    isLastMessageVisibleOnScreen.current = observedEntry.isIntersecting;
+  }, []);
+
+  const [elementRefCallback, elementRef] = useIntersectionObserver(
+    isLastMessage,
+    intersectionObserverCallback,
+  );
 
   const {
     type,
@@ -49,7 +61,6 @@ const Message = (props) => {
     }
   }, [status]);
 
-  const elementRef = useRef();
   const isMessageSentToday = sameDay(Date.now(), message.createdAt);
   //   const isMessageByCurrentUser = user.id === currentUser.id;
 
@@ -144,7 +155,7 @@ const Message = (props) => {
         <DateMessage date={message.createdAt} />
       )}
       <MessageContainer
-        ref={elementRef}
+        ref={elementRefCallback}
         shouldHighlight={shouldHighlight}
         hideMargin={isSimpleInlineMessage}
         id={id}
@@ -173,8 +184,10 @@ Message.propTypes = {
   isSameDay: PropTypes.bool.isRequired,
   scrollToReferenceMessage: PropTypes.func.isRequired,
   isScrollToReference: PropTypes.bool.isRequired,
+  isLastMessage: PropTypes.bool.isRequired,
   setReferenceMessageId: PropTypes.func.isRequired,
   scrollToContainerBottom: PropTypes.func.isRequired,
+  isLastMessageVisibleOnScreen: PropTypes.objectOf(PropTypes.any).isRequired,
 };
 
 export default memo(Message);

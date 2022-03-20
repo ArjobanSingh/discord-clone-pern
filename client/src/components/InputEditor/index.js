@@ -10,6 +10,7 @@ const InputEditor = (props) => {
     e.preventDefault();
     if (!value.trim()) return;
     prepareMessage(value);
+    setValue('');
   };
 
   const handleValueChange = (e) => {
@@ -23,6 +24,7 @@ const InputEditor = (props) => {
         label={null}
         value={value}
         onChange={handleValueChange}
+        autoComplete="off"
         injectCss={`
           border: none;
           &:focus-within {

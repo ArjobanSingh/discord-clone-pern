@@ -5,10 +5,12 @@ import PropTypes from 'prop-types';
 import { Container, MessagesWrapper } from './styles';
 import Message from '../Message';
 import { reachedThresholdTop, sameDay, scrollToBottom } from '../../utils/helperFunctions';
+import useDidUpdate from '../../customHooks/useDidUpdate';
 
 const Messages = (props) => {
   const { messages, getMoreMessages } = props;
   const containerRef = useRef();
+  const isLastMessageVisibleOnScreen = useRef();
 
   const [referenceMessageId, setReferenceMessageId] = useState(null);
 
@@ -17,6 +19,10 @@ const Messages = (props) => {
   useEffect(() => {
     scrollToContainerBottom();
   }, []);
+
+  useDidUpdate(() => {
+    console.log(isLastMessageVisibleOnScreen.current);
+  }, [messages.length]);
 
   const handleScroll = (e) => {
     if (reachedThresholdTop(e, 50)) {
@@ -59,6 +65,8 @@ const Messages = (props) => {
               isScrollToReference={referenceMessageId === currentMessage.id}
               setReferenceMessageId={setReferenceMessageId}
               scrollToContainerBottom={scrollToContainerBottom}
+              isLastMessage={index === messages.length - 1}
+              isLastMessageVisibleOnScreen={isLastMessageVisibleOnScreen}
             />
           );
         })}
