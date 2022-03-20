@@ -1,78 +1,131 @@
-import React, { memo } from 'react';
+import {
+  memo, useRef, useState,
+} from 'react';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { MessageType } from '../../constants/Message';
-import { MessageContainer, StyledAvatar } from './styles';
+import { MessageType, MessageUserPropType } from '../../constants/Message';
+import {
+  AvatarMessageContainer,
+  HoverableTime,
+  MessageContainer,
+  SameUserMessage,
+  StyledAvatar,
+} from './styles';
 import Logo from '../../common/Logo';
 import useUser from '../../customHooks/useUser';
 import { formatDate, getTime, sameDay } from '../../utils/helperFunctions';
 import DateMessage from '../MessageTypes/DateMessage';
+import ReferenceMessage from '../MessageTypes/ReferenceMessage';
+import useDidUpdate from '../../customHooks/useDidUpdate';
 
 const Message = (props) => {
-  const { message, isSameUser, isSameDay } = props;
+  const {
+    message,
+    isScrollToReference,
+    setReferenceMessageId,
+    isSameUser,
+    isSameDay,
+    scrollToReferenceMessage,
+  } = props;
   const { user: currentUser } = useUser();
+  const [shouldHighlight, setShouldHighlight] = useState(false);
 
   const {
-    type, content, id, user, createdAt,
+    type,
+    content,
+    id,
+    user,
+    createdAt,
+    referenceMessage,
   } = message;
 
+  const elementRef = useRef();
   const isMessageSentToday = sameDay(Date.now(), message.createdAt);
-
   //   const isMessageByCurrentUser = user.id === currentUser.id;
 
+  // if message send by same user as previous one and on same day
+  // and also is not reply to some other message, show simple
+  // message ui, without Avatar etc
+  const isSimpleInlineMessage = isSameDay && isSameUser && !referenceMessage;
+
+  useDidUpdate(() => {
+    let timeout;
+    if (isScrollToReference) {
+      elementRef.current.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'smooth' });
+      setShouldHighlight(true);
+      timeout = setTimeout(() => {
+        setReferenceMessageId(null);
+      }, 1000);
+    } else setShouldHighlight(false);
+
+    return () => {
+      clearInterval(timeout);
+    };
+  }, [isScrollToReference]);
+
   const getMessageBody = () => {
-    if (isSameUser && isSameDay) {
+    if (isSimpleInlineMessage) {
       return (
-        <Typography
-          variant="subtitle1"
-          color="text.primary"
-          lineHeight="1.3"
-          marginLeft="50px"
-        >
-          {content}
-        </Typography>
-      );
-    }
-
-    return (
-      <Box
-        display="flex"
-        gap="10px"
-      >
-        <StyledAvatar src={user.profilePicture}>
-          <Logo />
-        </StyledAvatar>
-        <div>
-          <Box display="flex" gap="10px" alignItems="center">
-            <Typography
-              variant="subtitle1"
-              color="primary.main"
-              lineHeight="1.2"
-              fontWeight="fontWeightBold"
-            >
-              {user.name}
-            </Typography>
-
-            <Typography
-              variant="caption"
-              color="text.secondaryDark"
-              lineHeight="1"
-            >
-              {isMessageSentToday
-                ? getTime(createdAt)
-                : formatDate(createdAt)}
-            </Typography>
-          </Box>
+        <SameUserMessage>
+          <HoverableTime>
+            {getTime(createdAt)}
+          </HoverableTime>
           <Typography
             variant="subtitle1"
             color="text.primary"
             lineHeight="1.3"
+            marginLeft="55px"
           >
             {content}
           </Typography>
-        </div>
-      </Box>
+        </SameUserMessage>
+      );
+    }
+
+    return (
+      <div>
+        {!!referenceMessage && (
+        <ReferenceMessage
+          scrollToReferenceMessage={scrollToReferenceMessage}
+          message={referenceMessage}
+        />
+        )}
+        <AvatarMessageContainer>
+          <StyledAvatar src={user.profilePicture}>
+            <Logo />
+          </StyledAvatar>
+          <div>
+            <Box display="flex" gap="10px" alignItems="center">
+              <Typography
+                variant="subtitle1"
+                color="primary.main"
+                lineHeight="1.2"
+                fontWeight="fontWeightBold"
+              >
+                {user.name}
+              </Typography>
+
+              <Typography
+                variant="caption"
+                color="text.secondaryDark"
+                lineHeight="1"
+              >
+                {isMessageSentToday
+                  ? getTime(createdAt)
+                  : formatDate(createdAt)}
+              </Typography>
+            </Box>
+            <Typography
+              variant="subtitle1"
+              color="text.primary"
+              lineHeight="1.3"
+            >
+              {content}
+            </Typography>
+          </div>
+        </AvatarMessageContainer>
+      </div>
     );
   };
 
@@ -81,7 +134,12 @@ const Message = (props) => {
       {!isSameDay && (
         <DateMessage date={message.createdAt} />
       )}
-      <MessageContainer hideMargin={isSameUser && isSameDay} id={id}>
+      <MessageContainer
+        ref={elementRef}
+        shouldHighlight={shouldHighlight}
+        hideMargin={isSimpleInlineMessage}
+        id={id}
+      >
         {getMessageBody()}
       </MessageContainer>
     </>
@@ -94,14 +152,18 @@ Message.propTypes = {
     content: PropTypes.string,
     id: PropTypes.string,
     createdAt: PropTypes.string,
-    user: PropTypes.shape({
-      profilePicture: PropTypes.string,
-      id: PropTypes.string,
-      name: PropTypes.string,
+    user: PropTypes.shape(MessageUserPropType).isRequired,
+    referenceMessage: PropTypes.shape({
+      user: PropTypes.shape(MessageUserPropType).isRequired,
+      content: PropTypes.string,
+      type: PropTypes.oneOf(Object.keys(MessageType)).isRequired,
     }),
   }).isRequired,
   isSameUser: PropTypes.bool.isRequired,
   isSameDay: PropTypes.bool.isRequired,
+  scrollToReferenceMessage: PropTypes.func.isRequired,
+  isScrollToReference: PropTypes.bool.isRequired,
+  setReferenceMessageId: PropTypes.func.isRequired,
 };
 
 export default memo(Message);

@@ -1,4 +1,6 @@
-import { useEffect, useRef } from 'react';
+import {
+  useCallback, useEffect, useRef, useState,
+} from 'react';
 import PropTypes from 'prop-types';
 import { Container, MessagesWrapper } from './styles';
 import Message from '../Message';
@@ -7,6 +9,8 @@ import { reachedThresholdTop, sameDay, scrollToBottom } from '../../utils/helper
 const Messages = (props) => {
   const { messages, getMoreMessages } = props;
   const containerRef = useRef();
+
+  const [referenceMessageId, setReferenceMessageId] = useState(null);
 
   useEffect(() => {
     scrollToBottom(containerRef.current);
@@ -17,6 +21,15 @@ const Messages = (props) => {
       getMoreMessages();
     }
   };
+
+  const scrollToReferenceMessage = useCallback((refMessageId) => {
+    const referenceMessageElement = document.getElementById(refMessageId);
+    if (!referenceMessageElement) {
+      // TODO: notify user or return;
+      return;
+    }
+    setReferenceMessageId(refMessageId);
+  }, []);
 
   return (
     <Container ref={containerRef} onScroll={handleScroll}>
@@ -40,6 +53,9 @@ const Messages = (props) => {
               isSameUser={isSameUser}
               isSameDay={isSameDay}
               message={currentMessage}
+              scrollToReferenceMessage={scrollToReferenceMessage}
+              isScrollToReference={referenceMessageId === currentMessage.id}
+              setReferenceMessageId={setReferenceMessageId}
             />
           );
         })}

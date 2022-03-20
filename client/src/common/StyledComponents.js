@@ -29,6 +29,9 @@ export const EllipsisDiv = styled.div`
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: ${({ linesCount }) => linesCount || '2'};
+
+  ${({ injectCss, theme }) => (typeof injectCss === 'function'
+    ? injectCss(theme) : injectCss)}
 `;
 
 export const SimpleEllipsis = styled.div`
