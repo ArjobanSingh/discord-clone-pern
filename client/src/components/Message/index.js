@@ -30,19 +30,11 @@ const Message = (props) => {
     scrollToReferenceMessage,
     scrollToContainerBottom,
     isLastMessage,
-    isLastMessageVisibleOnScreen,
   } = props;
   const { user: currentUser } = useUser();
   const [shouldHighlight, setShouldHighlight] = useState(false);
 
-  const intersectionObserverCallback = useCallback((observedEntry) => {
-    isLastMessageVisibleOnScreen.current = observedEntry.isIntersecting;
-  }, []);
-
-  const [elementRefCallback, elementRef] = useIntersectionObserver(
-    isLastMessage,
-    intersectionObserverCallback,
-  );
+  const elementRef = useRef();
 
   const {
     type,
@@ -155,7 +147,7 @@ const Message = (props) => {
         <DateMessage date={message.createdAt} />
       )}
       <MessageContainer
-        ref={elementRefCallback}
+        ref={elementRef}
         shouldHighlight={shouldHighlight}
         hideMargin={isSimpleInlineMessage}
         id={id}
@@ -187,7 +179,6 @@ Message.propTypes = {
   isLastMessage: PropTypes.bool.isRequired,
   setReferenceMessageId: PropTypes.func.isRequired,
   scrollToContainerBottom: PropTypes.func.isRequired,
-  isLastMessageVisibleOnScreen: PropTypes.objectOf(PropTypes.any).isRequired,
 };
 
 export default memo(Message);

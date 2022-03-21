@@ -4,13 +4,15 @@ import {
 import PropTypes from 'prop-types';
 import { Container, MessagesWrapper } from './styles';
 import Message from '../Message';
-import { reachedThresholdTop, sameDay, scrollToBottom } from '../../utils/helperFunctions';
+import {
+  reachedThresholdBottom, reachedThresholdTop, sameDay, scrollToBottom,
+} from '../../utils/helperFunctions';
 import useDidUpdate from '../../customHooks/useDidUpdate';
 
 const Messages = (props) => {
   const { messages, getMoreMessages } = props;
   const containerRef = useRef();
-  const isLastMessageVisibleOnScreen = useRef();
+  const lastScrollPositions = useRef({});
 
   const [referenceMessageId, setReferenceMessageId] = useState(null);
 
@@ -21,10 +23,18 @@ const Messages = (props) => {
   }, []);
 
   useDidUpdate(() => {
-    console.log(isLastMessageVisibleOnScreen.current);
+    if (reachedThresholdBottom(lastScrollPositions.current, 10)) {
+      scrollToContainerBottom();
+    }
   }, [messages.length]);
 
   const handleScroll = (e) => {
+    const { scrollHeight, scrollTop, clientHeight } = e.target;
+    lastScrollPositions.current = {
+      scrollHeight,
+      scrollTop,
+      clientHeight,
+    };
     if (reachedThresholdTop(e, 50)) {
       getMoreMessages();
     }
@@ -66,7 +76,6 @@ const Messages = (props) => {
               setReferenceMessageId={setReferenceMessageId}
               scrollToContainerBottom={scrollToContainerBottom}
               isLastMessage={index === messages.length - 1}
-              isLastMessageVisibleOnScreen={isLastMessageVisibleOnScreen}
             />
           );
         })}

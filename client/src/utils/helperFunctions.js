@@ -97,3 +97,9 @@ export const reachedThresholdTop = (event, threshold = 0) => {
   if (scrollTop <= threshold) return true;
   return false;
 };
+
+export const reachedThresholdBottom = (scrollPositionData, threshold = 3) => {
+  const { scrollHeight, scrollTop, clientHeight } = scrollPositionData;
+
+  return Math.abs(scrollHeight - scrollTop - clientHeight) <= threshold;
+};
