@@ -56,11 +56,11 @@ const Chat = (props) => {
   const mainJSX = () => {
     if (isLoading) return <div>TODO: Fetching messages...</div>;
     if (error) return <div>TODO: Error fetching messages...Retry</div>; // TODO
-    if (isEmpty(data)) return <div>No messages in this channel yet</div>;
     return (
       <>
         <MessagesContainer>
-          <Messages messages={data} getMoreMessages={getMoreMessages} />
+          {isEmpty(data) ? <div>No messages in this channel yet</div>
+            : <Messages messages={data} getMoreMessages={getMoreMessages} />}
         </MessagesContainer>
         <InputContainer>
           <InputEditor prepareMessage={prepareMessage} />

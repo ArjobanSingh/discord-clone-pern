@@ -43,6 +43,8 @@ const emptyChannel = {
 };
 
 // TODO: maybe change drawers logic in future
+// on server change, channel will unmount and remount, as user gets navigated
+// to new server initally with no channelId, and then navigated to first channel of server
 const Channel = (props) => {
   // const params = useParams();
   const { serverId, channelId } = useParams();

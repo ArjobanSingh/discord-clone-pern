@@ -1,9 +1,10 @@
 import {
-  take, call, fork, select,
+  take, call, fork, select, put,
 } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import socketHandler from '../services/socket-client';
 import { NEW_CHANNEL_MESSAGE } from '../constants/socket-io';
+import { sendChannelMessageSent } from '../redux/actions/channels';
 
 function createSocketChannel(socket) {
   return eventChannel((emit) => {
@@ -20,14 +21,16 @@ function createSocketChannel(socket) {
 }
 
 function* handleSocketEvents(socketEvent) {
-  const { user } = yield select((state) => state.user);
+  // const { user } = yield select((state) => state.user);
   const { event, args } = socketEvent;
   const [payload] = args;
 
   switch (event) {
-    case NEW_CHANNEL_MESSAGE:
-      console.log('New message received: ', payload);
+    case NEW_CHANNEL_MESSAGE: {
+      const { serverId, channelId } = payload;
+      yield put(sendChannelMessageSent(serverId, channelId, undefined, payload));
       break;
+    }
     default:
       break;
   }

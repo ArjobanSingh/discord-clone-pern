@@ -4,7 +4,7 @@ import {
 } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useServerData from '../../customHooks/useServerData';
 import { PreviewBar, StyledButton } from './styles';
 import JoinPublicServer from './JoinPublicServer';

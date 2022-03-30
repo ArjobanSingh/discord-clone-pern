@@ -38,7 +38,6 @@ function* sendChannelMessage(actionData) {
     const url = ChannelApi.SEND_CHANNEL_MESSAGE;
     const response = yield call(axiosInstance.post, url, { ...actionData.payload, sid: socket.id });
     yield put(sendChannelMessageSent(serverId, channelId, messageData.id, response.data));
-    console.log('Chat message response: ', response);
   } catch (err) {
     console.log('Message sending error: ', err, err.message);
     yield put(handleError(err, (error) => (

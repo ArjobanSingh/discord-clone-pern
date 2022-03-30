@@ -22,6 +22,7 @@ const Messages = (props) => {
     scrollToContainerBottom();
   }, []);
 
+  // if we are at bottom and some new message came, scroll to bottom
   useDidUpdate(() => {
     if (reachedThresholdBottom(lastScrollPositions.current, 10)) {
       scrollToContainerBottom();

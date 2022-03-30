@@ -52,10 +52,11 @@ const channelsChat = (state = {}, action) => {
     }
     case C.SEND_CHANNEL_MESSAGE_SUCCESS: {
       const { channelId, messageData, tempMessageId } = action.payload;
-      const data = state[channelId].data.map((message) => {
-        if (message.id === tempMessageId) return messageData;
-        return message;
-      });
+      const currentChannelData = state[channelId].data;
+      const data = tempMessageId
+        ? currentChannelData.map((message) => (message.id === tempMessageId ? messageData : message))
+        : [...currentChannelData, messageData];
+
       return {
         ...state,
         [channelId]: {
