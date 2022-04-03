@@ -29,7 +29,6 @@ const Message = (props) => {
     isSameDay,
     scrollToReferenceMessage,
     scrollToContainerBottom,
-    isLastMessage,
   } = props;
   const { user: currentUser } = useUser();
   const [shouldHighlight, setShouldHighlight] = useState(false);
@@ -176,7 +175,6 @@ Message.propTypes = {
   isSameDay: PropTypes.bool.isRequired,
   scrollToReferenceMessage: PropTypes.func.isRequired,
   isScrollToReference: PropTypes.bool.isRequired,
-  isLastMessage: PropTypes.bool.isRequired,
   setReferenceMessageId: PropTypes.func.isRequired,
   scrollToContainerBottom: PropTypes.func.isRequired,
 };

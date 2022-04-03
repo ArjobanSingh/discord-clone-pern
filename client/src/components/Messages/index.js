@@ -10,9 +10,10 @@ import {
 import useDidUpdate from '../../customHooks/useDidUpdate';
 
 const Messages = (props) => {
-  const { messages, getMoreMessages } = props;
+  const { messages, hasMoreMessages, getMoreMessages } = props;
   const containerRef = useRef();
   const lastScrollPositions = useRef({});
+  const previousScrollHeight = useRef();
 
   const [referenceMessageId, setReferenceMessageId] = useState(null);
 
@@ -23,7 +24,14 @@ const Messages = (props) => {
   }, []);
 
   // if we are at bottom and some new message came, scroll to bottom
+  // TODO: enhancement another approach could be saving new timestamp whenever new message
+  // comes, and using that flag in deps array
   useDidUpdate(() => {
+    if (previousScrollHeight.current) {
+      console.log({ prev: previousScrollHeight.current, newScrollHeight: containerRef.current.scrollHeight });
+      containerRef.current.scrollTop = previousScrollHeight.current;
+      previousScrollHeight.current = undefined;
+    }
     if (reachedThresholdBottom(lastScrollPositions.current, 10)) {
       scrollToContainerBottom();
     }
@@ -36,7 +44,8 @@ const Messages = (props) => {
       scrollTop,
       clientHeight,
     };
-    if (reachedThresholdTop(e, 50)) {
+    if (reachedThresholdTop(e, 50) && hasMoreMessages) {
+      previousScrollHeight.current = scrollHeight;
       getMoreMessages();
     }
   };
@@ -72,11 +81,10 @@ const Messages = (props) => {
               isSameUser={isSameUser}
               isSameDay={isSameDay}
               message={currentMessage}
-              scrollToReferenceMessage={scrollToReferenceMessage}
               isScrollToReference={referenceMessageId === currentMessage.id}
+              scrollToReferenceMessage={scrollToReferenceMessage}
               setReferenceMessageId={setReferenceMessageId}
               scrollToContainerBottom={scrollToContainerBottom}
-              isLastMessage={index === messages.length - 1}
             />
           );
         })}
@@ -88,6 +96,7 @@ const Messages = (props) => {
 Messages.propTypes = {
   messages: PropTypes.arrayOf(PropTypes.object).isRequired,
   getMoreMessages: PropTypes.func.isRequired,
+  hasMoreMessages: PropTypes.bool.isRequired,
 };
 
 export default Messages;

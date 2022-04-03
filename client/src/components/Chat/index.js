@@ -60,7 +60,13 @@ const Chat = (props) => {
       <>
         <MessagesContainer>
           {isEmpty(data) ? <div>No messages in this channel yet</div>
-            : <Messages messages={data} getMoreMessages={getMoreMessages} />}
+            : (
+              <Messages
+                hasMoreMessages={hasMore}
+                messages={data}
+                getMoreMessages={getMoreMessages}
+              />
+            )}
         </MessagesContainer>
         <InputContainer>
           <InputEditor prepareMessage={prepareMessage} />

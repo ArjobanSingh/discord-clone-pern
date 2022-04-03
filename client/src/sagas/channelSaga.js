@@ -3,7 +3,12 @@ import {
 } from 'redux-saga/effects';
 import { CHANNEL_MESSAGES_REQUESTED, SEND_CHANNEL_MESSAGE_REQUESTED } from '../constants/channels';
 import {
-  channelMessagesFailed, channelMessagesSuccess, sendChannelMessageFailed, sendChannelMessageSent,
+  channelMessagesFailed,
+  channelMessagesSuccess,
+  channelMoreMessagesFailed,
+  channelMoreMessagesSuccess,
+  sendChannelMessageFailed,
+  sendChannelMessageSent,
 } from '../redux/actions/channels';
 import { getChannelMessagesData } from '../redux/reducers';
 import socketHandler from '../services/socket-client';
@@ -28,6 +33,23 @@ function* getChannelMessages(actionData) {
   } catch (err) {
     yield put(handleError(err, (error) => (
       channelMessagesFailed(channelId, error)
+    )));
+  }
+}
+
+// TODO: maybe handle messages in chunk for fast rendering
+function* getMoreChannelMessages(actionData) {
+  const { channelId, serverId } = actionData.payload;
+  try {
+    const oldestMessage = yield select((state) => getChannelMessagesData(state, channelId).data[0]);
+    const { createdAt } = oldestMessage;
+    const url = `${ChannelApi.GET_CHANNEL_MESSAGES}/${serverId}/${channelId}?cursor=${createdAt}`;
+    const response = yield call(axiosInstance.get, url);
+    console.log('more messages', response);
+    yield put(channelMoreMessagesSuccess(channelId, response.data.messages.reverse()));
+  } catch (err) {
+    yield put(handleError(err, (error) => (
+      channelMoreMessagesFailed(channelId, error)
     )));
   }
 }

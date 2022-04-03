@@ -68,3 +68,27 @@ export const channelMessagesFailed = (channelId, error) => ({
     error,
   },
 });
+
+export const channelMoreMessagesRequested = (serverId, channelId) => ({
+  type: C.CHANNEL_MORE_MESSAGES_REQUESTED,
+  payload: {
+    channelId,
+    serverId,
+  },
+});
+
+export const channelMoreMessagesSuccess = (channelId, data) => ({
+  type: C.CHANNEL_MORE_MESSAGES_SUCCESS,
+  payload: {
+    channelId,
+    data,
+  },
+});
+
+export const channelMoreMessagesFailed = (channelId, error) => ({
+  type: C.CHANNEL_MORE_MESSAGES_FAILED,
+  payload: {
+    channelId,
+    error,
+  },
+});

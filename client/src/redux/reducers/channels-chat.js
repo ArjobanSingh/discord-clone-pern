@@ -81,6 +81,41 @@ const channelsChat = (state = {}, action) => {
         },
       };
     }
+    case C.CHANNEL_MORE_MESSAGES_REQUESTED: {
+      const { channelId } = action.payload;
+      return {
+        ...state,
+        [channelId]: {
+          ...[state.channelId],
+          isLoadingMore: true,
+          moreError: null,
+        },
+      };
+    }
+    case C.CHANNEL_MORE_MESSAGES_SUCCESS: {
+      const { channelId, data } = action.payload;
+      return {
+        ...state,
+        [channelId]: {
+          ...[state.channelId],
+          isLoadingMore: false,
+          data: [...state[channelId].data, ...data],
+          // if we got less messages than 50, means no more messages
+          hasMore: !(data.length < 50),
+        },
+      };
+    }
+    case C.CHANNEL_MORE_MESSAGES_FAILED: {
+      const { channelId, error } = action.payload;
+      return {
+        ...state,
+        [channelId]: {
+          ...state[channelId],
+          isLoadingMore: false,
+          moreError: error,
+        },
+      };
+    }
     default:
       return state;
   }

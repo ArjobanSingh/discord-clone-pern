@@ -27,6 +27,6 @@ module.exports = {
     'no-unused-vars': 'warn',
     'react/jsx-props-no-spreading': 0,
     'no-empty-pattern': 'warn',
-    'max-len': ['error', { code: 120 }],
+    'max-len': ['warn', { code: 120 }],
   },
 };
