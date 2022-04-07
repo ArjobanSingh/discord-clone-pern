@@ -1,7 +1,12 @@
 import {
   all, call, put, select, takeEvery,
 } from 'redux-saga/effects';
-import { CHANNEL_MESSAGES_REQUESTED, CHANNEL_MORE_MESSAGES_REQUESTED, SEND_CHANNEL_MESSAGE_REQUESTED } from '../constants/channels';
+import { toast } from 'react-toastify';
+import {
+  CHANNEL_MESSAGES_REQUESTED,
+  CHANNEL_MORE_MESSAGES_REQUESTED,
+  SEND_CHANNEL_MESSAGE_REQUESTED,
+} from '../constants/channels';
 import {
   channelMessagesFailed,
   channelMessagesSuccess,
@@ -47,9 +52,10 @@ function* getMoreChannelMessages(actionData) {
     // yield call(() => new Promise((r) => setTimeout(r, 3000)));
     yield put(channelMoreMessagesSuccess(channelId, response.data.messages.reverse()));
   } catch (err) {
-    yield put(handleError(err, (error) => (
-      channelMoreMessagesFailed(channelId, error)
-    )));
+    yield put(handleError(err, (error) => {
+      toast.error(error.message);
+      return channelMoreMessagesFailed(channelId, error);
+    }));
   }
 }
 
@@ -61,6 +67,7 @@ function* sendChannelMessage(actionData) {
     yield put(sendChannelMessageSent(serverId, channelId, messageData.id, response.data));
   } catch (err) {
     console.log('Message sending error: ', err, err.message);
+    // TODO: handle error
     yield put(handleError(err, (error) => (
       sendChannelMessageFailed(serverId, channelId, messageData.id, error)
     )));

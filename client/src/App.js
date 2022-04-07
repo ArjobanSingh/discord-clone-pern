@@ -2,7 +2,9 @@ import {
   useContext,
 } from 'react';
 import './App.css';
+import 'react-toastify/dist/ReactToastify.css';
 import { styled } from '@mui/material/styles';
+import { ToastContainer } from 'react-toastify';
 import Button from '@mui/material/Button';
 import { useDispatch } from 'react-redux';
 import CustomThemeProvider, { ColorModeContext } from './providers/CustomThemeProvider';
@@ -65,6 +67,7 @@ function App() {
       <SocketHandler />
       <BaseStyles />
       <GlobalNavigation />
+      <ToastContainer theme="dark" />
       <Container>
         <Child />
         <InnerWrapper>
