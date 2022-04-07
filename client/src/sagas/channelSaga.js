@@ -1,7 +1,7 @@
 import {
   all, call, put, select, takeEvery,
 } from 'redux-saga/effects';
-import { CHANNEL_MESSAGES_REQUESTED, SEND_CHANNEL_MESSAGE_REQUESTED } from '../constants/channels';
+import { CHANNEL_MESSAGES_REQUESTED, CHANNEL_MORE_MESSAGES_REQUESTED, SEND_CHANNEL_MESSAGE_REQUESTED } from '../constants/channels';
 import {
   channelMessagesFailed,
   channelMessagesSuccess,
@@ -27,7 +27,6 @@ function* getChannelMessages(actionData) {
     if (isEmpty(previousChannelState?.data)) {
       const url = `${ChannelApi.GET_CHANNEL_MESSAGES}/${serverId}/${channelId}`;
       const response = yield call(axiosInstance.get, url);
-      console.log('Get channel messages response: ', response);
       yield put(channelMessagesSuccess(channelId, response.data.messages.reverse()));
     }
   } catch (err) {
@@ -45,7 +44,7 @@ function* getMoreChannelMessages(actionData) {
     const { createdAt } = oldestMessage;
     const url = `${ChannelApi.GET_CHANNEL_MESSAGES}/${serverId}/${channelId}?cursor=${createdAt}`;
     const response = yield call(axiosInstance.get, url);
-    console.log('more messages', response);
+    // yield call(() => new Promise((r) => setTimeout(r, 3000)));
     yield put(channelMoreMessagesSuccess(channelId, response.data.messages.reverse()));
   } catch (err) {
     yield put(handleError(err, (error) => (
@@ -72,6 +71,7 @@ function* channelSaga() {
   yield all([
     takeEvery(SEND_CHANNEL_MESSAGE_REQUESTED, sendChannelMessage),
     takeEvery(CHANNEL_MESSAGES_REQUESTED, getChannelMessages),
+    takeEvery(CHANNEL_MORE_MESSAGES_REQUESTED, getMoreChannelMessages),
   ]);
 }
 

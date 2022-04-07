@@ -1,9 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 
-const useDidUpdate = (callback, deps) => {
+const useDidUpdate = (callback, deps, useUseEffect = true) => {
   const firstUpdate = useRef(true);
 
-  useEffect(() => {
+  const useEffectHook = useUseEffect ? useEffect : useLayoutEffect;
+
+  useEffectHook(() => {
     let returnFunc;
     if (firstUpdate.current) {
       firstUpdate.current = false;

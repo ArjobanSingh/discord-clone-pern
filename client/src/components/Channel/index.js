@@ -20,7 +20,7 @@ import { isEmpty } from '../../utils/validators';
 import { ServerMemberRoles } from '../../constants/servers';
 import { getChannelData, getChannelMessagesData } from '../../redux/reducers';
 import Chat from '../Chat';
-import { channelMessagesRequested, sendChannelMessageRequested } from '../../redux/actions/channels';
+import { channelMessagesRequested, channelMoreMessagesRequested, sendChannelMessageRequested } from '../../redux/actions/channels';
 
 const wideScreenDrawerProps = {
   variant: 'persistent',
@@ -97,10 +97,18 @@ const Channel = (props) => {
     dispatch(sendChannelMessageRequested(serverId, channelId, content));
   };
 
+  const getMoreChannelMessages = () => {
+    dispatch(channelMoreMessagesRequested(serverId, channelId));
+  };
+
   return (
     <ChannelContainer>
       <MainContent isDrawerOpen={isMembersDrawerOpen}>
-        <Chat messagesData={messagesData} sendMessage={sendMessage} />
+        <Chat
+          messagesData={messagesData}
+          sendMessage={sendMessage}
+          loadMoreMessages={getMoreChannelMessages}
+        />
       </MainContent>
 
       <ResponsiveDrawer

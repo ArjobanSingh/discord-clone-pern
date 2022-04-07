@@ -15,6 +15,7 @@ const Chat = (props) => {
   const {
     sendMessage,
     messagesData,
+    loadMoreMessages,
   } = props;
 
   const {
@@ -22,6 +23,7 @@ const Chat = (props) => {
     isLoading,
     error,
     hasMore,
+    isLoadingMore,
   } = messagesData;
 
   // const messageContainerRef = useRef();
@@ -50,7 +52,8 @@ const Chat = (props) => {
       // TODO: show no message notficition;
       return;
     }
-    let todo;
+    if (isLoadingMore) return;
+    loadMoreMessages();
   };
 
   const mainJSX = () => {
@@ -65,6 +68,7 @@ const Chat = (props) => {
                 hasMoreMessages={hasMore}
                 messages={data}
                 getMoreMessages={getMoreMessages}
+                isLoadingMore={!!isLoadingMore}
               />
             )}
         </MessagesContainer>
@@ -89,7 +93,9 @@ Chat.propTypes = {
     hasMore: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool.isRequired,
     error: PropTypes.shape({}),
+    isLoadingMore: PropTypes.bool,
   }).isRequired,
+  loadMoreMessages: PropTypes.func.isRequired,
 };
 
 export default Chat;

@@ -10,10 +10,12 @@ import {
 import useDidUpdate from '../../customHooks/useDidUpdate';
 
 const Messages = (props) => {
-  const { messages, hasMoreMessages, getMoreMessages } = props;
+  const {
+    messages, hasMoreMessages, getMoreMessages, isLoadingMore,
+  } = props;
   const containerRef = useRef();
   const lastScrollPositions = useRef({});
-  const previousScrollHeight = useRef();
+  const lastScrollHeight = useRef();
 
   const [referenceMessageId, setReferenceMessageId] = useState(null);
 
@@ -23,19 +25,21 @@ const Messages = (props) => {
     scrollToContainerBottom();
   }, []);
 
-  // if we are at bottom and some new message came, scroll to bottom
-  // TODO: enhancement another approach could be saving new timestamp whenever new message
-  // comes, and using that flag in deps array
   useDidUpdate(() => {
-    if (previousScrollHeight.current) {
-      console.log({ prev: previousScrollHeight.current, newScrollHeight: containerRef.current.scrollHeight });
-      containerRef.current.scrollTop = previousScrollHeight.current;
-      previousScrollHeight.current = undefined;
+    // basically when we have completed loading more messages
+    if (lastScrollHeight.current && !isLoadingMore) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight - lastScrollHeight.current;
+      lastScrollHeight.current = undefined;
+      return;
     }
+
+    // if we are at bottom and some new message came, scroll to bottom
+    // TODO: enhancement another approach could be saving new timestamp whenever new message
+    // comes, and using that flag in deps array
     if (reachedThresholdBottom(lastScrollPositions.current, 10)) {
       scrollToContainerBottom();
     }
-  }, [messages.length]);
+  }, [messages.length], false);
 
   const handleScroll = (e) => {
     const { scrollHeight, scrollTop, clientHeight } = e.target;
@@ -45,7 +49,7 @@ const Messages = (props) => {
       clientHeight,
     };
     if (reachedThresholdTop(e, 50) && hasMoreMessages) {
-      previousScrollHeight.current = scrollHeight;
+      lastScrollHeight.current = scrollHeight;
       getMoreMessages();
     }
   };
@@ -97,6 +101,7 @@ Messages.propTypes = {
   messages: PropTypes.arrayOf(PropTypes.object).isRequired,
   getMoreMessages: PropTypes.func.isRequired,
   hasMoreMessages: PropTypes.bool.isRequired,
+  isLoadingMore: PropTypes.bool.isRequired,
 };
 
 export default Messages;
