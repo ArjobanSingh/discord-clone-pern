@@ -2,7 +2,7 @@ import {
   useCallback, useEffect, useRef, useState,
 } from 'react';
 import PropTypes from 'prop-types';
-import { Container, MessagesWrapper } from './styles';
+import { Container, MessagesWrapper, AbsoluteLoader } from './styles';
 import Message from '../Message';
 import {
   reachedThresholdBottom, reachedThresholdTop, sameDay, scrollToBottom,
@@ -11,7 +11,7 @@ import useDidUpdate from '../../customHooks/useDidUpdate';
 
 const Messages = (props) => {
   const {
-    messages, hasMoreMessages, getMoreMessages, isLoadingMore,
+    messages, moreError, getMoreMessages, isLoadingMore,
   } = props;
   const containerRef = useRef();
   const lastScrollPositions = useRef({});
@@ -41,6 +41,10 @@ const Messages = (props) => {
     }
   }, [messages.length], false);
 
+  useDidUpdate(() => {
+    if (moreError) lastScrollHeight.current = undefined;
+  }, [moreError]);
+
   const handleScroll = (e) => {
     const { scrollHeight, scrollTop, clientHeight } = e.target;
     lastScrollPositions.current = {
@@ -48,7 +52,7 @@ const Messages = (props) => {
       scrollTop,
       clientHeight,
     };
-    if (reachedThresholdTop(e, 50) && hasMoreMessages) {
+    if (reachedThresholdTop(e, 50)) {
       lastScrollHeight.current = scrollHeight;
       getMoreMessages();
     }
@@ -64,44 +68,48 @@ const Messages = (props) => {
   }, []);
 
   return (
-    <Container ref={containerRef} onScroll={handleScroll}>
-      <MessagesWrapper>
-        {messages.map((currentMessage, index) => {
-          const previousMessage = messages[index - 1];
+    <>
+      {isLoadingMore && <AbsoluteLoader />}
+      <Container ref={containerRef} onScroll={handleScroll}>
+        <MessagesWrapper>
+          {messages.map((currentMessage, index) => {
+            const previousMessage = messages[index - 1];
 
-          // check if two messages are sent by same user
-          const isSameUser = index === 0
-            ? false
-            : currentMessage.user.id === previousMessage.user.id;
+            // check if two messages are sent by same user
+            const isSameUser = index === 0
+              ? false
+              : currentMessage.user.id === previousMessage.user.id;
 
-          // is two messages sent same day
-          const isSameDay = index === 0
-            ? false
-            : sameDay(currentMessage.createdAt, previousMessage.createdAt);
+            // is two messages sent same day
+            const isSameDay = index === 0
+              ? false
+              : sameDay(currentMessage.createdAt, previousMessage.createdAt);
 
-          return (
-            <Message
-              key={currentMessage.id}
-              isSameUser={isSameUser}
-              isSameDay={isSameDay}
-              message={currentMessage}
-              isScrollToReference={referenceMessageId === currentMessage.id}
-              scrollToReferenceMessage={scrollToReferenceMessage}
-              setReferenceMessageId={setReferenceMessageId}
-              scrollToContainerBottom={scrollToContainerBottom}
-            />
-          );
-        })}
-      </MessagesWrapper>
-    </Container>
+            return (
+              <Message
+                key={currentMessage.id}
+                isSameUser={isSameUser}
+                isSameDay={isSameDay}
+                message={currentMessage}
+                isScrollToReference={referenceMessageId === currentMessage.id}
+                scrollToReferenceMessage={scrollToReferenceMessage}
+                setReferenceMessageId={setReferenceMessageId}
+                scrollToContainerBottom={scrollToContainerBottom}
+              />
+            );
+          })}
+        </MessagesWrapper>
+      </Container>
+    </>
   );
 };
 
 Messages.propTypes = {
   messages: PropTypes.arrayOf(PropTypes.object).isRequired,
   getMoreMessages: PropTypes.func.isRequired,
-  hasMoreMessages: PropTypes.bool.isRequired,
+  // hasMoreMessages: PropTypes.bool.isRequired,
   isLoadingMore: PropTypes.bool.isRequired,
+  moreError: PropTypes.bool.isRequired,
 };
 
 export default Messages;

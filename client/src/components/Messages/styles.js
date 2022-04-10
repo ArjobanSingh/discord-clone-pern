@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export const Container = styled.div`
   position: absolute;
@@ -16,4 +17,11 @@ export const MessagesWrapper = styled.div`
   justify-content: flex-end;
   align-items: stretch;
   /* gap: 16px; */
+`;
+
+export const AbsoluteLoader = styled(CircularProgress)`
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
 `;

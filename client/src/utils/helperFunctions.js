@@ -103,3 +103,21 @@ export const reachedThresholdBottom = (scrollPositionData, threshold = 3) => {
 
   return Math.abs(scrollHeight - scrollTop - clientHeight) <= threshold;
 };
+
+export const getCaret = (el) => {
+  if (el.selectionStart) {
+    return el.selectionStart;
+  } if (document.selection) {
+    el.focus();
+    const r = document.selection.createRange();
+    if (r === null) {
+      return 0;
+    }
+    const re = el.createTextRange();
+    const rc = re.duplicate();
+    re.moveToBookmark(r.getBookmark());
+    rc.setEndPoint('EndToStart', re);
+    return rc.text.length;
+  }
+  return 0;
+};

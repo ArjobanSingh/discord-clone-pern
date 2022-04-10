@@ -1,6 +1,7 @@
 import {
-  memo, useCallback, useEffect, useRef, useState,
+  memo, useEffect, useRef, useState,
 } from 'react';
+import ReplyIcon from '@mui/icons-material/Reply';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -9,8 +10,10 @@ import {
   AvatarMessageContainer,
   HoverableTime,
   MessageContainer,
+  MessageContent,
   SameUserMessage,
   StyledAvatar,
+  OptionsContainer,
 } from './styles';
 import Logo from '../../common/Logo';
 import useUser from '../../customHooks/useUser';
@@ -18,7 +21,6 @@ import { formatDate, getTime, sameDay } from '../../utils/helperFunctions';
 import DateMessage from '../MessageTypes/DateMessage';
 import ReferenceMessage from '../MessageTypes/ReferenceMessage';
 import useDidUpdate from '../../customHooks/useDidUpdate';
-import useIntersectionObserver from '../../customHooks/useIntersectionObserver';
 
 const Message = (props) => {
   const {
@@ -82,14 +84,13 @@ const Message = (props) => {
           <HoverableTime>
             {getTime(createdAt)}
           </HoverableTime>
-          <Typography
+          <MessageContent
             variant="subtitle1"
-            color="text.primary"
-            lineHeight="1.3"
             marginLeft="55px"
+            component="div"
           >
             {content}
-          </Typography>
+          </MessageContent>
         </SameUserMessage>
       );
     }
@@ -127,13 +128,12 @@ const Message = (props) => {
                   : formatDate(createdAt)}
               </Typography>
             </Box>
-            <Typography
+            <MessageContent
               variant="subtitle1"
-              color="text.primary"
-              lineHeight="1.3"
+              component="div"
             >
               {content}
-            </Typography>
+            </MessageContent>
           </div>
         </AvatarMessageContainer>
       </div>
@@ -152,6 +152,9 @@ const Message = (props) => {
         id={id}
       >
         {getMessageBody()}
+        <OptionsContainer>
+          <ReplyIcon />
+        </OptionsContainer>
       </MessageContainer>
     </>
   );

@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
-import StyledTextfield from '../../common/StyledTextfield';
+import ChatInputField from './styles';
 
 const InputEditor = (props) => {
   const { prepareMessage } = props;
   const [value, setValue] = useState('');
 
-  const onSubmit = (e) => {
-    e.preventDefault();
+  const onSubmit = () => {
     if (!value.trim()) return;
     prepareMessage(value);
     setValue('');
@@ -17,23 +16,19 @@ const InputEditor = (props) => {
     setValue(e.target.value);
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      onSubmit();
+    }
+  };
+
   return (
-    <form onSubmit={onSubmit}>
-      <StyledTextfield
-        id="main-chat-input"
-        label={null}
-        value={value}
-        onChange={handleValueChange}
-        autoComplete="off"
-        injectCss={`
-          border: none;
-          &:focus-within {
-            border: none;
-          }
-        `}
-        {...props}
-      />
-    </form>
+    <ChatInputField
+      onKeyDown={handleKeyDown}
+      onChange={handleValueChange}
+      value={value}
+    />
   );
 };
 

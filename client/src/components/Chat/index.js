@@ -1,5 +1,7 @@
 import PropTypes from 'prop-types';
 import { nanoid } from 'nanoid';
+import { useRef } from 'react';
+import { toast } from 'react-toastify';
 import {
   ChatContainer, InputContainer, MessagesContainer,
 } from './styles';
@@ -24,9 +26,10 @@ const Chat = (props) => {
     error,
     hasMore,
     isLoadingMore,
+    moreError,
   } = messagesData;
 
-  // const messageContainerRef = useRef();
+  const isAlertShownAlready = useRef(false);
   const { user } = useUser();
 
   const prepareMessage = (message, type = MessageType.TEXT) => {
@@ -47,9 +50,11 @@ const Chat = (props) => {
   };
 
   const getMoreMessages = () => {
-    console.log('Has more messages: ', hasMore);
     if (!hasMore) {
-      // TODO: show no message notficition;
+      if (!isAlertShownAlready.current) {
+        toast('No more messages to load');
+        isAlertShownAlready.current = true;
+      }
       return;
     }
     if (isLoadingMore) return;
@@ -69,6 +74,7 @@ const Chat = (props) => {
                 messages={data}
                 getMoreMessages={getMoreMessages}
                 isLoadingMore={!!isLoadingMore}
+                moreError={!!moreError}
               />
             )}
         </MessagesContainer>
@@ -94,6 +100,7 @@ Chat.propTypes = {
     isLoading: PropTypes.bool.isRequired,
     error: PropTypes.shape({}),
     isLoadingMore: PropTypes.bool,
+    moreError: PropTypes.string,
   }).isRequired,
   loadMoreMessages: PropTypes.func.isRequired,
 };

@@ -1,15 +1,47 @@
 import styled from 'styled-components';
 import Avatar from '@mui/material/Avatar';
 import { grey } from '@mui/material/colors';
+import Typography from '@mui/material/Typography';
+import { darken } from '@mui/material';
+
+export const OptionsContainer = styled.div(({ theme }) => `
+  display: none;
+  position: absolute;
+  right: 20px;
+  top: -20px;
+  align-items: center;
+  background-color: ${darken(theme.palette.background.default, 0.2)};
+  border: 1px solid ${theme.palette.background.darker};
+  color: ${theme.palette.text.secondary};
+  border-radius: ${theme.shape.borderRadius}px;
+
+  &:hover {
+    box-shadow: ${theme.shadows[1]};
+  }
+
+  svg {
+    font-size: ${theme.typography.h6.fontSize};
+    cursor: pointer;
+
+    :hover {
+      background-color: ${theme.palette.background.darker};
+    }
+  }
+`);
 
 export const MessageContainer = styled.div`
   width: 100%;
-  padding: ${({ theme }) => `${theme.spacing(0.5)} ${theme.spacing(2)}`};
+  padding: ${({ theme }) => `${theme.spacing(0.1)} ${theme.spacing(2)}`};
   margin-top: ${({ theme, hideMargin }) => (hideMargin ? '' : theme.spacing(2))};
   background-color: ${({ shouldHighlight }) => (shouldHighlight ? grey[800] : 'inherit')};
+  position: relative;
 
   &:hover {
     background-color: ${({ theme }) => theme.palette.background.paper};
+
+    ${OptionsContainer} {
+      display: flex;
+    }
   }
 `;
 
@@ -44,4 +76,10 @@ export const SameUserMessage = styled.div`
   &:hover ${HoverableTime} {
     display: block;
   }
+`;
+
+export const MessageContent = styled(Typography)`
+  line-height: 1.375rem;
+  color: ${({ theme }) => theme.palette.text.primary};
+  white-space: break-spaces;
 `;
