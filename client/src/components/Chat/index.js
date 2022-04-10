@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { nanoid } from 'nanoid';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
   ChatContainer, InputContainer, MessagesContainer,
@@ -31,6 +31,8 @@ const Chat = (props) => {
 
   const isAlertShownAlready = useRef(false);
   const { user } = useUser();
+
+  const [replyMessage, setReplyMessage] = useState({});
 
   const prepareMessage = (message, type = MessageType.TEXT) => {
     // nanoid and createdAt will work as temporary id and
@@ -75,6 +77,8 @@ const Chat = (props) => {
                 getMoreMessages={getMoreMessages}
                 isLoadingMore={!!isLoadingMore}
                 moreError={!!moreError}
+                replyMessage={replyMessage}
+                setReplyMessage={setReplyMessage}
               />
             )}
         </MessagesContainer>

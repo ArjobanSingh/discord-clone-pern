@@ -11,8 +11,14 @@ import useDidUpdate from '../../customHooks/useDidUpdate';
 
 const Messages = (props) => {
   const {
-    messages, moreError, getMoreMessages, isLoadingMore,
+    messages,
+    moreError,
+    getMoreMessages,
+    isLoadingMore,
+    replyMessage,
+    setReplyMessage,
   } = props;
+
   const containerRef = useRef();
   const lastScrollPositions = useRef({});
   const lastScrollHeight = useRef();
@@ -95,6 +101,8 @@ const Messages = (props) => {
                 scrollToReferenceMessage={scrollToReferenceMessage}
                 setReferenceMessageId={setReferenceMessageId}
                 scrollToContainerBottom={scrollToContainerBottom}
+                replyMessage={replyMessage}
+                setReplyMessage={setReplyMessage}
               />
             );
           })}
@@ -107,9 +115,10 @@ const Messages = (props) => {
 Messages.propTypes = {
   messages: PropTypes.arrayOf(PropTypes.object).isRequired,
   getMoreMessages: PropTypes.func.isRequired,
-  // hasMoreMessages: PropTypes.bool.isRequired,
   isLoadingMore: PropTypes.bool.isRequired,
   moreError: PropTypes.bool.isRequired,
+  replyMessage: PropTypes.objectOf(PropTypes.string).isRequired,
+  setReplyMessage: PropTypes.func.isRequired,
 };
 
 export default Messages;

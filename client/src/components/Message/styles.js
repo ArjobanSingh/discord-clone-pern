@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import Avatar from '@mui/material/Avatar';
-import { grey } from '@mui/material/colors';
+import { blue, blueGrey, grey } from '@mui/material/colors';
 import Typography from '@mui/material/Typography';
 import { darken } from '@mui/material';
 
@@ -19,13 +19,17 @@ export const OptionsContainer = styled.div(({ theme }) => `
     box-shadow: ${theme.shadows[1]};
   }
 
-  svg {
-    font-size: ${theme.typography.h6.fontSize};
+  div {
     cursor: pointer;
+    padding: ${theme.spacing(0.5)};
 
     :hover {
       background-color: ${theme.palette.background.darker};
     }
+  }
+
+  svg {
+    font-size: ${theme.typography.h6.fontSize};
   }
 `);
 
@@ -33,11 +37,16 @@ export const MessageContainer = styled.div`
   width: 100%;
   padding: ${({ theme }) => `${theme.spacing(0.1)} ${theme.spacing(2)}`};
   margin-top: ${({ theme, hideMargin }) => (hideMargin ? '' : theme.spacing(2))};
-  background-color: ${({ shouldHighlight }) => (shouldHighlight ? grey[800] : 'inherit')};
+  background-color: ${({ shouldHighlight, isReplyMessage }) => {
+    if (isReplyMessage) return `${blueGrey[800]}90`;
+    if (shouldHighlight) return grey[800];
+    return 'inherit';
+  }};
   position: relative;
 
   &:hover {
-    background-color: ${({ theme }) => theme.palette.background.paper};
+    background-color: ${({ theme, isReplyMessage }) => (isReplyMessage
+    ? blueGrey[800] : theme.palette.background.paper)};
 
     ${OptionsContainer} {
       display: flex;

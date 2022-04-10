@@ -2,6 +2,7 @@ import {
   memo, useEffect, useRef, useState,
 } from 'react';
 import ReplyIcon from '@mui/icons-material/Reply';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -31,6 +32,8 @@ const Message = (props) => {
     isSameDay,
     scrollToReferenceMessage,
     scrollToContainerBottom,
+    replyMessage,
+    setReplyMessage,
   } = props;
   const { user: currentUser } = useUser();
   const [shouldHighlight, setShouldHighlight] = useState(false);
@@ -61,6 +64,13 @@ const Message = (props) => {
   // and also is not reply to some other message, show simple
   // message ui, without Avatar etc
   const isSimpleInlineMessage = isSameDay && isSameUser && !referenceMessage;
+
+  const handleReply = () => {
+    setReplyMessage({
+      messageId: id,
+      userName: user.name,
+    });
+  };
 
   useDidUpdate(() => {
     let timeout;
@@ -149,11 +159,13 @@ const Message = (props) => {
         ref={elementRef}
         shouldHighlight={shouldHighlight}
         hideMargin={isSimpleInlineMessage}
+        isReplyMessage={id === replyMessage.messageId}
         id={id}
       >
         {getMessageBody()}
         <OptionsContainer>
-          <ReplyIcon />
+          <div><ReplyIcon onClick={handleReply} /></div>
+          <div><MoreHorizIcon /></div>
         </OptionsContainer>
       </MessageContainer>
     </>
@@ -180,6 +192,8 @@ Message.propTypes = {
   isScrollToReference: PropTypes.bool.isRequired,
   setReferenceMessageId: PropTypes.func.isRequired,
   scrollToContainerBottom: PropTypes.func.isRequired,
+  replyMessage: PropTypes.func.isRequired,
+  setReplyMessage: PropTypes.func.isRequired,
 };
 
 export default memo(Message);

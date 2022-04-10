@@ -28,6 +28,7 @@ const InputEditor = (props) => {
       onKeyDown={handleKeyDown}
       onChange={handleValueChange}
       value={value}
+      placeholder="Send Message"
     />
   );
 };
