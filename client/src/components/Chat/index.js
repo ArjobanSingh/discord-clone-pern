@@ -83,7 +83,11 @@ const Chat = (props) => {
             )}
         </MessagesContainer>
         <InputContainer>
-          <InputEditor prepareMessage={prepareMessage} />
+          <InputEditor
+            replyMessage={replyMessage}
+            setReplyMessage={setReplyMessage}
+            prepareMessage={prepareMessage}
+          />
         </InputContainer>
       </>
     );
