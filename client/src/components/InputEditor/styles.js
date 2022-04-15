@@ -1,7 +1,34 @@
 import styled from 'styled-components';
 import TextareaAutosize from 'react-textarea-autosize';
+import { forwardRef } from 'react';
 
-const ChatInputField = styled(TextareaAutosize)(({ theme, isReplying }) => `
+// just random function, how styled components would have implemented
+// const customStyled = (WrappedComponent) => (cssFunc) => {
+//   const StyledComponent = (props) => {
+//     const { className, ...rest } = props;
+//     some kind of custom Hook to get theme for styled component
+//     const theme = useAppTheme();
+
+//     which creates the new class based on css, theme and props
+//     const classes = createClasses(cssFunc, props, theme);
+
+//     // merge our new generated className to already passed className in props(if user pass some custom class as well)
+//     const newClassName = mergeClasses(classes, className);
+
+//     return (
+//       <WrappedComponent
+//         {...rest}
+//         className={newClassName}
+//       />
+//     );
+//   };
+//   return StyledComponent;
+// };
+
+// eslint-disable-next-line react/prop-types
+const WrappedTextarea = forwardRef(({ isReplying, ...rest }, ref) => <TextareaAutosize ref={ref} {...rest} />);
+
+const ChatInputField = styled(WrappedTextarea)(({ theme, isReplying }) => `
   resize: none;
   min-height: 40px;
   max-height: 200px;

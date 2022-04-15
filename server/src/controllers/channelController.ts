@@ -59,7 +59,13 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
     promisesArray.push(channelPromise);
 
     if (messageData.referenceMessageId) {
-      promisesArray.push(Message.findOne(messageData.referenceMessageId));
+      const referenceMessagePromise = getRepository(Message)
+        .createQueryBuilder('refMsg')
+        .select(['refMsg', 'user.name', 'user.id', 'user.profilePicture'])
+        .innerJoin('refMsg.user', 'user')
+        .where('refMsg.id = :referenceMessageId', { referenceMessageId: messageData.referenceMessageId })
+        .getOne();
+      promisesArray.push(referenceMessagePromise);
     }
 
     const [[serverMember], channel, referenceMessage] = await Promise.all(promisesArray);

@@ -36,7 +36,7 @@ const Child = () => {
     <>
       <Button
         sx={{
-          position: 'fixed', bottom: '100px', right: '10px', zIndex: '20',
+          position: 'fixed', bottom: '100px', left: '10px', zIndex: '2000',
         }}
         color="primary"
         variant="contained"
@@ -48,7 +48,7 @@ const Child = () => {
       {isAuthenticated && (
         <Button
           sx={{
-            position: 'fixed', bottom: '100px', right: '210px', zIndex: '20',
+            position: 'fixed', bottom: '100px', left: '210px', zIndex: '2000',
           }}
           color="primary"
           variant="contained"

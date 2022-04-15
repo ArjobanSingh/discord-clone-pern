@@ -117,7 +117,7 @@ Messages.propTypes = {
   getMoreMessages: PropTypes.func.isRequired,
   isLoadingMore: PropTypes.bool.isRequired,
   moreError: PropTypes.bool.isRequired,
-  replyMessage: PropTypes.objectOf(PropTypes.string).isRequired,
+  replyMessage: PropTypes.shape({}).isRequired,
   setReplyMessage: PropTypes.func.isRequired,
 };
 

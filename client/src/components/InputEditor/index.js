@@ -10,8 +10,8 @@ const InputEditor = (props) => {
   const inputRef = useRef();
 
   useEffect(() => {
-    if (replyMessage.messageId) inputRef.current.focus();
-  }, [replyMessage.messageId]);
+    if (replyMessage.id) inputRef.current.focus();
+  }, [replyMessage.id]);
 
   const onSubmit = () => {
     if (!value.trim()) return;
@@ -24,7 +24,7 @@ const InputEditor = (props) => {
   };
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Escape' && replyMessage.messageId) {
+    if (e.key === 'Escape' && replyMessage.id) {
       setReplyMessage({});
     }
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -39,26 +39,26 @@ const InputEditor = (props) => {
   };
 
   const scrollToElement = () => {
-    const element = document.getElementById(replyMessage.messageId);
+    const element = document.getElementById(replyMessage.id);
     if (!element) return;
     element.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' });
   };
 
   return (
     <>
-      {!!replyMessage.messageId && (
+      {!!replyMessage.id && (
         <ReplyInputContainer onClick={scrollToElement}>
           <div>
             Replying to
             {' '}
-            <span>{replyMessage.userName}</span>
+            <span>{replyMessage.user.name}</span>
           </div>
           <CancelIcon onClick={closeReply} />
         </ReplyInputContainer>
       )}
       <ChatInputField
         ref={inputRef}
-        isReplying={!!replyMessage.messageId}
+        isReplying={!!replyMessage.id}
         onKeyDown={handleKeyDown}
         onChange={handleValueChange}
         value={value}
@@ -70,7 +70,12 @@ const InputEditor = (props) => {
 
 InputEditor.propTypes = {
   prepareMessage: PropTypes.func.isRequired,
-  replyMessage: PropTypes.objectOf(PropTypes.string).isRequired,
+  replyMessage: PropTypes.shape({
+    id: PropTypes.string,
+    user: PropTypes.shape({
+      name: PropTypes.string,
+    }),
+  }).isRequired,
   setReplyMessage: PropTypes.func.isRequired,
 };
 

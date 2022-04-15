@@ -1,5 +1,5 @@
 import {
-  memo, useEffect, useRef, useState,
+  memo, useEffect, useLayoutEffect, useRef, useState,
 } from 'react';
 import ReplyIcon from '@mui/icons-material/Reply';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -50,7 +50,7 @@ const Message = (props) => {
     status,
   } = message;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (status === MessageStatus.SENDING) {
       // we just sent this new message, scroll container to bottom
       scrollToContainerBottom();
@@ -66,10 +66,7 @@ const Message = (props) => {
   const isSimpleInlineMessage = isSameDay && isSameUser && !referenceMessage;
 
   const handleReply = () => {
-    setReplyMessage({
-      messageId: id,
-      userName: user.name,
-    });
+    setReplyMessage(message);
   };
 
   useDidUpdate(() => {
@@ -159,7 +156,7 @@ const Message = (props) => {
         ref={elementRef}
         shouldHighlight={shouldHighlight}
         hideMargin={isSimpleInlineMessage}
-        isReplyMessage={id === replyMessage.messageId}
+        isReplyMessage={id === replyMessage.id}
         id={id}
       >
         {getMessageBody()}
@@ -192,7 +189,9 @@ Message.propTypes = {
   isScrollToReference: PropTypes.bool.isRequired,
   setReferenceMessageId: PropTypes.func.isRequired,
   scrollToContainerBottom: PropTypes.func.isRequired,
-  replyMessage: PropTypes.func.isRequired,
+  replyMessage: PropTypes.shape({
+    id: PropTypes.string,
+  }).isRequired,
   setReplyMessage: PropTypes.func.isRequired,
 };
 

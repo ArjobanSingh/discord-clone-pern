@@ -43,12 +43,16 @@ const Chat = (props) => {
       id: nanoid(),
       status: MessageStatus.SENDING,
       createdAt: new Date().toString(),
+      // if reply Message will be present use it's id otherwise it will be undefined
+      referenceMessageId: replyMessage.id,
+      referenceMessage: isEmpty(replyMessage) ? undefined : replyMessage,
       user: {
         name: user.name,
         id: user.id,
         profilePicture: user.profilePicture,
       },
     });
+    setReplyMessage((prev) => (prev.id ? {} : prev));
   };
 
   const getMoreMessages = () => {
