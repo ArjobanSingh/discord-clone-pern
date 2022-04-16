@@ -1,3 +1,4 @@
+import { MessageType } from '../constants/Message';
 import { logoutSuccess } from '../redux/actions/auth';
 
 export function stringToColor(string) {
@@ -120,4 +121,15 @@ export const getCaret = (el) => {
     return rc.text.length;
   }
   return 0;
+};
+
+export const getMessageType = (file) => {
+  const { type } = file;
+
+  if (type.match('audio.*')) return MessageType.AUDIO;
+  if (type.match('image.*')) return MessageType.IMAGE;
+  if (type.match('video.*')) return MessageType.VIDEO;
+
+  // for now return file
+  return MessageType.FILE;
 };

@@ -33,6 +33,7 @@ const Chat = (props) => {
   const { user } = useUser();
 
   const [replyMessage, setReplyMessage] = useState({});
+  const [files, setFiles] = useState([]);
 
   const prepareMessage = (message, type = MessageType.TEXT) => {
     // nanoid and createdAt will work as temporary id and
@@ -91,6 +92,8 @@ const Chat = (props) => {
             replyMessage={replyMessage}
             setReplyMessage={setReplyMessage}
             prepareMessage={prepareMessage}
+            files={files}
+            setFiles={setFiles}
           />
         </InputContainer>
       </>

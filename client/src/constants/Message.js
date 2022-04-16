@@ -19,3 +19,5 @@ export const MessageUserPropType = {
   id: PropTypes.string,
   name: PropTypes.string,
 };
+
+export const MAX_FILE_SIZE = 1024 * 1024 * 3; // 3mb in bytes

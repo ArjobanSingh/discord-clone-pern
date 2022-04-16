@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import TextareaAutosize from 'react-textarea-autosize';
-import { forwardRef } from 'react';
 
 // just random function, how styled components would have implemented
 // const customStyled = (WrappedComponent) => (cssFunc) => {
@@ -26,20 +25,31 @@ import { forwardRef } from 'react';
 // };
 
 // eslint-disable-next-line react/prop-types
-const WrappedTextarea = forwardRef(({ isReplying, ...rest }, ref) => <TextareaAutosize ref={ref} {...rest} />);
 
-const ChatInputField = styled(WrappedTextarea)(({ theme, isReplying }) => `
+const iconDivWidth = '40px';
+
+const ChatInputField = styled(TextareaAutosize)(({ theme }) => `
   resize: none;
   min-height: 40px;
   max-height: 200px;
-  width: 100%;
-  border: 1px solid ${theme.palette.input.borderColor};
-  background: ${theme.palette.input.background};
-  border-radius: ${theme.shape.borderRadius}px;
+  flex: 1;
   color: ${theme.palette.text.secondary};
   padding: ${theme.spacing(1)};
   font-size: ${theme.typography.body1.fontSize};
   overflow-y: auto;
+  border: none;
+  background-color: inherit;
+  border-radius: inherit;
+  padding-left: ${iconDivWidth};
+  line-height: 1.5;
+`);
+
+export const TextWrapper = styled.div(({ theme, isReplying }) => `
+  display: flex;
+  border: 1px solid ${theme.palette.input.borderColor};
+  background-color: ${theme.palette.input.background};
+  border-radius: ${theme.shape.borderRadius}px;
+  position: relative;
 
   ${isReplying
     ? `
@@ -48,6 +58,26 @@ const ChatInputField = styled(WrappedTextarea)(({ theme, isReplying }) => `
     `
     : ''}
 `);
+
+export const UploadIconWrapper = styled.div`
+  position: absolute;
+  width: ${iconDivWidth};
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+`;
+
+export const FileInput = styled.input`
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  cursor: pointer;
+  z-index: 10;
+  font-size: 0;
+`;
 
 export const ReplyInputContainer = styled.div(({ theme }) => `
   width: 100%;
@@ -70,5 +100,17 @@ export const ReplyInputContainer = styled.div(({ theme }) => `
     font-size: 20px;
   }
 `);
+
+export const FilesContainer = styled.div`
+  width: 100%;
+  display: flex;
+  overflow: auto hidden;
+  background-color: ${({ theme }) => theme.palette.input.background};
+  height: 250px;
+  max-height: 250px;
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+`;
 
 export default ChatInputField;
