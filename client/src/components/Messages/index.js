@@ -1,5 +1,6 @@
 import {
-  useCallback, useEffect, useRef, useState,
+  forwardRef,
+  useCallback, useEffect, useImperativeHandle, useRef, useState,
 } from 'react';
 import PropTypes from 'prop-types';
 import { Container, MessagesWrapper, AbsoluteLoader } from './styles';
@@ -9,7 +10,7 @@ import {
 } from '../../utils/helperFunctions';
 import useDidUpdate from '../../customHooks/useDidUpdate';
 
-const Messages = (props) => {
+const Messages = forwardRef((props, ref) => {
   const {
     messages,
     moreError,
@@ -26,6 +27,14 @@ const Messages = (props) => {
   const [referenceMessageId, setReferenceMessageId] = useState(null);
 
   const scrollToContainerBottom = useCallback(() => scrollToBottom(containerRef.current), []);
+
+  useImperativeHandle(ref, () => ({
+    scrollToPreviousPosition: () => {
+      if (reachedThresholdBottom(lastScrollPositions.current, 10)) {
+        scrollToContainerBottom();
+      }
+    },
+  }));
 
   useEffect(() => {
     scrollToContainerBottom();
@@ -76,7 +85,7 @@ const Messages = (props) => {
   return (
     <>
       {isLoadingMore && <AbsoluteLoader />}
-      <Container ref={containerRef} onScroll={handleScroll}>
+      <Container id="messages-container" ref={containerRef} onScroll={handleScroll}>
         <MessagesWrapper>
           {messages.map((currentMessage, index) => {
             const previousMessage = messages[index - 1];
@@ -110,7 +119,7 @@ const Messages = (props) => {
       </Container>
     </>
   );
-};
+});
 
 Messages.propTypes = {
   messages: PropTypes.arrayOf(PropTypes.object).isRequired,

@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import TextareaAutosize from 'react-textarea-autosize';
+import { forwardRef } from 'react';
 
 // just random function, how styled components would have implemented
 // const customStyled = (WrappedComponent) => (cssFunc) => {
@@ -28,10 +29,15 @@ import TextareaAutosize from 'react-textarea-autosize';
 
 const iconDivWidth = '40px';
 
-const ChatInputField = styled(TextareaAutosize)(({ theme }) => `
+// eslint-disable-next-line react/prop-types
+const TextAreaWrapper = forwardRef(({ isReply, isFiles, ...rest }, ref) => (
+  <TextareaAutosize ref={ref} {...rest} />
+));
+
+const ChatInputField = styled(TextAreaWrapper)(({ theme, isReply, isFiles }) => `
   resize: none;
   min-height: 40px;
-  max-height: 200px;
+  max-height: ${isFiles && isReply ? '64px' : '200px'};
   flex: 1;
   color: ${theme.palette.text.secondary};
   padding: ${theme.spacing(1)};
@@ -44,14 +50,14 @@ const ChatInputField = styled(TextareaAutosize)(({ theme }) => `
   line-height: 1.5;
 `);
 
-export const TextWrapper = styled.div(({ theme, isReplying }) => `
+export const TextWrapper = styled.div(({ theme, hideTopRadius }) => `
   display: flex;
   border: 1px solid ${theme.palette.input.borderColor};
   background-color: ${theme.palette.input.background};
   border-radius: ${theme.shape.borderRadius}px;
   position: relative;
 
-  ${isReplying
+  ${hideTopRadius
     ? `
       border-top-left-radius: 0;
       border-top-right-radius: 0;

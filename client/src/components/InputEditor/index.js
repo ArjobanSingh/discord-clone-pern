@@ -91,7 +91,10 @@ const InputEditor = (props) => {
 
   const handleFileInput = (e) => {
     const selectedFiles = e.target.files || e.nativeEvent?.target?.files;
-    if (!selectedFiles) return;
+    if (!selectedFiles) {
+      toast.error('Some error occurred, Please try again');
+      return;
+    }
     const validFiles = [];
     const isAnyInvalid = [...selectedFiles].some((file) => {
       const {
@@ -116,11 +119,12 @@ const InputEditor = (props) => {
       toast.error('Max file size is 3mb');
       return;
     }
-    console.log({ validFiles });
-    setCurrentFileIndex(0);
-    setFiles(validFiles);
+    // console.log({ validFiles });
+    setCurrentFileIndex((prev) => prev ?? 0);
+    setFiles((prevFiles) => [...prevFiles, ...validFiles]);
   };
 
+  const removeFile = (index) => setFiles((prev) => prev.filter((_, idx) => idx !== index));
   return (
     <>
       {!!replyMessage.id && (
@@ -135,15 +139,24 @@ const InputEditor = (props) => {
       )}
       {!isEmpty(files) && (
         <FilesContainer>
-          {files.map((file) => <FilePreview key={file.id} file={file} />)}
+          {files.map((file, index) => (
+            <FilePreview
+              removeFile={removeFile}
+              index={index}
+              key={file.id}
+              file={file}
+            />
+          ))}
         </FilesContainer>
       )}
-      <TextWrapper isReplying={!!replyMessage.id}>
+      <TextWrapper hideTopRadius={!!replyMessage.id || !isEmpty(files)}>
         <UploadIconWrapper>
           <AddCircleIcon />
           <FileInput type="file" onChange={handleFileInput} multiple />
         </UploadIconWrapper>
         <ChatInputField
+          isReply={!!replyMessage.id}
+          isFiles={!isEmpty(files)}
           ref={inputRef}
           onKeyDown={handleKeyDown}
           onChange={handleValueChange}

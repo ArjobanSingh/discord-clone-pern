@@ -10,13 +10,16 @@ export const ChatContainer = styled.div`
 `;
 
 export const MessagesContainer = styled.div`
-  flex: 1;
+  flex: 1 1 auto;
   position: relative;
 `;
 
+// 36 for reply box, 250 for files if selected and 80 maximum for text field
+// when other files and reply is selected as well
+const maxInputHeight = 36 + 250 + 80;
 export const InputContainer = styled.div`
   min-height: 40px;
-  max-height: 300px;
+  max-height: ${maxInputHeight}px;
   width: 100%;
   padding: ${({ theme }) => theme.spacing(2)};
   padding-top: 0;

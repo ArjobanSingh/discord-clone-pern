@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import { nanoid } from 'nanoid';
-import { useRef, useState } from 'react';
+import {
+  useEffect, useLayoutEffect, useRef, useState,
+} from 'react';
 import { toast } from 'react-toastify';
 import {
   ChatContainer, InputContainer, MessagesContainer,
@@ -10,6 +12,8 @@ import { MessageStatus, MessageType } from '../../constants/Message';
 import { isEmpty } from '../../utils/validators';
 import Messages from '../Messages';
 import useUser from '../../customHooks/useUser';
+import { scrollToBottom } from '../../utils/helperFunctions';
+import useDidUpdate from '../../customHooks/useDidUpdate';
 
 // chat component should be independent of channel/server logic
 // to support personal messages in future
@@ -31,9 +35,18 @@ const Chat = (props) => {
 
   const isAlertShownAlready = useRef(false);
   const { user } = useUser();
+  const messagesRef = useRef();
 
   const [replyMessage, setReplyMessage] = useState({});
   const [files, setFiles] = useState([]);
+
+  useDidUpdate(() => {
+    console.log('useEffect', messagesRef.current.scrollToPreviousPosition());
+  }, [files], false);
+  // const scrollMessagesToBottom = () => {
+  //   console.log('Messages ref', messagesRef.current.scrollToPreviousPosition());
+  //   // scrollToBottom(messagesRef.current.messagesContainer);
+  // };
 
   const prepareMessage = (message, type = MessageType.TEXT) => {
     // nanoid and createdAt will work as temporary id and
@@ -77,6 +90,7 @@ const Chat = (props) => {
           {isEmpty(data) ? <div>No messages in this channel yet</div>
             : (
               <Messages
+                ref={messagesRef}
                 hasMoreMessages={hasMore}
                 messages={data}
                 getMoreMessages={getMoreMessages}
