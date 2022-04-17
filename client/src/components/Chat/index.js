@@ -41,12 +41,8 @@ const Chat = (props) => {
   const [files, setFiles] = useState([]);
 
   useDidUpdate(() => {
-    console.log('useEffect', messagesRef.current.scrollToPreviousPosition());
+    if (!isEmpty(files)) messagesRef.current.scrollToPreviousPosition();
   }, [files], false);
-  // const scrollMessagesToBottom = () => {
-  //   console.log('Messages ref', messagesRef.current.scrollToPreviousPosition());
-  //   // scrollToBottom(messagesRef.current.messagesContainer);
-  // };
 
   const prepareMessage = (message, type = MessageType.TEXT) => {
     // nanoid and createdAt will work as temporary id and

@@ -20,20 +20,24 @@ import { isEmpty } from '../../utils/validators';
 import { ServerMemberRoles } from '../../constants/servers';
 import { getChannelData, getChannelMessagesData } from '../../redux/reducers';
 import Chat from '../Chat';
-import { channelMessagesRequested, channelMoreMessagesRequested, sendChannelMessageRequested } from '../../redux/actions/channels';
+import {
+  channelMessagesRequested,
+  channelMoreMessagesRequested,
+  sendChannelMessageRequested,
+} from '../../redux/actions/channels';
 
-const wideScreenDrawerProps = {
+const wideScreenDrawerProps = (isDrawerOpen) => ({
   variant: 'persistent',
   sx: {
     flexShrink: 0,
     display: { xs: 'none', sm: 'block' },
-    width: membersDrawerWidth,
+    width: isDrawerOpen ? membersDrawerWidth : 0,
     '& .MuiDrawer-paper': {
       boxSizing: 'border-box',
       width: membersDrawerWidth,
     },
   },
-};
+});
 
 const emptyChannel = {
   error: null,
@@ -116,7 +120,7 @@ const Channel = (props) => {
         open={isMembersDrawerOpen}
         anchor="right"
         closeDrawer={closeMembersDrawer}
-        wideScreenDrawerProps={wideScreenDrawerProps}
+        wideScreenDrawerProps={wideScreenDrawerProps(isMembersDrawerOpen)}
         drawerWidth={membersDrawerWidth}
         boxProps={{
           sx: {

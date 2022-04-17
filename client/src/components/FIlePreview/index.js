@@ -1,34 +1,40 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { MessageType } from '../../constants/Message';
-import { Image, ImageWrapper, Wrapper } from './styles';
+import {
+  Column, Image, ImageWrapper, Wrapper,
+} from './styles';
 import { AUDIO_ICON, FILE_ICON, VIDEO_ICON } from '../../constants/images';
 
 const FilePreview = ({ file, index, removeFile }) => {
   const { messageType, originalFile, url } = file;
 
-  const getSrc = () => {
+  const getImgProps = () => {
     switch (file.messageType) {
       case MessageType.IMAGE:
-        return url;
+        return { src: url };
       case MessageType.VIDEO:
-        return VIDEO_ICON;
+        return { src: VIDEO_ICON, isStatic: true };
       case MessageType.AUDIO:
-        return AUDIO_ICON;
+        return { src: AUDIO_ICON, isStatic: true };
       default: {
-        return FILE_ICON;
+        return { src: FILE_ICON, isStatic: true };
       }
     }
   };
   return (
     <Wrapper onClick={() => { removeFile(index); }}>
-      <ImageWrapper>
-        <Image
-          src={getSrc()}
-          alt={originalFile.name}
-        />
-      </ImageWrapper>
-      {messageType}
+      <Column minHeight="0">
+        <ImageWrapper>
+          <Image
+            {...getImgProps()}
+            alt={originalFile.name}
+          />
+        </ImageWrapper>
+      </Column>
+      <Column>
+        {messageType}
+      </Column>
     </Wrapper>
   );
 };
