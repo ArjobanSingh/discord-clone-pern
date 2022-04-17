@@ -1,4 +1,12 @@
-import { IsEnum, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Max,
+  MaxLength,
+} from 'class-validator';
 import {
   BaseEntity,
   Column,
@@ -22,10 +30,42 @@ export enum MessageTypeEnum {
   FILE = 'FILE'
 }
 
+export const MAX_FILE_SIZE = 1024 * 1024 * 3; // 3mb in bytes
+
+// fileContentType, fileUrl, fileSize, fileName, fileThumbnail?
 @Entity()
 export default class Message extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  @IsString()
+  fileContentType: string;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  @IsUrl()
+  fileUrl: string;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  @IsNumber()
+  @Max(MAX_FILE_SIZE)
+  fileSize: number;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(120, {
+    message: 'Must be smaller than or equal to 120 characters',
+  })
+  fileName: string;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  @IsString()
+  fileThumbnail: string;
 
   @Column()
   @IsString()

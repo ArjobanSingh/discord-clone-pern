@@ -61,15 +61,27 @@ function* getMoreChannelMessages(actionData) {
 
 function* sendChannelMessage(actionData) {
   const { serverId, channelId, messageData } = actionData.payload;
+  const { file, ...restMessageData } = messageData;
+
+  const jsonBody = {
+    ...actionData.payload,
+    messageData: restMessageData,
+    sid: socket.id,
+  };
+
   try {
+    const formData = new FormData();
+    formData.append('jsonData', JSON.stringify(jsonBody));
+
+    if (file) formData.append('file', file);
     const url = ChannelApi.SEND_CHANNEL_MESSAGE;
-    const response = yield call(axiosInstance.post, url, { ...actionData.payload, sid: socket.id });
-    yield put(sendChannelMessageSent(serverId, channelId, messageData.id, response.data));
+    const response = yield call(axiosInstance.post, url, formData);
+    yield put(sendChannelMessageSent(serverId, channelId, restMessageData.id, response.data));
   } catch (err) {
     console.log('Message sending error: ', err, err.message);
     // TODO: handle error
     yield put(handleError(err, (error) => (
-      sendChannelMessageFailed(serverId, channelId, messageData.id, error)
+      sendChannelMessageFailed(serverId, channelId, restMessageData.id, error)
     )));
   }
 }

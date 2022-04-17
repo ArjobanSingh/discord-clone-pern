@@ -98,6 +98,8 @@ const isTokensValidForSocket = async (tokens: { accessToken: string, refreshToke
   return [false];
 };
 
+// const isFileAdded = (file: File) => {}
+
 export {
   createAccessToken,
   createRefreshToken,

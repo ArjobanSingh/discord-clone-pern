@@ -6,6 +6,7 @@ import { createServer } from 'http';
 import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import { Server as SocketIoServer } from 'socket.io';
+import multer from 'multer';
 import apiRouter from './routes';
 import * as C from '../../common/socket-io-constants';
 import { isTokensValidForSocket } from './utils/helperFunctions';
@@ -46,8 +47,14 @@ createConnection()
     app.use(
       (err: CustomError, req: Request, res: Response, next: NextFunction) => {
         console.log('Main error', err);
-        const status = err.status || 500;
-        const { message = 'Something went wrong', error = { message } } = err;
+        let status = err.status || 500;
+
+        let { message = 'Something went wrong' } = err;
+
+        if (err instanceof multer.MulterError) {
+          status = 418;
+          if (err.code === 'LIMIT_FILE_SIZE') message = 'File is Too large, Maximum file size supported is 3mb';
+        }
 
         if (res.headersSent) {
           console.log('headers sent already');
@@ -55,7 +62,7 @@ createConnection()
         }
 
         return res.status(status).json({
-          error,
+          error: err.error ?? { message },
         });
       },
     );

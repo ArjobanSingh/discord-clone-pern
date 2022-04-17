@@ -4,10 +4,10 @@ import { blue, blueGrey, grey } from '@mui/material/colors';
 import Typography from '@mui/material/Typography';
 import { darken } from '@mui/material';
 
-export const OptionsContainer = styled.div(({ theme }) => `
-  display: none;
+export const OptionsContainer = styled.div(({ theme, display, right }) => `
+  display: ${display || 'none'};
   position: absolute;
-  right: 20px;
+  right: ${right || '20px'};
   top: -20px;
   align-items: center;
   background-color: ${darken(theme.palette.background.default, 0.2)};

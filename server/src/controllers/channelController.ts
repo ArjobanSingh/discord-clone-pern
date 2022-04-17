@@ -6,7 +6,7 @@ import {
 } from 'typeorm';
 import * as C from '../../../common/socket-io-constants';
 import Channel from '../entity/Channel';
-import Message from '../entity/Message';
+import Message, { MessageTypeEnum } from '../entity/Message';
 import CustomRequest from '../interfaces/CustomRequest';
 import { createValidationError, CustomError } from '../utils/errors';
 import MessageData from '../types/ChannelMessageInput';
@@ -15,17 +15,19 @@ import ServerMember from '../entity/ServerMember';
 
 export const sendChannelMessageRest = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
+    const { jsonData } : { jsonData: string } = req.body;
+
     const {
       serverId,
       channelId,
       sid,
       messageData,
-    } : {
+    }: {
       serverId: string;
       channelId: string;
       sid: string;
       messageData: MessageData;
-    } = req.body;
+    } = JSON.parse(jsonData);
 
     const io: SocketServer = req.app.get('io');
     const currentSocket = io.sockets.sockets.get(sid);
@@ -88,6 +90,13 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
     }
 
     const { content, type } = messageData;
+
+    if (type !== MessageTypeEnum.TEXT) {
+      const base64File = req.file.buffer.toString('base64');
+      console.log('file!!!!!!!!!!!!!!!!!!', req.file);
+      // todo file validation
+      return;
+    }
 
     const message = new Message();
     message.content = content;

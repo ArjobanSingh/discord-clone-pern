@@ -47,14 +47,18 @@ const InputEditor = (props) => {
     if (replyMessage.id) inputRef.current.focus();
   }, [replyMessage.id]);
 
+  useDidUpdate(() => {
+    if (isEmpty(files)) setCurrentFileIndex(undefined);
+    else if (currentFileIndex >= files.length) setCurrentFileIndex(files.length - 1);
+  }, [files, currentFileIndex]);
+
   const onSubmit = () => {
-    if (!value.trim()) return;
+    if (isEmpty(files) && !value.trim()) return;
     prepareMessage(value);
     setValue('');
   };
 
   const updateCaption = useCallback(debounce((caption, index) => {
-    console.log('updating caption...');
     setFiles((prevFiles) => prevFiles.map((file, idx) => (
       idx === index ? { ...file, caption } : file
     )));
@@ -119,12 +123,15 @@ const InputEditor = (props) => {
       toast.error('Max file size is 3mb');
       return;
     }
-    // console.log({ validFiles });
     setCurrentFileIndex((prev) => prev ?? 0);
     setFiles((prevFiles) => [...prevFiles, ...validFiles]);
   };
 
-  const removeFile = (index) => setFiles((prev) => prev.filter((_, idx) => idx !== index));
+  const removeFile = (index) => {
+    setFiles((prev) => prev.filter((_, idx) => idx !== index));
+  };
+  const selectFile = (index) => setCurrentFileIndex(index);
+
   return (
     <>
       {!!replyMessage.id && (
@@ -142,6 +149,8 @@ const InputEditor = (props) => {
           {files.map((file, index) => (
             <FilePreview
               removeFile={removeFile}
+              selectFile={selectFile}
+              selectedIndex={currentFileIndex}
               index={index}
               key={file.id}
               file={file}
@@ -161,7 +170,7 @@ const InputEditor = (props) => {
           onKeyDown={handleKeyDown}
           onChange={handleValueChange}
           value={value}
-          placeholder="Send Message"
+          placeholder={isEmpty(files) ? 'Send Message' : 'Add Caption to selected file'}
         />
       </TextWrapper>
     </>

@@ -1,12 +1,15 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { MessageType } from '../../constants/Message';
 import {
   Column, Image, ImageWrapper, Wrapper,
 } from './styles';
 import { AUDIO_ICON, FILE_ICON, VIDEO_ICON } from '../../constants/images';
+import { OptionsContainer } from '../Message/styles';
 
-const FilePreview = ({ file, index, removeFile }) => {
+const FilePreview = ({
+  file, index, removeFile, selectFile, selectedIndex,
+}) => {
   const { messageType, originalFile, url } = file;
 
   const getImgProps = () => {
@@ -22,8 +25,23 @@ const FilePreview = ({ file, index, removeFile }) => {
       }
     }
   };
+
+  const removeHandler = (e) => {
+    e.stopPropagation();
+    removeFile(index);
+  };
+
+  const selectHandler = () => {
+    selectFile(index);
+  };
+
   return (
-    <Wrapper onClick={() => { removeFile(index); }}>
+    <Wrapper onClick={selectHandler} isSelected={selectedIndex === index}>
+      <OptionsContainer display="block" right="-10px">
+        <div>
+          <DeleteIcon onClick={removeHandler} />
+        </div>
+      </OptionsContainer>
       <Column minHeight="0">
         <ImageWrapper>
           <Image
@@ -49,6 +67,12 @@ FilePreview.propTypes = {
   }).isRequired,
   index: PropTypes.number.isRequired,
   removeFile: PropTypes.func.isRequired,
+  selectFile: PropTypes.func.isRequired,
+  selectedIndex: PropTypes.number,
+};
+
+FilePreview.defaultProps = {
+  selectedIndex: null,
 };
 
 export default FilePreview;

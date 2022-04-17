@@ -10,6 +10,13 @@ export const Wrapper = styled.div`
   max-width: 250px;
   box-shadow: ${({ theme }) => theme.shadows[1]};
   border-radius: ${({ theme }) => theme.shape.borderRadius}px;
+  position: relative;
+  border: ${({ isSelected, theme }) => (isSelected
+    ? `1px solid ${theme.palette.primary.main}` : '')};
+
+  svg {
+    color: ${({ theme }) => theme.palette.error.dark};
+  }
 `;
 
 export const Column = styled.div`

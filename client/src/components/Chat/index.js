@@ -44,24 +44,32 @@ const Chat = (props) => {
     if (!isEmpty(files)) messagesRef.current.scrollToPreviousPosition();
   }, [files], false);
 
-  const prepareMessage = (message, type = MessageType.TEXT) => {
-    // nanoid and createdAt will work as temporary id and
-    // temporart createdAt, till message is sent
-    sendMessage({
-      content: message,
-      type,
-      id: nanoid(),
-      status: MessageStatus.SENDING,
-      createdAt: new Date().toString(),
-      // if reply Message will be present use it's id otherwise it will be undefined
-      referenceMessageId: replyMessage.id,
-      referenceMessage: isEmpty(replyMessage) ? undefined : replyMessage,
-      user: {
-        name: user.name,
-        id: user.id,
-        profilePicture: user.profilePicture,
-      },
-    });
+  // nanoid and createdAt will work as temporary id and
+  // temporart createdAt, till message is sent
+  const getObj = (id = nanoid(), content, type, file) => ({
+    content,
+    type,
+    id,
+    status: MessageStatus.SENDING,
+    createdAt: new Date().toString(),
+    // if reply Message will be present use it's id otherwise it will be undefined
+    referenceMessageId: replyMessage.id,
+    referenceMessage: isEmpty(replyMessage) ? undefined : replyMessage,
+    user: {
+      name: user.name,
+      id: user.id,
+      profilePicture: user.profilePicture,
+    },
+    file,
+  });
+
+  const prepareMessage = (message) => {
+    if (isEmpty(files)) sendMessage(getObj(nanoid(), message, MessageType.TEXT));
+    else {
+      files.forEach((file) => {
+        sendMessage(getObj(file.id, file.caption, file.messageType, file.originalFile));
+      });
+    }
     setReplyMessage((prev) => (prev.id ? {} : prev));
   };
 
