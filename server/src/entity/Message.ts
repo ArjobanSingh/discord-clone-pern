@@ -32,7 +32,7 @@ export enum MessageTypeEnum {
 
 export const MAX_FILE_SIZE = 1024 * 1024 * 3; // 3mb in bytes
 
-// fileContentType, fileUrl, fileSize, fileName, fileThumbnail?
+// fileMimeType, fileUrl, fileSize, fileName, fileThumbnail?
 @Entity()
 export default class Message extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -41,7 +41,7 @@ export default class Message extends BaseEntity {
   @Column({ nullable: true })
   @IsOptional()
   @IsString()
-  fileContentType: string;
+  fileMimeType: string;
 
   @Column({ nullable: true })
   @IsOptional()
@@ -67,8 +67,7 @@ export default class Message extends BaseEntity {
   @IsString()
   fileThumbnail: string;
 
-  @Column()
-  @IsString()
+  @Column({ nullable: true })
   content: string;
 
   @Column({ default: 'SENT' })

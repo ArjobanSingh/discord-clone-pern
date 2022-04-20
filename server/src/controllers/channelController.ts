@@ -1,9 +1,12 @@
 import { validate } from 'class-validator';
 import { NextFunction, Response } from 'express';
 import { Server as SocketServer } from 'socket.io';
+import sharp from 'sharp';
 import {
   getConnection, getRepository,
 } from 'typeorm';
+import { isString } from 'util';
+import { nanoid } from 'nanoid';
 import * as C from '../../../common/socket-io-constants';
 import Channel from '../entity/Channel';
 import Message, { MessageTypeEnum } from '../entity/Message';
@@ -12,6 +15,7 @@ import { createValidationError, CustomError } from '../utils/errors';
 import MessageData from '../types/ChannelMessageInput';
 import { ServerTypeEnum } from '../entity/Server';
 import ServerMember from '../entity/ServerMember';
+import { getFileName, getMessageType } from '../utils/helperFunctions';
 
 export const sendChannelMessageRest = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
@@ -28,6 +32,20 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
       sid: string;
       messageData: MessageData;
     } = JSON.parse(jsonData);
+
+    const { content, type } = messageData;
+
+    if (!Object.values(MessageTypeEnum).includes(type)) {
+      next(new CustomError('Invalid message type', 400));
+      return;
+    }
+
+    if (type === MessageTypeEnum.TEXT) {
+      if (!isString(content) || !content.trim()) {
+        next(new CustomError('Content is required in Text message', 400));
+        return;
+      }
+    }
 
     const io: SocketServer = req.app.get('io');
     const currentSocket = io.sockets.sockets.get(sid);
@@ -89,21 +107,56 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
       return;
     }
 
-    const { content, type } = messageData;
-
-    if (type !== MessageTypeEnum.TEXT) {
-      const base64File = req.file.buffer.toString('base64');
-      console.log('file!!!!!!!!!!!!!!!!!!', req.file);
-      // todo file validation
-      return;
-    }
-
     const message = new Message();
-    message.content = content;
+    if (content) message.content = content; // optional in non text messages
     message.type = type;
     message.userId = req.userId;
     message.channelId = channelId;
     message.serverId = serverId;
+
+    if (type !== MessageTypeEnum.TEXT) {
+      if (!req.file) {
+        next(new CustomError('Media file not present', 400));
+        return;
+      }
+      // const base64File = req.file.buffer.toString('base64');
+      if (!req.file.mimetype) {
+        next(new CustomError('Unsupported mimeType', 400));
+        return;
+      }
+      const fileType = getMessageType(req.file.mimetype);
+      const { size, buffer, originalname } = req.file;
+
+      let fileBuffer = buffer;
+
+      message.type = fileType;
+      message.fileName = getFileName(originalname);
+      message.fileSize = size;
+      message.fileMimeType = req.file.mimetype;
+
+      if (fileType === MessageTypeEnum.IMAGE) {
+        let thumbnailBuffer: Buffer;
+        const thumbnailPromise = sharp(buffer)
+          .resize(200, 200)
+          .blur(5)
+          .webp({ quality: 70 })
+          .toBuffer();
+
+        const jpegBufferPromise = sharp(buffer)
+          .jpeg({ mozjpeg: true, quality: 70 })
+          .toBuffer();
+
+        ([thumbnailBuffer, fileBuffer] = await Promise.all([thumbnailPromise, jpegBufferPromise]));
+
+        // setting size of modified image
+        message.fileSize = Buffer.byteLength(buffer);
+        message.fileMimeType = 'image/jpeg';
+        message.fileThumbnail = thumbnailBuffer.toString('base64');
+      }
+
+      // TODO: set file url after uploading to cloudinary
+      return;
+    }
 
     if (referenceMessage) {
       message.referenceMessageId = referenceMessage.id;

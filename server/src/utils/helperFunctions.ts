@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid';
 import InviteLink from '../entity/InviteLink';
+import { MessageTypeEnum } from '../entity/Message';
 import Server from '../entity/Server';
 import LoginDataType from '../interfaces/LoginData';
 import redisClient from '../redisConfig';
@@ -98,6 +99,20 @@ const isTokensValidForSocket = async (tokens: { accessToken: string, refreshToke
   return [false];
 };
 
+const getMessageType = (type: string) => {
+  if (type.match('audio.*')) return MessageTypeEnum.AUDIO;
+  if (type.match('image.*')) return MessageTypeEnum.IMAGE;
+  if (type.match('video.*')) return MessageTypeEnum.VIDEO;
+
+  // for now return file
+  return MessageTypeEnum.FILE;
+};
+
+const getFileName = (originalName: string) => {
+  if (originalName) return `${nanoid()}-${originalName}`;
+  return `${nanoid()}`;
+};
+
 // const isFileAdded = (file: File) => {}
 
 export {
@@ -108,4 +123,6 @@ export {
   createLoginData,
   getServerForJoinLink,
   isTokensValidForSocket,
+  getMessageType,
+  getFileName,
 };
