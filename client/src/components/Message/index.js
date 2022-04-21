@@ -15,6 +15,7 @@ import {
   SameUserMessage,
   StyledAvatar,
   OptionsContainer,
+  TextContent,
 } from './styles';
 import Logo from '../../common/Logo';
 import useUser from '../../customHooks/useUser';
@@ -22,6 +23,7 @@ import { formatDate, getTime, sameDay } from '../../utils/helperFunctions';
 import DateMessage from '../MessageTypes/DateMessage';
 import ReferenceMessage from '../MessageTypes/ReferenceMessage';
 import useDidUpdate from '../../customHooks/useDidUpdate';
+import ImageMessage from '../MessageTypes/ImageMessage';
 
 const Message = (props) => {
   const {
@@ -84,6 +86,17 @@ const Message = (props) => {
     };
   }, [isScrollToReference]);
 
+  const commonProps = { message };
+
+  const getMessageComponent = () => {
+    switch (message.type) {
+      case MessageType.IMAGE:
+        return <ImageMessage {...commonProps} />;
+      default:
+        return null;
+    }
+  };
+
   const getMessageBody = () => {
     if (isSimpleInlineMessage) {
       return (
@@ -96,7 +109,8 @@ const Message = (props) => {
             marginLeft="55px"
             component="div"
           >
-            {content}
+            <TextContent>{content}</TextContent>
+            {getMessageComponent()}
           </MessageContent>
         </SameUserMessage>
       );
@@ -139,7 +153,8 @@ const Message = (props) => {
               variant="subtitle1"
               component="div"
             >
-              {content}
+              <TextContent>{content}</TextContent>
+              {getMessageComponent()}
             </MessageContent>
           </div>
         </AvatarMessageContainer>

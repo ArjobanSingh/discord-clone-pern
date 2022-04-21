@@ -35,7 +35,7 @@ export const OptionsContainer = styled.div(({ theme, display, right }) => `
 
 export const MessageContainer = styled.div`
   width: 100%;
-  padding: ${({ theme }) => `${theme.spacing(0.1)} ${theme.spacing(2)}`};
+  padding: ${({ theme }) => `0 ${theme.spacing(2)}`};
   margin-top: ${({ theme, hideMargin }) => (hideMargin ? '' : theme.spacing(2))};
   background-color: ${({ shouldHighlight, isReplyMessage }) => {
     if (isReplyMessage) return `${blueGrey[800]}90`;
@@ -57,6 +57,7 @@ export const MessageContainer = styled.div`
 export const AvatarMessageContainer = styled.div`
   display: flex;
   gap: 15px;
+  padding-block: ${({ theme }) => theme.spacing(0.5)}
 `;
 
 export const StyledAvatar = styled(Avatar)(({
@@ -91,4 +92,7 @@ export const MessageContent = styled(Typography)`
   line-height: 1.375rem;
   color: ${({ theme }) => theme.palette.text.primary};
   white-space: break-spaces;
+`;
+
+export const TextContent = styled.div`
 `;

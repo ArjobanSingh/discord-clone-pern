@@ -77,7 +77,7 @@ const Chat = (props) => {
             fileMimeType: type,
             fileName: name,
             fileSize: size,
-            url: file.url,
+            fileUrl: file.url,
           },
         ));
       });
