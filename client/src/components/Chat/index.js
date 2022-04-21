@@ -46,7 +46,7 @@ const Chat = (props) => {
 
   // nanoid and createdAt will work as temporary id and
   // temporart createdAt, till message is sent
-  const getObj = (id = nanoid(), content, type, file) => ({
+  const getObj = (id = nanoid(), content, type, fileObject = {}) => ({
     content,
     type,
     id,
@@ -60,17 +60,30 @@ const Chat = (props) => {
       id: user.id,
       profilePicture: user.profilePicture,
     },
-    file,
+    ...fileObject,
   });
 
   const prepareMessage = (message) => {
     if (isEmpty(files)) sendMessage(getObj(nanoid(), message, MessageType.TEXT));
     else {
       files.forEach((file) => {
-        sendMessage(getObj(file.id, file.caption, file.messageType, file.originalFile));
+        const { type, name, size } = file.originalFile;
+        sendMessage(getObj(
+          file.id,
+          file.caption,
+          file.messageType,
+          {
+            file: file.originalFile,
+            fileMimeType: type,
+            fileName: name,
+            fileSize: size,
+            url: file.url,
+          },
+        ));
       });
     }
     setReplyMessage((prev) => (prev.id ? {} : prev));
+    setFiles([]);
   };
 
   const getMoreMessages = () => {

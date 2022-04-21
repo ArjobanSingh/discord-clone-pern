@@ -88,6 +88,7 @@ export const getTime = (date) => {
 };
 
 export const scrollToBottom = (element) => {
+  if (!element) return;
   // eslint-disable-next-line no-param-reassign
   element.scrollTop = element.scrollHeight;
 };

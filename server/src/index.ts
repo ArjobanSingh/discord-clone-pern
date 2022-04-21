@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import './config';
+import './cloudinary';
 
 import { createConnection } from 'typeorm';
 import { createServer } from 'http';

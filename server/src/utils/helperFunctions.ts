@@ -99,13 +99,13 @@ const isTokensValidForSocket = async (tokens: { accessToken: string, refreshToke
   return [false];
 };
 
-const getMessageType = (type: string) => {
-  if (type.match('audio.*')) return MessageTypeEnum.AUDIO;
-  if (type.match('image.*')) return MessageTypeEnum.IMAGE;
-  if (type.match('video.*')) return MessageTypeEnum.VIDEO;
+const getMessageType = (type: string): [MessageTypeEnum, string] => {
+  if (type.match('audio.*')) return [MessageTypeEnum.AUDIO, 'video'];
+  if (type.match('image.*')) return [MessageTypeEnum.IMAGE, 'image'];
+  if (type.match('video.*')) return [MessageTypeEnum.VIDEO, 'video'];
 
   // for now return file
-  return MessageTypeEnum.FILE;
+  return [MessageTypeEnum.FILE, 'auto'];
 };
 
 const getFileName = (originalName: string) => {

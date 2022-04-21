@@ -6,7 +6,8 @@ import {
   getConnection, getRepository,
 } from 'typeorm';
 import { isString } from 'util';
-import { nanoid } from 'nanoid';
+import { UploadApiOptions } from 'cloudinary';
+import cloudinary from '../cloudinary';
 import * as C from '../../../common/socket-io-constants';
 import Channel from '../entity/Channel';
 import Message, { MessageTypeEnum } from '../entity/Message';
@@ -124,14 +125,13 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
         next(new CustomError('Unsupported mimeType', 400));
         return;
       }
-      const fileType = getMessageType(req.file.mimetype);
-      const { size, buffer, originalname } = req.file;
+      const [fileType, cloudinaryResourceType] = getMessageType(req.file.mimetype);
+      const { buffer, originalname } = req.file;
 
       let fileBuffer = buffer;
 
       message.type = fileType;
       message.fileName = getFileName(originalname);
-      message.fileSize = size;
       message.fileMimeType = req.file.mimetype;
 
       if (fileType === MessageTypeEnum.IMAGE) {
@@ -149,13 +149,25 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
         ([thumbnailBuffer, fileBuffer] = await Promise.all([thumbnailPromise, jpegBufferPromise]));
 
         // setting size of modified image
-        message.fileSize = Buffer.byteLength(buffer);
         message.fileMimeType = 'image/jpeg';
         message.fileThumbnail = thumbnailBuffer.toString('base64');
       }
 
-      // TODO: set file url after uploading to cloudinary
-      return;
+      const base64String = `data:${message.fileMimeType};base64,${fileBuffer.toString('base64')}`;
+      const cloudinayObj: UploadApiOptions = {
+        folder: 'discord_clone/api_uploads',
+        resource_type: cloudinaryResourceType,
+      };
+      if (message.type === MessageTypeEnum.FILE) {
+        cloudinayObj.public_id = message.fileName;
+      }
+      const fileResponse = await cloudinary.uploader.upload(base64String, cloudinayObj);
+      console.log('file response', fileResponse);
+
+      const { bytes, secure_url: secureUrl } = fileResponse;
+
+      message.fileSize = bytes;
+      message.fileUrl = secureUrl;
     }
 
     if (referenceMessage) {
