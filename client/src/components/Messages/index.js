@@ -9,6 +9,7 @@ import {
   reachedThresholdBottom, reachedThresholdTop, sameDay, scrollToBottom,
 } from '../../utils/helperFunctions';
 import useDidUpdate from '../../customHooks/useDidUpdate';
+import { MessageStatus, MessageType } from '../../constants/Message';
 
 const Messages = forwardRef((props, ref) => {
   const {
@@ -99,6 +100,8 @@ const Messages = forwardRef((props, ref) => {
             const isSameDay = index === 0
               ? false
               : sameDay(currentMessage.createdAt, previousMessage.createdAt);
+
+            if (currentMessage.type !== MessageType.TEXT && currentMessage.status === MessageStatus.SENDING) return null;
 
             return (
               <Message

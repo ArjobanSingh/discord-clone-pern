@@ -39,35 +39,6 @@ export default class Message extends BaseEntity {
   id: string;
 
   @Column({ nullable: true })
-  @IsOptional()
-  @IsString()
-  fileMimeType: string;
-
-  @Column({ nullable: true })
-  @IsOptional()
-  @IsUrl()
-  fileUrl: string;
-
-  @Column({ nullable: true })
-  @IsOptional()
-  @IsNumber()
-  @Max(MAX_FILE_SIZE)
-  fileSize: number;
-
-  @Column({ nullable: true })
-  @IsOptional()
-  @IsString()
-  @MaxLength(120, {
-    message: 'Must be smaller than or equal to 120 characters',
-  })
-  fileName: string;
-
-  @Column({ nullable: true })
-  @IsOptional()
-  @IsString()
-  fileThumbnail: string;
-
-  @Column({ nullable: true })
   content: string;
 
   @Column({ default: 'SENT' })
@@ -110,4 +81,36 @@ export default class Message extends BaseEntity {
 
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  @IsString()
+  fileMimeType: string;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  @IsUrl()
+  fileUrl: string;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  @IsNumber()
+  @Max(MAX_FILE_SIZE)
+  fileSize: number;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  @IsString()
+  @MaxLength(120, {
+    message: 'Must be smaller than or equal to 120 characters',
+  })
+  fileName: string;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  @IsString()
+  fileThumbnail: string;
+
+  @Column({ nullable: true })
+  fileDimensions: string;
 }
