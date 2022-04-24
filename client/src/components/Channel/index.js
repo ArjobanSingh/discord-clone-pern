@@ -1,6 +1,6 @@
 // import PropTypes from 'prop-types';
 import {
-  memo, useMemo, Fragment, useEffect,
+  memo, useMemo, Fragment, useEffect, useCallback,
 } from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -23,8 +23,12 @@ import Chat from '../Chat';
 import {
   channelMessagesRequested,
   channelMoreMessagesRequested,
+  removeChannelMessageObjectUrl,
   sendChannelMessageRequested,
 } from '../../redux/actions/channels';
+import { MessageType } from '../../constants/Message';
+import { getFileDimensions } from '../../utils/helperFunctions';
+import MessageProvider from '../../providers/MessageProvider';
 
 const wideScreenDrawerProps = (isDrawerOpen) => ({
   variant: 'persistent',
@@ -97,22 +101,36 @@ const Channel = (props) => {
     return <div>TODO: NO such channel</div>;
   }
 
-  const sendMessage = (content) => {
-    dispatch(sendChannelMessageRequested(serverId, channelId, content));
+  const sendMessage = async (content) => {
+    const messageObj = content;
+    if (messageObj.type === MessageType.IMAGE) {
+      messageObj.fileDimensions = await getFileDimensions(messageObj);
+    }
+    dispatch(sendChannelMessageRequested(serverId, channelId, messageObj));
   };
 
   const getMoreChannelMessages = () => {
     dispatch(channelMoreMessagesRequested(serverId, channelId));
   };
 
+  const removeObjectUrl = useCallback((messageId) => {
+    dispatch(removeChannelMessageObjectUrl(channelId, messageId));
+  }, [dispatch, channelId]);
+
+  const messageProviderValue = useMemo(() => ({
+    removeObjectUrl,
+  }), [removeObjectUrl]);
+
   return (
     <ChannelContainer>
       <MainContent isDrawerOpen={isMembersDrawerOpen}>
-        <Chat
-          messagesData={messagesData}
-          sendMessage={sendMessage}
-          loadMoreMessages={getMoreChannelMessages}
-        />
+        <MessageProvider value={messageProviderValue}>
+          <Chat
+            messagesData={messagesData}
+            sendMessage={sendMessage}
+            loadMoreMessages={getMoreChannelMessages}
+          />
+        </MessageProvider>
       </MainContent>
 
       <ResponsiveDrawer

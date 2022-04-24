@@ -134,3 +134,34 @@ export const getMessageType = (file) => {
   // for now return file
   return MessageType.FILE;
 };
+
+export const calculateAspectRatioFit = (srcWidth, srcHeight, maxWidth = 400, maxHeight = 300) => {
+  const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
+
+  return { width: Math.floor(srcWidth * ratio), height: Math.floor(srcHeight * ratio) };
+};
+
+export const getFileDimensions = (file) => new Promise((resolve) => {
+  let img = new Image();
+  img.onload = () => {
+    const { naturalWidth, naturalHeight } = img;
+    const { width, height } = calculateAspectRatioFit(naturalWidth, naturalHeight);
+    resolve(`${width} ${height}`);
+    img = null;
+  };
+  img.onerror = () => {
+    resolve('400 300');
+    img = null;
+  };
+  img.src = file.blobUrl;
+});
+
+export const isHostedUrl = (url) => !url.startsWith('blob:');
+export const transformCloudinaryUrl = (url, width, height) => {
+  if (!url) return url;
+  const cloudinaryDeliveryType = 'upload/';
+  const indexOfDelType = url.indexOf(cloudinaryDeliveryType);
+  const indexTillSlice = indexOfDelType + cloudinaryDeliveryType.length;
+  const transformations = `c_scale,h_${height},w_${width}`;
+  return `${url.slice(0, indexTillSlice)}${transformations}/${url.slice(indexTillSlice)}`;
+};

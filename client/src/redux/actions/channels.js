@@ -92,3 +92,11 @@ export const channelMoreMessagesFailed = (channelId, error) => ({
     error,
   },
 });
+
+export const removeChannelMessageObjectUrl = (channelId, messageId) => ({
+  type: C.REMOVE_CHANNEL_MESSAGE_OBJECT_URL,
+  payload: {
+    channelId,
+    messageId,
+  },
+});

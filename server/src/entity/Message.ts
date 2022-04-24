@@ -113,4 +113,7 @@ export default class Message extends BaseEntity {
 
   @Column({ nullable: true })
   fileDimensions: string;
+
+  @Column({ nullable: true })
+  filePublicId: string;
 }

@@ -139,7 +139,7 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
         const thumbnailPromise = sharp(buffer)
           .resize(200, 200)
           .blur(5)
-          .webp({ quality: 70 })
+          .webp({ quality: 50 })
           .toBuffer();
 
         const jpegBufferPromise = sharp(buffer)
@@ -162,16 +162,18 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
         cloudinayObj.public_id = message.fileName;
       }
       const fileResponse = await cloudinary.uploader.upload(base64String, cloudinayObj);
+      console.log('File response', fileResponse);
 
       if (fileResponse.width && fileResponse.height) {
         const dimensions = calculateAspectRatioFit(fileResponse.width, fileResponse.height);
         message.fileDimensions = `${dimensions.width} ${dimensions.height}`;
       }
 
-      const { bytes, secure_url: secureUrl } = fileResponse;
+      const { bytes, secure_url: secureUrl, public_id: publicId } = fileResponse;
 
       message.fileSize = bytes;
       message.fileUrl = secureUrl;
+      message.filePublicId = publicId;
     }
 
     if (referenceMessage) {

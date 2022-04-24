@@ -116,6 +116,21 @@ const channelsChat = (state = {}, action) => {
         },
       };
     }
+    case C.REMOVE_CHANNEL_MESSAGE_OBJECT_URL: {
+      const { channelId, messageId } = action.payload;
+      return {
+        ...state,
+        [channelId]: {
+          ...state[channelId],
+          data: state[channelId].data.map((message) => {
+            if (message.id === messageId) {
+              return { ...message, blobUrl: undefined };
+            }
+            return message;
+          }),
+        },
+      };
+    }
     default:
       return state;
   }

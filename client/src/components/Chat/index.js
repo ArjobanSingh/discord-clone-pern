@@ -68,18 +68,14 @@ const Chat = (props) => {
     else {
       files.forEach((file) => {
         const { type, name, size } = file.originalFile;
-        sendMessage(getObj(
-          file.id,
-          file.caption,
-          file.messageType,
-          {
-            file: file.originalFile,
-            fileMimeType: type,
-            fileName: name,
-            fileSize: size,
-            fileUrl: file.url,
-          },
-        ));
+        const fileObject = {
+          file: file.originalFile,
+          fileMimeType: type,
+          fileName: name,
+          fileSize: size,
+          blobUrl: file.url,
+        };
+        sendMessage(getObj(file.id, file.caption, file.messageType, fileObject));
       });
     }
     setReplyMessage((prev) => (prev.id ? {} : prev));

@@ -77,7 +77,9 @@ function* sendChannelMessage(actionData) {
     const url = ChannelApi.SEND_CHANNEL_MESSAGE;
     const response = yield call(axiosInstance.post, url, formData);
     const newMessageData = { ...response.data };
-    if (restMessageData.fileUrl) newMessageData.blobUrl = restMessageData.fileUrl;
+
+    const { blobUrl } = restMessageData;
+    if (blobUrl) newMessageData.blobUrl = blobUrl;
 
     yield put(sendChannelMessageSent(serverId, channelId, restMessageData.id, newMessageData));
   } catch (err) {
