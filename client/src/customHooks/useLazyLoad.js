@@ -8,13 +8,11 @@ let rootObserver;
 
 function handleIntersections(entries) {
   entries.forEach((entry) => {
-    if (listenerCallbacks.has(entry.target)) {
-      const callback = listenerCallbacks.get(entry.target);
-      if (entry.isIntersecting) {
-        rootObserver.unobserve(entry.target);
-        listenerCallbacks.delete(entry.target);
-        if (typeof callback === 'function') callback();
-      }
+    const callback = listenerCallbacks.get(entry.target);
+    if (callback && entry.isIntersecting) {
+      rootObserver.unobserve(entry.target);
+      listenerCallbacks.delete(entry.target);
+      if (typeof callback === 'function') callback();
     }
   });
 }

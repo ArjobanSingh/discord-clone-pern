@@ -1,5 +1,5 @@
 import {
-  memo, useLayoutEffect, useRef, useState,
+  memo, useEffect, useLayoutEffect, useRef, useState,
 } from 'react';
 import ReplyIcon from '@mui/icons-material/Reply';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -38,7 +38,7 @@ const Message = (props) => {
     replyMessage,
     setReplyMessage,
   } = props;
-  const { user: currentUser } = useUser();
+  // const { user: currentUser } = useUser();
   const [shouldHighlight, setShouldHighlight] = useState(false);
 
   const elementRef = useRef();
@@ -52,6 +52,13 @@ const Message = (props) => {
     referenceMessage,
     status,
   } = message;
+
+  useEffect(() => {
+    console.log('Message mounted');
+    return () => {
+      console.log('Message unmounted');
+    };
+  }, []);
 
   useLayoutEffect(() => {
     if (status === MessageStatus.SENDING) {
@@ -90,7 +97,7 @@ const Message = (props) => {
   const commonProps = { message };
 
   const getMessageComponent = () => {
-    switch (message.type) {
+    switch (type) {
       case MessageType.IMAGE:
         return <ImageMessage {...commonProps} />;
       case MessageType.VIDEO:

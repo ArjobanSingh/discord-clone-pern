@@ -50,6 +50,7 @@ const Chat = (props) => {
     content,
     type,
     id,
+    localKey: id,
     status: MessageStatus.SENDING,
     createdAt: new Date().toString(),
     // if reply Message will be present use it's id otherwise it will be undefined

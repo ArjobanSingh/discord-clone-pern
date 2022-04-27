@@ -100,9 +100,10 @@ const Messages = forwardRef((props, ref) => {
               ? false
               : sameDay(currentMessage.createdAt, previousMessage.createdAt);
 
+            // localKey for preventing remount when sending messages
             return (
               <Message
-                key={currentMessage.id}
+                key={currentMessage.localKey || currentMessage.id}
                 isSameUser={isSameUser}
                 isSameDay={isSameDay}
                 message={currentMessage}

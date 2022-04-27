@@ -3,12 +3,8 @@ import { useState } from 'react';
 import { MediaContainer, MediaMessageContainer } from '../commonMessageStyles';
 import { useMessageData } from '../../../providers/MessageProvider';
 import Video from './styles';
-
-const getPoster = (fileUrl) => {
-  const lastIndexOfDot = fileUrl.lastIndexOf('.');
-  const removedExtensions = fileUrl.slice(0, lastIndexOfDot);
-  return `${removedExtensions}.jpg`;
-};
+import useDidUpdate from '../../../customHooks/useDidUpdate';
+import useLazyLoad from '../../../customHooks/useLazyLoad';
 
 const VideoMessage = (props) => {
   const { message } = props;
@@ -19,27 +15,33 @@ const VideoMessage = (props) => {
     fileUrl,
   } = message;
 
-  const [isLoadedData, setIsLoadedData] = useState(false);
+  const { setRef, isIntersecting } = useLazyLoad();
+
+  const [isVideoReady, setIsVideoReady] = useState(false);
 
   const { removeObjectUrl } = useMessageData();
   const [width, height] = fileDimensions.split(' ');
 
-  const poster = fileUrl ? getPoster(fileUrl) : '';
-  const showMainVideo = !blobUrl || isLoadedData;
-  const showBlobVideo = !!blobUrl && !isLoadedData;
+  useDidUpdate(() => {
+    if (isVideoReady && blobUrl) {
+      URL.revokeObjectURL(blobUrl);
+      removeObjectUrl(id);
+    }
+  }, [isVideoReady, blobUrl, id, removeObjectUrl]);
+
+  const showBlobVideo = blobUrl && !isVideoReady;
 
   return (
     <MediaMessageContainer>
-      <MediaContainer width={width} height={height}>
+      <MediaContainer ref={setRef} width={width} height={height}>
         <Video
-        //   poster={poster}
           controls
-          src={fileUrl}
+          src={isIntersecting && fileUrl}
           onCanPlay={() => {
-            setIsLoadedData(true);
+            setIsVideoReady(true);
           }}
-          position={showMainVideo ? '' : 'absolute'}
-          opacity={showMainVideo ? '' : '0'}
+          position={showBlobVideo ? 'absolute' : ''}
+          opacity={showBlobVideo ? '0' : '1'}
         />
         {showBlobVideo && <Video controls src={blobUrl} />}
       </MediaContainer>

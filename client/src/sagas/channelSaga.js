@@ -78,8 +78,11 @@ function* sendChannelMessage(actionData) {
     const response = yield call(axiosInstance.post, url, formData);
     const newMessageData = { ...response.data };
 
-    const { blobUrl } = restMessageData;
-    if (blobUrl) newMessageData.blobUrl = blobUrl;
+    const { blobUrl, localKey } = restMessageData;
+    newMessageData.localKey = localKey;
+    if (blobUrl) {
+      newMessageData.blobUrl = blobUrl;
+    }
 
     yield put(sendChannelMessageSent(serverId, channelId, restMessageData.id, newMessageData));
   } catch (err) {
