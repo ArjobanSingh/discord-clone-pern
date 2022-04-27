@@ -142,18 +142,29 @@ export const calculateAspectRatioFit = (srcWidth, srcHeight, maxWidth = 400, max
 };
 
 export const getFileDimensions = (file) => new Promise((resolve) => {
-  let img = new Image();
-  img.onload = () => {
-    const { naturalWidth, naturalHeight } = img;
-    const { width, height } = calculateAspectRatioFit(naturalWidth, naturalHeight);
-    resolve(`${width} ${height}`);
-    img = null;
-  };
-  img.onerror = () => {
+  const isImage = MessageType.IMAGE === file.type;
+  let obj = isImage ? new Image() : document.createElement('video');
+
+  if (isImage) {
+    obj.onload = () => {
+      const { naturalWidth, naturalHeight } = obj;
+      const { width, height } = calculateAspectRatioFit(naturalWidth, naturalHeight);
+      resolve(`${width} ${height}`);
+      obj = null;
+    };
+  } else {
+    obj.onloadedmetadata = () => {
+      const { videoWidth, videoHeight } = obj;
+      const { width, height } = calculateAspectRatioFit(videoWidth, videoHeight);
+      resolve(`${width} ${height}`);
+      obj = null;
+    };
+  }
+  obj.onerror = () => {
     resolve('400 300');
-    img = null;
+    obj = null;
   };
-  img.src = file.blobUrl;
+  obj.src = file.blobUrl;
 });
 
 export const isHostedUrl = (url) => !url.startsWith('blob:');

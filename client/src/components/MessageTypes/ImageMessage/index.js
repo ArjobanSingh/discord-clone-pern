@@ -1,10 +1,11 @@
-import { useCallback, useRef, useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { ImageContainer, ImageMessageContainer, StyledImage } from './styles';
+import { StyledImage } from './styles';
 import { useMessageData } from '../../../providers/MessageProvider';
 import useDidUpdate from '../../../customHooks/useDidUpdate';
 import { transformCloudinaryUrl } from '../../../utils/helperFunctions';
-import useIntersectionObserver from '../../../customHooks/useIntersectionObserver';
+import useLazyLoad from '../../../customHooks/useLazyLoad';
+import { MediaContainer, MediaMessageContainer } from '../commonMessageStyles';
 
 const ImageMessage = (props) => {
   const { message } = props;
@@ -20,13 +21,8 @@ const ImageMessage = (props) => {
   } = message;
 
   const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const [isIntersected, setIsIntersected] = useState(false);
 
-  const callback = useCallback(() => {
-    setIsIntersected(true);
-  }, []);
-
-  const [functionRef] = useIntersectionObserver(callback);
+  const { setRef, isIntersecting } = useLazyLoad();
 
   let thumbnail = blobUrl;
   if (!thumbnail) thumbnail = fileThumbnail ? `data:${fileMimeType};base64,${fileThumbnail}` : '';
@@ -50,11 +46,11 @@ const ImageMessage = (props) => {
   const transformedUrl = transformCloudinaryUrl(fileUrl, width, height);
 
   return (
-    <ImageMessageContainer>
-      <ImageContainer width={width} height={height} ref={functionRef}>
+    <MediaMessageContainer>
+      <MediaContainer width={width} height={height} ref={setRef}>
         <StyledImage
           onLoad={onImageLoad}
-          src={isIntersected ? transformedUrl : ''}
+          src={isIntersecting ? transformedUrl : ''}
           alt="attachment"
           position={isImageLoaded ? '' : 'absolute'}
           opacity={isImageLoaded ? '' : '0'}
@@ -62,13 +58,13 @@ const ImageMessage = (props) => {
         {!isImageLoaded && thumbnail ? (
           <>
             <StyledImage
-              src={isIntersected ? thumbnail : ''}
+              src={isIntersecting ? thumbnail : ''}
               alt="attachment thumbnail"
             />
           </>
         ) : null}
-      </ImageContainer>
-    </ImageMessageContainer>
+      </MediaContainer>
+    </MediaMessageContainer>
   );
 };
 

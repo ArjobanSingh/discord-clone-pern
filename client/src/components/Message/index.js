@@ -1,5 +1,5 @@
 import {
-  memo, useEffect, useLayoutEffect, useRef, useState,
+  memo, useLayoutEffect, useRef, useState,
 } from 'react';
 import ReplyIcon from '@mui/icons-material/Reply';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
@@ -24,6 +24,7 @@ import DateMessage from '../MessageTypes/DateMessage';
 import ReferenceMessage from '../MessageTypes/ReferenceMessage';
 import useDidUpdate from '../../customHooks/useDidUpdate';
 import ImageMessage from '../MessageTypes/ImageMessage';
+import VideoMessage from '../MessageTypes/VideoMessage';
 
 const Message = (props) => {
   const {
@@ -92,6 +93,8 @@ const Message = (props) => {
     switch (message.type) {
       case MessageType.IMAGE:
         return <ImageMessage {...commonProps} />;
+      case MessageType.VIDEO:
+        return <VideoMessage {...commonProps} />;
       default:
         return null;
     }

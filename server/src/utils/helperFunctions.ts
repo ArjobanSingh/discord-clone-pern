@@ -116,7 +116,7 @@ const getFileName = (originalName: string) => {
 const calculateAspectRatioFit = (srcWidth: number, srcHeight: number, maxWidth = 400, maxHeight = 300) => {
   const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
 
-  return { width: Math.floor(srcWidth * ratio), height: Math.floor(srcHeight * ratio) };
+  return { width: Math.round(srcWidth * ratio), height: Math.round(srcHeight * ratio) };
 };
 
 export {
