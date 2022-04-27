@@ -53,13 +53,6 @@ const Message = (props) => {
     status,
   } = message;
 
-  useEffect(() => {
-    console.log('Message mounted');
-    return () => {
-      console.log('Message unmounted');
-    };
-  }, []);
-
   useLayoutEffect(() => {
     if (status === MessageStatus.SENDING) {
       // we just sent this new message, scroll container to bottom

@@ -125,6 +125,7 @@ const InputEditor = (props) => {
     }
     setCurrentFileIndex((prev) => prev ?? 0);
     setFiles((prevFiles) => [...prevFiles, ...validFiles]);
+    inputRef.current.focus();
   };
 
   const removeFile = (index) => {

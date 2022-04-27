@@ -36,7 +36,7 @@ const VideoMessage = (props) => {
       <MediaContainer ref={setRef} width={width} height={height}>
         <Video
           controls
-          src={isIntersecting && fileUrl}
+          src={isIntersecting ? fileUrl : ''}
           onCanPlay={() => {
             setIsVideoReady(true);
           }}

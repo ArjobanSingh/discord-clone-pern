@@ -6,6 +6,7 @@ const Video = styled.video`
   object-fit: contain;
   position: ${({ position }) => position};
   opacity: ${({ opacity }) => opacity};
+  border-radius: inherit;
 `;
 
 export default Video;

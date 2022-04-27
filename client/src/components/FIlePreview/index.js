@@ -1,11 +1,13 @@
 import PropTypes from 'prop-types';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Typography from '@mui/material/Typography';
 import { MessageType } from '../../constants/Message';
 import {
   Column, Image, ImageWrapper, Wrapper,
 } from './styles';
 import { AUDIO_ICON, FILE_ICON, VIDEO_ICON } from '../../constants/images';
 import { OptionsContainer } from '../Message/styles';
+import { SimpleEllipsis } from '../../common/StyledComponents';
 
 const FilePreview = ({
   file, index, removeFile, selectFile, selectedIndex,
@@ -51,7 +53,11 @@ const FilePreview = ({
         </ImageWrapper>
       </Column>
       <Column>
-        {messageType}
+        <Typography component="div" padding="5px" variant="body2" color="text.primary">
+          <SimpleEllipsis>
+            {originalFile.name}
+          </SimpleEllipsis>
+        </Typography>
       </Column>
     </Wrapper>
   );
