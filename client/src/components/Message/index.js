@@ -1,6 +1,7 @@
 import {
-  memo, useEffect, useLayoutEffect, useRef, useState,
+  memo, useCallback, useLayoutEffect, useRef, useState,
 } from 'react';
+import { toast } from 'react-toastify';
 import ReplyIcon from '@mui/icons-material/Reply';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import PropTypes from 'prop-types';
@@ -19,12 +20,16 @@ import {
 } from './styles';
 import Logo from '../../common/Logo';
 import useUser from '../../customHooks/useUser';
-import { formatDate, getTime, sameDay } from '../../utils/helperFunctions';
+import {
+  downloadFile, formatDate, getTime, sameDay,
+} from '../../utils/helperFunctions';
 import DateMessage from '../MessageTypes/DateMessage';
 import ReferenceMessage from '../MessageTypes/ReferenceMessage';
 import useDidUpdate from '../../customHooks/useDidUpdate';
 import ImageMessage from '../MessageTypes/ImageMessage';
 import VideoMessage from '../MessageTypes/VideoMessage';
+import AudioMessage from '../MessageTypes/AudioMessage';
+import FileMessage from '../MessageTypes/FileMessage';
 
 const Message = (props) => {
   const {
@@ -51,6 +56,8 @@ const Message = (props) => {
     createdAt,
     referenceMessage,
     status,
+    fileUrl,
+    fileName,
   } = message;
 
   useLayoutEffect(() => {
@@ -87,7 +94,16 @@ const Message = (props) => {
     };
   }, [isScrollToReference]);
 
-  const commonProps = { message };
+  const downloadCurrentFile = useCallback(() => {
+    if (message.status === MessageStatus.SENDING) return;
+    try {
+      downloadFile(fileUrl, fileName);
+    } catch (err) {
+      toast.error('Error downloading current file, Please try again later');
+    }
+  }, [message.status, fileUrl, fileName]);
+
+  const commonProps = { message, downloadCurrentFile };
 
   const getMessageComponent = () => {
     switch (type) {
@@ -95,6 +111,10 @@ const Message = (props) => {
         return <ImageMessage {...commonProps} />;
       case MessageType.VIDEO:
         return <VideoMessage {...commonProps} />;
+      case MessageType.AUDIO:
+        return <AudioMessage {...commonProps} />;
+      case MessageType.FILE:
+        return <FileMessage {...commonProps} />;
       default:
         return null;
     }
@@ -112,8 +132,8 @@ const Message = (props) => {
             marginLeft="55px"
             component="div"
           >
-            <TextContent>{content}</TextContent>
             {getMessageComponent()}
+            <TextContent>{content}</TextContent>
           </MessageContent>
         </SameUserMessage>
       );
@@ -156,8 +176,8 @@ const Message = (props) => {
               variant="subtitle1"
               component="div"
             >
-              <TextContent>{content}</TextContent>
               {getMessageComponent()}
+              <TextContent>{content}</TextContent>
             </MessageContent>
           </div>
         </AvatarMessageContainer>
@@ -195,6 +215,8 @@ Message.propTypes = {
     status: PropTypes.oneOf(Object.keys(MessageStatus)).isRequired,
     createdAt: PropTypes.string,
     user: PropTypes.shape(MessageUserPropType).isRequired,
+    fileUrl: PropTypes.string,
+    fileName: PropTypes.string,
     referenceMessage: PropTypes.shape({
       user: PropTypes.shape(MessageUserPropType).isRequired,
       content: PropTypes.string,

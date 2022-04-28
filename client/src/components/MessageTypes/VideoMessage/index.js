@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { MediaContainer, MediaMessageContainer } from '../commonMessageStyles';
 import { useMessageData } from '../../../providers/MessageProvider';
 import Video from './styles';
@@ -58,4 +58,4 @@ VideoMessage.propTypes = {
   }).isRequired,
 };
 
-export default VideoMessage;
+export default memo(VideoMessage);

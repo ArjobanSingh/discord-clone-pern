@@ -176,3 +176,25 @@ export const transformCloudinaryUrl = (url, width, height) => {
   const transformations = `c_scale,h_${height},w_${width}`;
   return `${url.slice(0, indexTillSlice)}${transformations}/${url.slice(indexTillSlice)}`;
 };
+
+export const downloadFile = async (url, name) => {
+  const response = await fetch(url);
+  const blob = await response.blob();
+
+  const localOriginDownloadUrl = URL.createObjectURL(blob);
+
+  const anchor = document.createElement('a');
+  anchor.href = localOriginDownloadUrl;
+  anchor.download = name;
+  document.body.appendChild(anchor);
+  anchor.click();
+
+  URL.revokeObjectURL(localOriginDownloadUrl);
+};
+
+export function bytesToSize(bytes) {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  if (bytes === 0) return '0 Byte';
+  const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
+  return `${Math.round(bytes / 1024 ** i, 2)} ${sizes[i]}`;
+}

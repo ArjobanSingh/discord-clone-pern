@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { StyledImage } from './styles';
 import { useMessageData } from '../../../providers/MessageProvider';
@@ -79,4 +79,4 @@ ImageMessage.propTypes = {
   }).isRequired,
 };
 
-export default ImageMessage;
+export default memo(ImageMessage);
