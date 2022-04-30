@@ -1,8 +1,12 @@
+/* eslint-disable react/prop-types */
 import styled from 'styled-components';
+import Typography from '@mui/material/Typography';
 import DownloadIcon from '@mui/icons-material/Download';
 import CircularProgress from '@mui/material/CircularProgress';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { LIGHT_THEME } from '../../constants/theme';
+import { SimpleEllipsis } from '../../common/StyledComponents';
+import { bytesToSize } from '../../utils/helperFunctions';
 
 export const MediaMessageContainer = styled.div(({ theme }) => `
   padding-block: ${theme.spacing(0.5)};
@@ -17,9 +21,9 @@ export const MediaContainer = styled.div(({
   border-radius: ${theme.shape.borderRadius}px;
 `);
 
-export const FileContainer = styled.div(({ theme }) => `
+export const FileContainer = styled.div(({ theme, isFailed }) => `
   padding: ${theme.spacing(1)};
-  background-color: ${theme.palette.background.darker};
+  background-color: ${isFailed ? theme.palette.error.dark : theme.palette.background.darker};
   border-radius: ${theme.shape.borderRadius}px;
   width: 320px;
   display: flex;
@@ -138,7 +142,7 @@ export const ImageVideoLoader = () => (
 export const ErrorWrapper = styled.div`
   width: 100%;
   padding: 5px;
-  background-color: red;
+  background-color: ${({ theme }) => theme.palette.error.dark};
   position: absolute;
   bottom: 0;
   left: 0;
@@ -146,6 +150,7 @@ export const ErrorWrapper = styled.div`
   display: flex;
   gap: 10px;
   align-items: center;
+  color: ${({ theme }) => theme.palette.common.white};
 `;
 
 export const ImageVideoError = () => (
@@ -153,4 +158,43 @@ export const ImageVideoError = () => (
     <ErrorOutlineIcon />
     Error: Message Not sent
   </ErrorWrapper>
+);
+
+export const ErrorFileUi = ({ fileName }) => (
+  <>
+    <Typography
+      color="common.white"
+      lineHeight="1"
+      variant="body2"
+      component="div"
+    >
+      <SimpleEllipsis>
+        {fileName}
+      </SimpleEllipsis>
+    </Typography>
+    <Typography
+      color="common.white"
+      lineHeight="1"
+      variant="caption"
+    >
+      Error: Something went wrong
+    </Typography>
+  </>
+);
+
+export const MainFileUi = ({ fileUrl, fileName, fileSize }) => (
+  <>
+    <Anchor href={fileUrl} rel="nonreferrer noopener" target="_blank">
+      <SimpleEllipsis>
+        {fileName}
+      </SimpleEllipsis>
+    </Anchor>
+    <Typography
+      color="text.secondaryDark"
+      lineHeight="1"
+      variant="caption"
+    >
+      {bytesToSize(fileSize)}
+    </Typography>
+  </>
 );

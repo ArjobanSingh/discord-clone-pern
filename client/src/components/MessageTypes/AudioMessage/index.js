@@ -1,21 +1,19 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import { memo } from 'react';
 import PropTypes from 'prop-types';
-import Typography from '@mui/material/Typography';
 import {
-  Anchor,
+  ErrorFileUi,
   FileContainer,
   FileLoader,
   FileNameWrapper,
   FileTopContainer,
+  MainFileUi,
   MediaMessageContainer,
   StyledDownloadIcon,
 } from '../commonMessageStyles';
 import { AUDIO_ICON } from '../../../constants/images';
 import StyledImage from '../../../common/StyledImage';
-import { SimpleEllipsis } from '../../../common/StyledComponents';
 import { MessageStatus } from '../../../constants/Message';
-import { bytesToSize } from '../../../utils/helperFunctions';
 
 // TODO: add custom audio player ui
 const AudioMessage = (props) => {
@@ -29,11 +27,12 @@ const AudioMessage = (props) => {
   } = message;
 
   const isLoading = status === MessageStatus.SENDING;
+  const isFailed = status === MessageStatus.FAILED;
   const isSent = status === MessageStatus.SENT;
 
   return (
     <MediaMessageContainer>
-      <FileContainer>
+      <FileContainer isFailed={isFailed}>
         {isLoading && <FileLoader />}
         <FileTopContainer>
           <StyledImage
@@ -41,18 +40,9 @@ const AudioMessage = (props) => {
             height="100%"
           />
           <FileNameWrapper>
-            <Anchor href={fileUrl} rel="nonreferrer noopener" target="_blank">
-              <SimpleEllipsis>
-                {fileName}
-              </SimpleEllipsis>
-            </Anchor>
-            <Typography
-              color="text.secondaryDark"
-              lineHeight="1"
-              variant="caption"
-            >
-              {bytesToSize(fileSize)}
-            </Typography>
+            {isFailed
+              ? <ErrorFileUi fileName={fileName} />
+              : <MainFileUi fileUrl={fileUrl} fileName={fileName} fileSize={fileSize} />}
           </FileNameWrapper>
           {isSent && <StyledDownloadIcon onClick={downloadCurrentFile} />}
         </FileTopContainer>
