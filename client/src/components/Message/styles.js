@@ -57,7 +57,7 @@ export const MessageContainer = styled.div`
 export const AvatarMessageContainer = styled.div`
   display: flex;
   gap: 15px;
-  padding-block: ${({ theme }) => theme.spacing(0.5)}
+  padding-block: ${({ theme }) => theme.spacing(0.5)};
 `;
 
 export const StyledAvatar = styled(Avatar)(({
@@ -88,9 +88,16 @@ export const SameUserMessage = styled.div`
   }
 `;
 
-export const MessageContent = styled(Typography)`
+// eslint-disable-next-line react/prop-types
+const WrappedTypography = ({ isLoading, isFailed, ...rest }) => <Typography {...rest} />;
+
+export const MessageContent = styled(WrappedTypography)`
   line-height: 1.375rem;
-  color: ${({ theme }) => theme.palette.text.primary};
+  color: ${({ theme, isLoading, isFailed }) => {
+    if (isLoading) return theme.palette.text.secondaryDark;
+    if (isFailed) return theme.palette.error.main;
+    return theme.palette.text.primary;
+  }};
   white-space: break-spaces;
 `;
 

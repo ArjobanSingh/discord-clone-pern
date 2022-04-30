@@ -60,6 +60,9 @@ const Message = (props) => {
     fileName,
   } = message;
 
+  const isLoading = status === MessageStatus.SENDING;
+  const isFailed = status === MessageStatus.FAILED;
+
   useLayoutEffect(() => {
     if (status === MessageStatus.SENDING) {
       // we just sent this new message, scroll container to bottom
@@ -131,6 +134,8 @@ const Message = (props) => {
             variant="subtitle1"
             marginLeft="55px"
             component="div"
+            isLoading={isLoading}
+            isFailed={isFailed}
           >
             {getMessageComponent()}
             <TextContent>{content}</TextContent>
@@ -175,6 +180,8 @@ const Message = (props) => {
             <MessageContent
               variant="subtitle1"
               component="div"
+              isLoading={isLoading}
+              isFailed={isFailed}
             >
               {getMessageComponent()}
               <TextContent>{content}</TextContent>
