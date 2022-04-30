@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/media-has-caption */
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   ErrorFileUi,
@@ -14,11 +14,15 @@ import {
 import { FILE_ICON, PDF_ICON } from '../../../constants/images';
 import StyledImage from '../../../common/StyledImage';
 import { MessageStatus } from '../../../constants/Message';
+import { useMessageData } from '../../../providers/MessageProvider';
 
 const FileMessage = (props) => {
   const { message, downloadCurrentFile } = props;
+  const { removeObjectUrl } = useMessageData();
+
   const {
-    // blobUrl,
+    id,
+    blobUrl,
     fileUrl,
     fileName,
     fileSize,
@@ -30,16 +34,17 @@ const FileMessage = (props) => {
   const isFailed = status === MessageStatus.FAILED;
   const isSent = status === MessageStatus.SENT;
 
-  const getStatusUi = () => {
-    if (isLoading) return <FileLoader />;
-    if (isSent) return <StyledDownloadIcon onClick={downloadCurrentFile} />;
-    return null;
-  };
+  useEffect(() => {
+    if (isSent && blobUrl) {
+      URL.revokeObjectURL(blobUrl);
+      removeObjectUrl(id);
+    }
+  }, [isSent, blobUrl]);
 
   return (
     <MediaMessageContainer>
       <FileContainer isFailed={isFailed}>
-        {getStatusUi()}
+        {isLoading && <FileLoader />}
         <FileTopContainer>
           <StyledImage
             src={fileMimeType === 'application/pdf' ? PDF_ICON : FILE_ICON}
@@ -50,6 +55,7 @@ const FileMessage = (props) => {
               ? <ErrorFileUi fileName={fileName} />
               : <MainFileUi fileUrl={fileUrl} fileName={fileName} fileSize={fileSize} />}
           </FileNameWrapper>
+          {isSent && <StyledDownloadIcon onClick={downloadCurrentFile} />}
         </FileTopContainer>
       </FileContainer>
     </MediaMessageContainer>

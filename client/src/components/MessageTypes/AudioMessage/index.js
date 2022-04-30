@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/media-has-caption */
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   ErrorFileUi,
@@ -14,11 +14,15 @@ import {
 import { AUDIO_ICON } from '../../../constants/images';
 import StyledImage from '../../../common/StyledImage';
 import { MessageStatus } from '../../../constants/Message';
+import { useMessageData } from '../../../providers/MessageProvider';
 
-// TODO: add custom audio player ui
+// TODO: add custom audio player ui and revoke blob url on main audio loadedData
 const AudioMessage = (props) => {
   const { message, downloadCurrentFile } = props;
+  const { removeObjectUrl } = useMessageData();
+
   const {
+    id,
     blobUrl,
     fileUrl,
     fileName,
@@ -30,16 +34,17 @@ const AudioMessage = (props) => {
   const isFailed = status === MessageStatus.FAILED;
   const isSent = status === MessageStatus.SENT;
 
-  const getStatusUi = () => {
-    if (isLoading) return <FileLoader />;
-    if (isSent) return <StyledDownloadIcon onClick={downloadCurrentFile} />;
-    return null;
-  };
+  useEffect(() => {
+    if (isSent && blobUrl) {
+      URL.revokeObjectURL(blobUrl);
+      removeObjectUrl(id);
+    }
+  }, [isSent, blobUrl]);
 
   return (
     <MediaMessageContainer>
       <FileContainer isFailed={isFailed}>
-        {getStatusUi()}
+        {isLoading && <FileLoader />}
         <FileTopContainer>
           <StyledImage
             src={AUDIO_ICON}
@@ -50,6 +55,7 @@ const AudioMessage = (props) => {
               ? <ErrorFileUi fileName={fileName} />
               : <MainFileUi fileUrl={fileUrl} fileName={fileName} fileSize={fileSize} />}
           </FileNameWrapper>
+          {isSent && <StyledDownloadIcon onClick={downloadCurrentFile} />}
         </FileTopContainer>
         <audio controls src={fileUrl ?? blobUrl} />
       </FileContainer>
