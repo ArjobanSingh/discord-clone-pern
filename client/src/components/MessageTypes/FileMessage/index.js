@@ -30,10 +30,16 @@ const FileMessage = (props) => {
   const isFailed = status === MessageStatus.FAILED;
   const isSent = status === MessageStatus.SENT;
 
+  const getStatusUi = () => {
+    if (isLoading) return <FileLoader />;
+    if (isSent) return <StyledDownloadIcon onClick={downloadCurrentFile} />;
+    return null;
+  };
+
   return (
     <MediaMessageContainer>
       <FileContainer isFailed={isFailed}>
-        {isLoading && <FileLoader />}
+        {getStatusUi()}
         <FileTopContainer>
           <StyledImage
             src={fileMimeType === 'application/pdf' ? PDF_ICON : FILE_ICON}
@@ -44,7 +50,6 @@ const FileMessage = (props) => {
               ? <ErrorFileUi fileName={fileName} />
               : <MainFileUi fileUrl={fileUrl} fileName={fileName} fileSize={fileSize} />}
           </FileNameWrapper>
-          {isSent && <StyledDownloadIcon onClick={downloadCurrentFile} />}
         </FileTopContainer>
       </FileContainer>
     </MediaMessageContainer>

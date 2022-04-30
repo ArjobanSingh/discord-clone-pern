@@ -30,10 +30,16 @@ const AudioMessage = (props) => {
   const isFailed = status === MessageStatus.FAILED;
   const isSent = status === MessageStatus.SENT;
 
+  const getStatusUi = () => {
+    if (isLoading) return <FileLoader />;
+    if (isSent) return <StyledDownloadIcon onClick={downloadCurrentFile} />;
+    return null;
+  };
+
   return (
     <MediaMessageContainer>
       <FileContainer isFailed={isFailed}>
-        {isLoading && <FileLoader />}
+        {getStatusUi()}
         <FileTopContainer>
           <StyledImage
             src={AUDIO_ICON}
@@ -44,7 +50,6 @@ const AudioMessage = (props) => {
               ? <ErrorFileUi fileName={fileName} />
               : <MainFileUi fileUrl={fileUrl} fileName={fileName} fileSize={fileSize} />}
           </FileNameWrapper>
-          {isSent && <StyledDownloadIcon onClick={downloadCurrentFile} />}
         </FileTopContainer>
         <audio controls src={fileUrl ?? blobUrl} />
       </FileContainer>
