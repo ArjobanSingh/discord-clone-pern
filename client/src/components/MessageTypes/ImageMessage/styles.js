@@ -6,4 +6,5 @@ export const StyledImage = styled.img`
   position: ${({ position }) => position};
   opacity: ${({ opacity }) => opacity};
   border-radius: inherit;
+  filter: ${({ filter }) => filter};
 `;

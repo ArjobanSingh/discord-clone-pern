@@ -5,7 +5,8 @@ import { useMessageData } from '../../../providers/MessageProvider';
 import useDidUpdate from '../../../customHooks/useDidUpdate';
 import { transformCloudinaryUrl } from '../../../utils/helperFunctions';
 import useLazyLoad from '../../../customHooks/useLazyLoad';
-import { MediaContainer, MediaMessageContainer } from '../commonMessageStyles';
+import { ImageVideoLoader, MediaContainer, MediaMessageContainer } from '../commonMessageStyles';
+import { MessageStatus } from '../../../constants/Message';
 
 const ImageMessage = (props) => {
   const { message } = props;
@@ -18,6 +19,7 @@ const ImageMessage = (props) => {
     blobUrl,
     fileDimensions,
     fileThumbnail,
+    status,
   } = message;
 
   const [isImageLoaded, setIsImageLoaded] = useState(false);
@@ -44,10 +46,12 @@ const ImageMessage = (props) => {
   // 1) Intially, it was loading image two times with different urls when applied transformations
   // 2) just needed this simple transformations, so can avoid installing that
   const transformedUrl = transformCloudinaryUrl(fileUrl, width, height);
+  const isLoading = status === MessageStatus.SENDING;
 
   return (
     <MediaMessageContainer>
       <MediaContainer width={width} height={height} ref={setRef}>
+        <ImageVideoLoader />
         <StyledImage
           onLoad={onImageLoad}
           src={isIntersecting ? transformedUrl : ''}
@@ -60,6 +64,7 @@ const ImageMessage = (props) => {
             <StyledImage
               src={isIntersecting ? thumbnail : ''}
               alt="attachment thumbnail"
+              filter={isLoading ? 'opacity(0.5)' : ''}
             />
           </>
         ) : null}
@@ -76,6 +81,7 @@ ImageMessage.propTypes = {
     blobUrl: PropTypes.string,
     fileDimensions: PropTypes.string,
     fileThumbnail: PropTypes.string,
+    status: PropTypes.oneOf(Object.values(MessageStatus)).isRequired,
   }).isRequired,
 };
 

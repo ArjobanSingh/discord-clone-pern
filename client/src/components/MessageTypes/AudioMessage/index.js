@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Typography from '@mui/material/Typography';
 import {
   Anchor,
-  FileContainer, FileNameWrapper, FileTopContainer, MediaMessageContainer, StyledDownloadIcon,
+  FileContainer, FileLoader, FileNameWrapper, FileTopContainer, MediaMessageContainer, StyledDownloadIcon,
 } from '../commonMessageStyles';
 import { AUDIO_ICON } from '../../../constants/images';
 import StyledImage from '../../../common/StyledImage';
@@ -20,11 +20,15 @@ const AudioMessage = (props) => {
     fileUrl,
     fileName,
     fileSize,
+    status,
   } = message;
+
+  const isLoading = status === MessageStatus.SENT;
 
   return (
     <MediaMessageContainer>
       <FileContainer>
+        <FileLoader />
         <FileTopContainer>
           <StyledImage
             src={AUDIO_ICON}
@@ -44,7 +48,7 @@ const AudioMessage = (props) => {
               {bytesToSize(fileSize)}
             </Typography>
           </FileNameWrapper>
-          <StyledDownloadIcon onClick={downloadCurrentFile} />
+          {isLoading && <StyledDownloadIcon onClick={downloadCurrentFile} />}
         </FileTopContainer>
         <audio controls src={fileUrl ?? blobUrl} />
       </FileContainer>

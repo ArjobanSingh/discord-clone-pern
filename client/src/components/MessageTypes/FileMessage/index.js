@@ -4,30 +4,34 @@ import PropTypes from 'prop-types';
 import Typography from '@mui/material/Typography';
 import {
   Anchor,
-  FileContainer, FileNameWrapper, FileTopContainer, MediaMessageContainer, StyledDownloadIcon,
+  FileContainer, FileLoader, FileNameWrapper, FileTopContainer, MediaMessageContainer, StyledDownloadIcon,
 } from '../commonMessageStyles';
-import { FILE_ICON } from '../../../constants/images';
+import { FILE_ICON, PDF_ICON } from '../../../constants/images';
 import StyledImage from '../../../common/StyledImage';
 import { SimpleEllipsis } from '../../../common/StyledComponents';
 import { MessageStatus } from '../../../constants/Message';
 import { bytesToSize } from '../../../utils/helperFunctions';
 
-// TODO: disinguish different pdf files from others
 const FileMessage = (props) => {
   const { message, downloadCurrentFile } = props;
   const {
-    blobUrl,
+    // blobUrl,
     fileUrl,
     fileName,
     fileSize,
+    fileMimeType,
+    status,
   } = message;
+
+  const isLoading = status === MessageStatus.SENT;
 
   return (
     <MediaMessageContainer>
       <FileContainer>
+        <FileLoader />
         <FileTopContainer>
           <StyledImage
-            src={FILE_ICON}
+            src={fileMimeType === 'application/pdf' ? PDF_ICON : FILE_ICON}
             height="100%"
           />
           <FileNameWrapper>
@@ -44,7 +48,7 @@ const FileMessage = (props) => {
               {bytesToSize(fileSize)}
             </Typography>
           </FileNameWrapper>
-          <StyledDownloadIcon onClick={downloadCurrentFile} />
+          {isLoading && <StyledDownloadIcon onClick={downloadCurrentFile} />}
         </FileTopContainer>
       </FileContainer>
     </MediaMessageContainer>
@@ -55,6 +59,7 @@ FileMessage.propTypes = {
   message: PropTypes.shape({
     id: PropTypes.string.isRequired,
     fileSize: PropTypes.number.isRequired,
+    fileMimeType: PropTypes.string.isRequired,
     blobUrl: PropTypes.string,
     fileUrl: PropTypes.string,
     fileName: PropTypes.string,

@@ -198,10 +198,18 @@ const Message = (props) => {
         id={id}
       >
         {getMessageBody()}
-        <OptionsContainer>
-          <div><ReplyIcon onClick={handleReply} /></div>
-          <div><MoreHorizIcon /></div>
-        </OptionsContainer>
+        {status !== MessageStatus.SENDING && (
+          <OptionsContainer>
+            {status === MessageStatus.FAILED
+              ? <div>failed icon</div>
+              : (
+                <>
+                  <div><ReplyIcon onClick={handleReply} /></div>
+                  <div><MoreHorizIcon /></div>
+                </>
+              )}
+          </OptionsContainer>
+        )}
       </MessageContainer>
     </>
   );

@@ -1,10 +1,11 @@
 import PropTypes from 'prop-types';
 import { memo, useState } from 'react';
-import { MediaContainer, MediaMessageContainer } from '../commonMessageStyles';
+import { ImageVideoLoader, MediaContainer, MediaMessageContainer } from '../commonMessageStyles';
 import { useMessageData } from '../../../providers/MessageProvider';
 import Video from './styles';
 import useDidUpdate from '../../../customHooks/useDidUpdate';
 import useLazyLoad from '../../../customHooks/useLazyLoad';
+import { MessageStatus } from '../../../constants/Message';
 
 const VideoMessage = (props) => {
   const { message } = props;
@@ -13,6 +14,7 @@ const VideoMessage = (props) => {
     fileDimensions,
     blobUrl,
     fileUrl,
+    status,
   } = message;
 
   const { setRef, isIntersecting } = useLazyLoad();
@@ -30,10 +32,12 @@ const VideoMessage = (props) => {
   }, [isVideoReady, blobUrl, id, removeObjectUrl]);
 
   const showBlobVideo = blobUrl && !isVideoReady;
+  const isLoading = status === MessageStatus.SENDING;
 
   return (
     <MediaMessageContainer>
       <MediaContainer ref={setRef} width={width} height={height}>
+        {isLoading && <ImageVideoLoader />}
         <Video
           controls
           src={isIntersecting ? fileUrl : ''}
@@ -42,6 +46,7 @@ const VideoMessage = (props) => {
           }}
           position={showBlobVideo ? 'absolute' : ''}
           opacity={showBlobVideo ? '0' : '1'}
+          filter={isLoading ? 'opacity(0.5)' : ''}
         />
         {showBlobVideo && <Video controls src={blobUrl} />}
       </MediaContainer>
@@ -55,6 +60,7 @@ VideoMessage.propTypes = {
     fileDimensions: PropTypes.string.isRequired,
     blobUrl: PropTypes.string,
     fileUrl: PropTypes.string,
+    status: PropTypes.oneOf(Object.values(MessageStatus)).isRequired,
   }).isRequired,
 };
 

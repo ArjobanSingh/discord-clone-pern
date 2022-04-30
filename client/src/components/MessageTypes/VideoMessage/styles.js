@@ -7,6 +7,7 @@ const Video = styled.video`
   position: ${({ position }) => position};
   opacity: ${({ opacity }) => opacity};
   border-radius: inherit;
+  filter: ${({ filter }) => filter};
 `;
 
 export default Video;

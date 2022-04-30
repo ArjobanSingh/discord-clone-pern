@@ -6,6 +6,7 @@ export const LIGHT_THEME = 'light';
 
 export const LIGHT_THEME_OPTIONS = {
   palette: {
+    mode: LIGHT_THEME,
     type: LIGHT_THEME,
     input: {
       background: '#fff',
@@ -39,6 +40,7 @@ export const LIGHT_THEME_OPTIONS = {
 
 export const DARK_THEME_OPTIONS = {
   palette: {
+    mode: DARK_THEME,
     type: DARK_THEME,
     input: {
       background: 'rgba(0, 0, 0, 0.1)',
