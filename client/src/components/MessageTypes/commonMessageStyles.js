@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import DownloadIcon from '@mui/icons-material/Download';
-import CircularProgress, { circularProgressClasses } from '@mui/material/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { LIGHT_THEME } from '../../constants/theme';
 
 export const MediaMessageContainer = styled.div(({ theme }) => `
@@ -35,9 +36,15 @@ export const FileTopContainer = styled.div`
   gap: 10px;
 `;
 
-export const StyledDownloadIcon = styled(DownloadIcon)(({ theme }) => `
+export const StyledDownloadIcon = styled(DownloadIcon)(({ theme, isImage }) => `
   color: ${theme.palette.primary.secondaryDark};
   cursor: pointer;
+  ${isImage ? `
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    z-index: 10;
+  ` : ''}
 `);
 
 export const FileNameWrapper = styled.div`
@@ -126,4 +133,24 @@ export const ImageVideoLoader = () => (
   <LoaderContainer>
     <CircularProgress disableShrink />
   </LoaderContainer>
+);
+
+export const ErrorWrapper = styled.div`
+  width: 100%;
+  padding: 5px;
+  background-color: red;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+`;
+
+export const ImageVideoError = () => (
+  <ErrorWrapper>
+    <ErrorOutlineIcon />
+    Error: Message Not sent
+  </ErrorWrapper>
 );

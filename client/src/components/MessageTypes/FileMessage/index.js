@@ -23,12 +23,13 @@ const FileMessage = (props) => {
     status,
   } = message;
 
-  const isLoading = status === MessageStatus.SENT;
+  const isLoading = status === MessageStatus.SENDING;
+  const isSent = status === MessageStatus.SENT;
 
   return (
     <MediaMessageContainer>
       <FileContainer>
-        <FileLoader />
+        {isLoading && <FileLoader />}
         <FileTopContainer>
           <StyledImage
             src={fileMimeType === 'application/pdf' ? PDF_ICON : FILE_ICON}
@@ -48,7 +49,7 @@ const FileMessage = (props) => {
               {bytesToSize(fileSize)}
             </Typography>
           </FileNameWrapper>
-          {isLoading && <StyledDownloadIcon onClick={downloadCurrentFile} />}
+          {isSent && <StyledDownloadIcon onClick={downloadCurrentFile} />}
         </FileTopContainer>
       </FileContainer>
     </MediaMessageContainer>

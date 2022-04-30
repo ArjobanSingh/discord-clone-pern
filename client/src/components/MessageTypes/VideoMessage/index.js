@@ -1,6 +1,11 @@
 import PropTypes from 'prop-types';
 import { memo, useState } from 'react';
-import { ImageVideoLoader, MediaContainer, MediaMessageContainer } from '../commonMessageStyles';
+import {
+  ImageVideoError,
+  ImageVideoLoader,
+  MediaContainer,
+  MediaMessageContainer,
+} from '../commonMessageStyles';
 import { useMessageData } from '../../../providers/MessageProvider';
 import Video from './styles';
 import useDidUpdate from '../../../customHooks/useDidUpdate';
@@ -33,11 +38,18 @@ const VideoMessage = (props) => {
 
   const showBlobVideo = blobUrl && !isVideoReady;
   const isLoading = status === MessageStatus.SENDING;
+  const isFailed = status === MessageStatus.FAILED;
+
+  const getStatusUi = () => {
+    if (isLoading) return <ImageVideoLoader />;
+    if (isFailed) return <ImageVideoError />;
+    return null;
+  };
 
   return (
     <MediaMessageContainer>
       <MediaContainer ref={setRef} width={width} height={height}>
-        {isLoading && <ImageVideoLoader />}
+        {getStatusUi()}
         <Video
           controls
           src={isIntersecting ? fileUrl : ''}
@@ -46,9 +58,14 @@ const VideoMessage = (props) => {
           }}
           position={showBlobVideo ? 'absolute' : ''}
           opacity={showBlobVideo ? '0' : '1'}
-          filter={isLoading ? 'opacity(0.5)' : ''}
         />
-        {showBlobVideo && <Video controls src={blobUrl} />}
+        {showBlobVideo && (
+        <Video
+          controls
+          src={blobUrl}
+          filter={isLoading || isFailed ? 'opacity(0.5)' : ''}
+        />
+        )}
       </MediaContainer>
     </MediaMessageContainer>
   );

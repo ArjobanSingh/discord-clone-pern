@@ -1,15 +1,19 @@
 import { memo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { StyledImage } from './styles';
+import { DownloadIconWrapper, StyledImage } from './styles';
 import { useMessageData } from '../../../providers/MessageProvider';
 import useDidUpdate from '../../../customHooks/useDidUpdate';
 import { transformCloudinaryUrl } from '../../../utils/helperFunctions';
 import useLazyLoad from '../../../customHooks/useLazyLoad';
-import { ImageVideoLoader, MediaContainer, MediaMessageContainer } from '../commonMessageStyles';
+import {
+  ErrorWrapper,
+  ImageVideoError,
+  ImageVideoLoader, MediaContainer, MediaMessageContainer, StyledDownloadIcon,
+} from '../commonMessageStyles';
 import { MessageStatus } from '../../../constants/Message';
 
 const ImageMessage = (props) => {
-  const { message } = props;
+  const { message, downloadCurrentFile } = props;
   const { removeObjectUrl } = useMessageData();
 
   const {
@@ -47,11 +51,22 @@ const ImageMessage = (props) => {
   // 2) just needed this simple transformations, so can avoid installing that
   const transformedUrl = transformCloudinaryUrl(fileUrl, width, height);
   const isLoading = status === MessageStatus.SENDING;
+  const isFailed = status === MessageStatus.FAILED;
+
+  const getStatusUi = () => {
+    if (isLoading) return <ImageVideoLoader />;
+    if (isFailed) return <ImageVideoError />;
+    return (
+      <DownloadIconWrapper onClick={downloadCurrentFile} aria-label="download picture">
+        <StyledDownloadIcon />
+      </DownloadIconWrapper>
+    );
+  };
 
   return (
     <MediaMessageContainer>
       <MediaContainer width={width} height={height} ref={setRef}>
-        <ImageVideoLoader />
+        {getStatusUi()}
         <StyledImage
           onLoad={onImageLoad}
           src={isIntersecting ? transformedUrl : ''}
@@ -64,7 +79,7 @@ const ImageMessage = (props) => {
             <StyledImage
               src={isIntersecting ? thumbnail : ''}
               alt="attachment thumbnail"
-              filter={isLoading ? 'opacity(0.5)' : ''}
+              filter={isLoading || isFailed ? 'opacity(0.5)' : ''}
             />
           </>
         ) : null}
@@ -83,6 +98,7 @@ ImageMessage.propTypes = {
     fileThumbnail: PropTypes.string,
     status: PropTypes.oneOf(Object.values(MessageStatus)).isRequired,
   }).isRequired,
+  downloadCurrentFile: PropTypes.func.isRequired,
 };
 
 export default memo(ImageMessage);
