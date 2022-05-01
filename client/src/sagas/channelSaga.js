@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import {
   CHANNEL_MESSAGES_REQUESTED,
   CHANNEL_MORE_MESSAGES_REQUESTED,
+  DELETE_CHANNEL_MESSAGE_REQUESTED,
+  RETRY_CHANNEL_FAILED_MESSAGE,
   SEND_CHANNEL_MESSAGE_REQUESTED,
 } from '../constants/channels';
 import {
@@ -97,8 +99,10 @@ function* sendChannelMessage(actionData) {
 function* channelSaga() {
   yield all([
     takeEvery(SEND_CHANNEL_MESSAGE_REQUESTED, sendChannelMessage),
+    takeEvery(RETRY_CHANNEL_FAILED_MESSAGE, sendChannelMessage),
     takeEvery(CHANNEL_MESSAGES_REQUESTED, getChannelMessages),
     takeEvery(CHANNEL_MORE_MESSAGES_REQUESTED, getMoreChannelMessages),
+    // takeEvery(DELETE_CHANNEL_MESSAGE_REQUESTED, todoSaga),
   ]);
 }
 

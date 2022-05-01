@@ -40,6 +40,22 @@ const channelsChat = (state = {}, action) => {
           hasMore: !(action.payload.data.length < 50),
         },
       };
+    case C.RETRY_CHANNEL_FAILED_MESSAGE: {
+      const { channelId, messageData } = action.payload;
+      return {
+        ...state,
+        [channelId]: {
+          ...state[channelId],
+          data: state[channelId].data.map((msg) => {
+            if (msg.id === messageData.id) {
+              // this is failed message which we are retrying
+              return { ...msg, status: MessageStatus.SENDING };
+            }
+            return msg;
+          }),
+        },
+      };
+    }
     case C.SEND_CHANNEL_MESSAGE_REQUESTED: {
       const { channelId, messageData } = action.payload;
       return {
@@ -78,6 +94,17 @@ const channelsChat = (state = {}, action) => {
         [channelId]: {
           ...state[channelId],
           data,
+        },
+      };
+    }
+    case C.DELETE_CHANNEL_MESSAGE_REQUESTED: {
+      // TODO: with backend delete api, this action hanlder might change
+      const { channelId, messageId } = action.payload;
+      return {
+        ...state,
+        [channelId]: {
+          ...state[channelId],
+          data: state[channelId].data.filter((msg) => msg.id !== messageId),
         },
       };
     }

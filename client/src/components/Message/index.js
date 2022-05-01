@@ -3,10 +3,13 @@ import {
 } from 'react';
 import { toast } from 'react-toastify';
 import ReplyIcon from '@mui/icons-material/Reply';
+import DeleteIcon from '@mui/icons-material/Delete';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import PropTypes from 'prop-types';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material';
 import { MessageStatus, MessageType, MessageUserPropType } from '../../constants/Message';
 import {
   AvatarMessageContainer,
@@ -30,6 +33,8 @@ import ImageMessage from '../MessageTypes/ImageMessage';
 import VideoMessage from '../MessageTypes/VideoMessage';
 import AudioMessage from '../MessageTypes/AudioMessage';
 import FileMessage from '../MessageTypes/FileMessage';
+import { useMessageData } from '../../providers/MessageProvider';
+import StyledTooltip from '../../common/StyledToolTip';
 
 const Message = (props) => {
   const {
@@ -43,6 +48,8 @@ const Message = (props) => {
     replyMessage,
     setReplyMessage,
   } = props;
+
+  const { retryFailedMessage, deleteMessage } = useMessageData();
   // const { user: currentUser } = useUser();
   const [shouldHighlight, setShouldHighlight] = useState(false);
 
@@ -59,6 +66,8 @@ const Message = (props) => {
     fileUrl,
     fileName,
   } = message;
+
+  const appTheme = useTheme();
 
   const isLoading = status === MessageStatus.SENDING;
   const isFailed = status === MessageStatus.FAILED;
@@ -80,6 +89,14 @@ const Message = (props) => {
 
   const handleReply = () => {
     setReplyMessage(message);
+  };
+
+  const retryMessage = () => {
+    retryFailedMessage(message);
+  };
+
+  const deleteCurrentMessage = () => {
+    deleteMessage(id);
   };
 
   useDidUpdate(() => {
@@ -208,11 +225,48 @@ const Message = (props) => {
         {status !== MessageStatus.SENDING && (
           <OptionsContainer>
             {status === MessageStatus.FAILED
-              ? <div>failed icon</div>
+              ? (
+                <>
+                  <div>
+                    <StyledTooltip
+                      fontSize={appTheme.typography.subtitle1.fontSize}
+                      placement="top"
+                      title="Retry message"
+                    >
+                      <RefreshIcon onClick={retryMessage} />
+                    </StyledTooltip>
+                  </div>
+                  <div>
+                    <StyledTooltip
+                      fontSize={appTheme.typography.subtitle1.fontSize}
+                      placement="top"
+                      title="Delete message"
+                    >
+                      <DeleteIcon onClick={deleteCurrentMessage} />
+                    </StyledTooltip>
+                  </div>
+                </>
+              )
               : (
                 <>
-                  <div><ReplyIcon onClick={handleReply} /></div>
-                  <div><MoreHorizIcon /></div>
+                  <div>
+                    <StyledTooltip
+                      fontSize={appTheme.typography.subtitle1.fontSize}
+                      placement="top"
+                      title="Reply"
+                    >
+                      <ReplyIcon onClick={handleReply} />
+                    </StyledTooltip>
+                  </div>
+                  <div>
+                    <StyledTooltip
+                      fontSize={appTheme.typography.subtitle1.fontSize}
+                      placement="top"
+                      title="More"
+                    >
+                      <MoreHorizIcon />
+                    </StyledTooltip>
+                  </div>
                 </>
               )}
           </OptionsContainer>

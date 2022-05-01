@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 
 const StyledTooltip = styled(({ className, ...props }) => (
   <Tooltip arrow classes={{ popper: className }} {...props} />
-))(({ theme }) => `
+))(({ theme, fontSize }) => `
   .${tooltipClasses.arrow} {
     color: ${theme.palette.common.black};
   };
@@ -11,6 +11,7 @@ const StyledTooltip = styled(({ className, ...props }) => (
   .${tooltipClasses.tooltip} {
     background-color: ${theme.palette.common.black};
     padding: ${theme.spacing(1)};
+    font-size: ${fontSize};
   }
 `);
 

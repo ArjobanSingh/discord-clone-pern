@@ -100,3 +100,21 @@ export const removeChannelMessageObjectUrl = (channelId, messageId) => ({
     messageId,
   },
 });
+
+export const retryFailedChannelMessage = (serverId, channelId, messageData) => ({
+  type: C.RETRY_CHANNEL_FAILED_MESSAGE,
+  payload: {
+    serverId,
+    channelId,
+    messageData,
+  },
+});
+
+export const deleteChannelMessage = (serverId, channelId, messageId) => ({
+  type: C.DELETE_CHANNEL_MESSAGE_REQUESTED,
+  payload: {
+    serverId,
+    channelId,
+    messageId,
+  },
+});

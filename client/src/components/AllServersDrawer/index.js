@@ -32,26 +32,6 @@ const AllServersDrawer = ({ isDiscoveryPage }) => {
   const exploreServers = useSelector(getAllExploreServersData);
   const dispatch = useDispatch();
 
-  // const previousServersIds = useRef([]);
-
-  // const uniqueServerIds = useMemo(() => {
-  //   const serverIds = Object.keys(servers);
-  //   if (serverIds.length !== previousServersIds.length) {
-  //     previousServersIds.current = serverIds;
-  //     return serverIds;
-  //   }
-
-  //   // if new server's object, does not have any previous server id, means changes done
-  //   const isChangesDone = previousServersIds.current.some((sId) => !servers[sId]);
-
-  //   if (isChangesDone) {
-  //     previousServersIds.current = serverIds;
-  //     return serverIds;
-  //   }
-
-  //   return previousServersIds.current;
-  // }, [servers]);
-
   const { serverId } = useParams();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 

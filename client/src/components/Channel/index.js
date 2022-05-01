@@ -23,7 +23,9 @@ import Chat from '../Chat';
 import {
   channelMessagesRequested,
   channelMoreMessagesRequested,
+  deleteChannelMessage,
   removeChannelMessageObjectUrl,
+  retryFailedChannelMessage,
   sendChannelMessageRequested,
 } from '../../redux/actions/channels';
 import { MessageType } from '../../constants/Message';
@@ -115,12 +117,24 @@ const Channel = (props) => {
     dispatch(channelMoreMessagesRequested(serverId, channelId));
   };
 
+  const retryFailedMessage = useCallback((messageObj) => {
+    dispatch(retryFailedChannelMessage(serverId, channelId, messageObj));
+  }, [dispatch, serverId, channelId]);
+
   const removeObjectUrl = useCallback((messageId) => {
     dispatch(removeChannelMessageObjectUrl(channelId, messageId));
   }, [dispatch, channelId]);
 
+  // TODO: for now only deleting failed messages,
+  // server delete support will be added in future
+  const deleteMessage = useCallback((messageId) => {
+    dispatch(deleteChannelMessage(serverId, channelId, messageId));
+  }, [serverId, channelId]);
+
   const messageProviderValue = useMemo(() => ({
     removeObjectUrl,
+    retryFailedMessage,
+    deleteMessage,
   }), [removeObjectUrl]);
 
   return (
@@ -131,6 +145,7 @@ const Channel = (props) => {
             messagesData={messagesData}
             sendMessage={sendMessage}
             loadMoreMessages={getMoreChannelMessages}
+            retryFailedMessage={retryFailedMessage}
           />
         </MessageProvider>
       </MainContent>

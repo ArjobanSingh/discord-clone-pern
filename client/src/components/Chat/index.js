@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { nanoid } from 'nanoid';
 import {
+  useCallback,
   useEffect, useLayoutEffect, useRef, useState,
 } from 'react';
 import { toast } from 'react-toastify';
@@ -107,10 +108,10 @@ const Chat = (props) => {
                 ref={messagesRef}
                 hasMoreMessages={hasMore}
                 messages={data}
-                getMoreMessages={getMoreMessages}
                 isLoadingMore={!!isLoadingMore}
                 moreError={!!moreError}
                 replyMessage={replyMessage}
+                getMoreMessages={getMoreMessages}
                 setReplyMessage={setReplyMessage}
               />
             )}
