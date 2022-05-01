@@ -9,13 +9,14 @@ import {
   updateServer,
   updateServerMemberRoles,
 } from '../controllers/serverController';
+import { uploadServerAvatar } from '../middlewarres/fileUpload';
 import isAuthenticated from '../middlewarres/isAuthenticated';
 
 const serverRouter = Router();
 
 serverRouter.get('/', isAuthenticated, getAllServers);
 serverRouter.get('/:serverId', isAuthenticated, getServerDetails);
-serverRouter.post('/create-server', isAuthenticated, createServer);
+serverRouter.post('/create-server', isAuthenticated, uploadServerAvatar, createServer);
 serverRouter.post('/join-server', isAuthenticated, joinServer);
 serverRouter.put('/update-server', isAuthenticated, updateServer);
 serverRouter.put('/update-roles', isAuthenticated, updateServerMemberRoles);

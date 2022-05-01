@@ -141,21 +141,22 @@ export const calculateAspectRatioFit = (srcWidth, srcHeight, maxWidth = 400, max
   return { width: Math.floor(srcWidth * ratio), height: Math.floor(srcHeight * ratio) };
 };
 
+// will set original dimensions
 export const getFileDimensions = (file) => new Promise((resolve) => {
   const isImage = MessageType.IMAGE === file.type;
   let obj = isImage ? new Image() : document.createElement('video');
 
   if (isImage) {
     obj.onload = () => {
-      const { naturalWidth, naturalHeight } = obj;
-      const { width, height } = calculateAspectRatioFit(naturalWidth, naturalHeight);
+      const { naturalWidth: width, naturalHeight: height } = obj;
+      // const { width, height } = calculateAspectRatioFit(naturalWidth, naturalHeight);
       resolve(`${width} ${height}`);
       obj = null;
     };
   } else {
     obj.onloadedmetadata = () => {
-      const { videoWidth, videoHeight } = obj;
-      const { width, height } = calculateAspectRatioFit(videoWidth, videoHeight);
+      const { videoWidth: width, videoHeight: height } = obj;
+      // const { width, height } = calculateAspectRatioFit(videoWidth, videoHeight);
       resolve(`${width} ${height}`);
       obj = null;
     };

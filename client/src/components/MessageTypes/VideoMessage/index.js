@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { memo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import {
   ImageVideoError,
   ImageVideoLoader,
@@ -11,6 +11,7 @@ import Video from './styles';
 import useDidUpdate from '../../../customHooks/useDidUpdate';
 import useLazyLoad from '../../../customHooks/useLazyLoad';
 import { MessageStatus } from '../../../constants/Message';
+import { calculateAspectRatioFit } from '../../../utils/helperFunctions';
 
 const VideoMessage = (props) => {
   const { message } = props;
@@ -27,7 +28,11 @@ const VideoMessage = (props) => {
   const [isVideoReady, setIsVideoReady] = useState(false);
 
   const { removeObjectUrl } = useMessageData();
-  const [width, height] = fileDimensions.split(' ');
+
+  const { width, height } = useMemo(() => {
+    const [srcWidth, srcHeight] = fileDimensions.split(' ');
+    return calculateAspectRatioFit(srcWidth, srcHeight);
+  }, [fileDimensions]);
 
   useDidUpdate(() => {
     if (isVideoReady && blobUrl) {

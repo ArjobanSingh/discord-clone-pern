@@ -8,6 +8,7 @@ export const StyledImage = styled.img`
   opacity: ${({ opacity }) => opacity};
   border-radius: inherit;
   filter: ${({ filter }) => filter};
+  cursor: ${({ cursor }) => cursor};
 `;
 
 export const DownloadIconWrapper = styled(IconButton)(({ theme }) => `

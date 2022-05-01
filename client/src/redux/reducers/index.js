@@ -63,8 +63,8 @@ export const getExploreServerData = (state, serverId) => (
 
 export const getNavigationState = (state) => state.navigate;
 
-export const getServerCreationError = (state) => (
-  fromCreateServers.getServerCreationError(state.createServers)
+export const getServerCreationData = (state) => (
+  fromCreateServers.getServerCreationData(state.createServers)
 );
 
 export const getAllServerChannels = (state, serverId) => (

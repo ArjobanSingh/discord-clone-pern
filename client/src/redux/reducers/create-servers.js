@@ -28,4 +28,4 @@ export default (state = initialState, action) => {
   }
 };
 
-export const getServerCreationError = (state) => state.error;
+export const getServerCreationData = (state) => state;

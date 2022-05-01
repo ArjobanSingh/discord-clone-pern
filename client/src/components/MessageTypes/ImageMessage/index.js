@@ -1,9 +1,9 @@
-import { memo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { DownloadIconWrapper, StyledImage } from './styles';
 import { useMessageData } from '../../../providers/MessageProvider';
 import useDidUpdate from '../../../customHooks/useDidUpdate';
-import { transformCloudinaryUrl } from '../../../utils/helperFunctions';
+import { calculateAspectRatioFit, transformCloudinaryUrl } from '../../../utils/helperFunctions';
 import useLazyLoad from '../../../customHooks/useLazyLoad';
 import {
   ErrorWrapper,
@@ -13,7 +13,7 @@ import {
 import { MessageStatus } from '../../../constants/Message';
 
 const ImageMessage = (props) => {
-  const { message, downloadCurrentFile } = props;
+  const { message, downloadCurrentFile, setOpenSelectedImage } = props;
   const { removeObjectUrl } = useMessageData();
 
   const {
@@ -33,7 +33,10 @@ const ImageMessage = (props) => {
   let thumbnail = blobUrl;
   if (!thumbnail) thumbnail = fileThumbnail ? `data:${fileMimeType};base64,${fileThumbnail}` : '';
 
-  const [width, height] = fileDimensions.split(' ');
+  const { width, height } = useMemo(() => {
+    const [srcWidth, srcHeight] = fileDimensions.split(' ');
+    return calculateAspectRatioFit(srcWidth, srcHeight);
+  }, [fileDimensions]);
 
   useDidUpdate(() => {
     if (isImageLoaded && blobUrl) {
@@ -52,6 +55,11 @@ const ImageMessage = (props) => {
   const transformedUrl = transformCloudinaryUrl(fileUrl, width, height);
   const isLoading = status === MessageStatus.SENDING;
   const isFailed = status === MessageStatus.FAILED;
+  const isSent = status === MessageStatus.SENT;
+
+  const openThisImageInModal = () => {
+    if (isSent) setOpenSelectedImage({ fileUrl, fileDimensions });
+  };
 
   const getStatusUi = () => {
     if (isLoading) return <ImageVideoLoader />;
@@ -68,11 +76,13 @@ const ImageMessage = (props) => {
       <MediaContainer width={width} height={height} ref={setRef}>
         {getStatusUi()}
         <StyledImage
+          onClick={openThisImageInModal}
           onLoad={onImageLoad}
           src={isIntersecting ? transformedUrl : ''}
           alt="attachment"
           position={isImageLoaded ? '' : 'absolute'}
           opacity={isImageLoaded ? '' : '0'}
+          cursor={isSent ? 'pointer' : ''}
         />
         {!isImageLoaded && thumbnail ? (
           <>
@@ -99,6 +109,7 @@ ImageMessage.propTypes = {
     status: PropTypes.oneOf(Object.values(MessageStatus)).isRequired,
   }).isRequired,
   downloadCurrentFile: PropTypes.func.isRequired,
+  setOpenSelectedImage: PropTypes.func.isRequired,
 };
 
 export default memo(ImageMessage);

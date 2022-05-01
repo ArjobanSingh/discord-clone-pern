@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import Button from '@mui/material/Button';
 import Icon from '@mui/material/Icon';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
@@ -74,3 +75,8 @@ export const ModalFooter = styled.footer(({ theme }) => `
   border-bottom-left-radius: ${theme.shape.borderRadius}px;
   border-bottom-right-radius: ${theme.shape.borderRadius}px;
 `);
+
+export const CreateServerButton = styled(Button)`
+  width: 74px;
+  height: 36px;
+`;

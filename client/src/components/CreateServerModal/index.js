@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import { toast } from 'react-toastify';
 import Switch from '@mui/material/Switch';
 import CloseIcon from '@mui/icons-material/Close';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
 import {
   ContentWrapper,
+  CreateServerButton,
   FileInput,
   Form,
   IconWrapper,
@@ -21,29 +23,52 @@ import StyledTextfield from '../../common/StyledTextfield';
 import { createServerRequested } from '../../redux/actions/servers';
 import { ServerTypes, serverValidation } from '../../constants/servers';
 import { isEmpty } from '../../utils/validators';
-import { getServerCreationError } from '../../redux/reducers';
+import { getServerCreationData } from '../../redux/reducers';
 import useDidUpdate from '../../customHooks/useDidUpdate';
 import Error from '../../common/Error';
+import { MAX_FILE_SIZE } from '../../constants/Message';
+import StyledImage from '../../common/StyledImage';
 
-// TODO: add loader
 const CreateServerModal = (props) => {
   const { closeModal } = props;
   const dispatch = useDispatch();
-  const apiErrors = useSelector(getServerCreationError);
+  const { error: apiErrors, isLoading: isCreatingServer } = useSelector(getServerCreationData);
 
   const [errors, setErrors] = useState({});
+  const [newServerAvatar, setNewServerAvatar] = useState(null);
 
   useDidUpdate(() => {
     if (!isEmpty(apiErrors)) setErrors(apiErrors);
   }, [apiErrors]);
 
-  // TODO: handle image upload
   const handleImageUpload = (e) => {
-    console.log('files', e.target.files);
+    const [currentFile] = e.target.files || e.nativeEvent?.target?.files;
+    if (!currentFile) {
+      toast.error('Some error occurred, Please try again');
+      return;
+    }
+
+    const { size, type } = currentFile;
+
+    if (!type.match('image.*')) {
+      toast.error('Only Image files are supported');
+      return;
+    }
+
+    if (size > MAX_FILE_SIZE) {
+      toast.error('Max file size is 3mb');
+      return;
+    }
+
+    setNewServerAvatar({
+      fileUrl: URL.createObjectURL(currentFile),
+      originalFile: currentFile,
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (isCreatingServer) return;
     const formData = new FormData(e.currentTarget);
     const name = formData.get('server-name');
     const description = formData.get('server-description');
@@ -70,7 +95,9 @@ const CreateServerModal = (props) => {
     setErrors({});
     const payload = {
       name,
+      description,
       type: isServerPublic ? ServerTypes.PUBLIC : ServerTypes.PRIVATE,
+      file: newServerAvatar,
     };
     dispatch(createServerRequested(payload, Date.now()));
   };
@@ -126,8 +153,15 @@ const CreateServerModal = (props) => {
           </Typography>
 
           <Upload>
-            <img src={UPLOAD_FILE} alt="upload server avatar" width={80} height={80} />
-            <FileInput type="file" accept="image/*" onChange={handleImageUpload} />
+            <StyledImage
+              src={newServerAvatar?.fileUrl ?? UPLOAD_FILE}
+              alt="upload server avatar"
+              width="80px"
+              height="80px"
+              borderRadius={newServerAvatar?.fileUrl ? '50%' : ''}
+              objectFit="cover"
+            />
+            <FileInput multiple={false} type="file" accept="image/*" onChange={handleImageUpload} />
           </Upload>
         </FlexDiv>
 
@@ -175,13 +209,15 @@ const CreateServerModal = (props) => {
         {!!errors.message && <Error>{errors.message}</Error>}
       </ContentWrapper>
       <ModalFooter>
-        <Button
+        <CreateServerButton
           form="create-server-form"
           type="submit"
           variant="contained"
         >
-          Create
-        </Button>
+          {isCreatingServer
+            ? <CircularProgress color="inherit" size={20} />
+            : 'Create'}
+        </CreateServerButton>
       </ModalFooter>
     </ModalContainer>
   );

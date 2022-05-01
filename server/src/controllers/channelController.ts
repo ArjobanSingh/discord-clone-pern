@@ -16,9 +16,9 @@ import { createValidationError, CustomError } from '../utils/errors';
 import MessageData from '../types/ChannelMessageInput';
 import { ServerTypeEnum } from '../entity/Server';
 import ServerMember from '../entity/ServerMember';
-import { calculateAspectRatioFit, getFileName, getMessageType } from '../utils/helperFunctions';
+import { getFileName, getMessageType } from '../utils/helperFunctions';
 
-export const sendChannelMessageRest = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const sendChannelMessage = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { jsonData } : { jsonData: string } = req.body;
 
@@ -162,11 +162,13 @@ export const sendChannelMessageRest = async (req: CustomRequest, res: Response, 
         cloudinayObj.public_id = message.fileName;
       }
       const fileResponse = await cloudinary.uploader.upload(base64String, cloudinayObj);
-      console.log('File response', fileResponse);
 
       if (fileResponse.width && fileResponse.height) {
-        const dimensions = calculateAspectRatioFit(fileResponse.width, fileResponse.height);
-        message.fileDimensions = `${dimensions.width} ${dimensions.height}`;
+        // const dimensions = calculateAspectRatioFit(fileResponse.width, fileResponse.height);
+        // message.fileDimensions = `${dimensions.width} ${dimensions.height}`;
+
+        // set original dimensions
+        message.fileDimensions = `${fileResponse.width} ${fileResponse.height}`;
       }
 
       const { bytes, secure_url: secureUrl, public_id: publicId } = fileResponse;

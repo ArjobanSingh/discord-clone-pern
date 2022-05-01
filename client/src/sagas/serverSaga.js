@@ -83,11 +83,22 @@ function* createServer(actionData) {
   const { data, uniqueIdentifier } = actionData.payload;
   try {
     const url = ServerApi.CREATE_SERVER;
-    const response = yield call(axiosInstance.post, url, data);
+    const formData = new FormData();
+    const {
+      name, description, type, file,
+    } = data;
+    formData.append('name', name);
+    formData.append('type', type);
+    if (description) formData.append('description', description);
+    if (file?.originalFile) formData.append('avatar', file.originalFile);
+
+    console.log({ formData });
+    const response = yield call(axiosInstance.post, url, formData);
     yield put(saveAllChannels(response.data.id, response.data.channels ?? []));
     yield put(createServerSuccess(response.data.id, response.data));
     yield put(setNavigateState([`/channels/${response.data.id}`]));
     socketClient.connectSingleServer(response.data.id);
+    if (file?.fileUrl) URL.revokeObjectURL(file.fileUrl);
   } catch (err) {
     yield put(
       handleError(err, (error) => {

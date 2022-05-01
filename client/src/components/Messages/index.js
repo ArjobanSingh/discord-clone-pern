@@ -3,12 +3,17 @@ import {
   useCallback, useEffect, useImperativeHandle, useRef, useState,
 } from 'react';
 import PropTypes from 'prop-types';
-import { Container, MessagesWrapper, AbsoluteLoader } from './styles';
+import {
+  Container, MessagesWrapper, AbsoluteLoader, ImageModalWrapper,
+} from './styles';
 import Message from '../Message';
 import {
-  reachedThresholdBottom, reachedThresholdTop, sameDay, scrollToBottom,
+  reachedThresholdBottom, reachedThresholdTop, sameDay, scrollToBottom, stopPropagation,
 } from '../../utils/helperFunctions';
 import useDidUpdate from '../../customHooks/useDidUpdate';
+import TransitionModal from '../../common/TransitionModal';
+import StyledImage from '../../common/StyledImage';
+import ModalImage from './ModalImage';
 
 const Messages = forwardRef((props, ref) => {
   const {
@@ -25,6 +30,7 @@ const Messages = forwardRef((props, ref) => {
   const lastScrollHeight = useRef();
 
   const [referenceMessageId, setReferenceMessageId] = useState(null);
+  const [openSelectedImage, setOpenSelectedImage] = useState(null);
 
   const scrollToContainerBottom = useCallback(() => scrollToBottom(containerRef.current), []);
 
@@ -82,6 +88,8 @@ const Messages = forwardRef((props, ref) => {
     setReferenceMessageId(refMessageId);
   }, []);
 
+  const closeImageModal = () => setOpenSelectedImage(null);
+
   return (
     <>
       {isLoadingMore && <AbsoluteLoader />}
@@ -111,6 +119,7 @@ const Messages = forwardRef((props, ref) => {
                 scrollToReferenceMessage={scrollToReferenceMessage}
                 setReferenceMessageId={setReferenceMessageId}
                 scrollToContainerBottom={scrollToContainerBottom}
+                setOpenSelectedImage={setOpenSelectedImage}
                 replyMessage={replyMessage}
                 setReplyMessage={setReplyMessage}
               />
@@ -118,6 +127,14 @@ const Messages = forwardRef((props, ref) => {
           })}
         </MessagesWrapper>
       </Container>
+      <TransitionModal
+        open={!!openSelectedImage}
+        onClose={closeImageModal}
+      >
+        <ImageModalWrapper onClick={closeImageModal} open={!!openSelectedImage}>
+          {!!openSelectedImage && <ModalImage {...(openSelectedImage || {})} />}
+        </ImageModalWrapper>
+      </TransitionModal>
     </>
   );
 });

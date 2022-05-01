@@ -47,6 +47,7 @@ const Message = (props) => {
     scrollToContainerBottom,
     replyMessage,
     setReplyMessage,
+    setOpenSelectedImage,
   } = props;
 
   const { retryFailedMessage, deleteMessage } = useMessageData();
@@ -128,7 +129,7 @@ const Message = (props) => {
   const getMessageComponent = () => {
     switch (type) {
       case MessageType.IMAGE:
-        return <ImageMessage {...commonProps} />;
+        return <ImageMessage {...commonProps} setOpenSelectedImage={setOpenSelectedImage} />;
       case MessageType.VIDEO:
         return <VideoMessage {...commonProps} />;
       case MessageType.AUDIO:
@@ -302,6 +303,7 @@ Message.propTypes = {
     id: PropTypes.string,
   }).isRequired,
   setReplyMessage: PropTypes.func.isRequired,
+  setOpenSelectedImage: PropTypes.func.isRequired,
 };
 
 export default memo(Message);

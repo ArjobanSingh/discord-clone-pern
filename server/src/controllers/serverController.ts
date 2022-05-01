@@ -2,6 +2,7 @@ import { NextFunction, Response } from 'express';
 import {
   isString, isURL, isUUID, validate,
 } from 'class-validator';
+import sharp from 'sharp';
 import {
   FindManyOptions, getConnection, In, LessThan,
 } from 'typeorm';
@@ -13,6 +14,7 @@ import User from '../entity/User';
 import { AllServersQuery } from '../types/ServerTypes';
 import { getServerForJoinLink } from '../utils/helperFunctions';
 import Channel from '../entity/Channel';
+import cloudinary from '../cloudinary';
 
 export const createServer = async (
   req: CustomRequest,
@@ -23,15 +25,16 @@ export const createServer = async (
     const { userId, body } = req;
 
     const user = await User.findOne(userId);
-    const { avatar, description, banner } = body;
+    const { avatar, description } = body;
 
+    console.log('server avatar', req.file);
     const newServer = new Server();
     newServer.name = body.name;
     newServer.owner = user;
     newServer.type = body.type || ServerTypeEnum.PUBLIC;
     newServer.memberCount = 1;
     newServer.channelCount = 1;
-    newServer.banner = banner;
+    // newServer.banner = banner;
     newServer.description = description;
 
     if (isString(avatar) && isURL(avatar)) newServer.avatar = avatar;
@@ -51,6 +54,22 @@ export const createServer = async (
     const generalChannel = new Channel();
     generalChannel.name = 'general';
     generalChannel.server = newServer;
+
+    if (req.file) {
+      const { buffer } = req.file;
+      const jpegBuffer = await sharp(buffer)
+        .jpeg({ mozjpeg: true, quality: 90 })
+        .toBuffer();
+
+      const base64String = `data:image/jpeg;base64,${jpegBuffer.toString('base64')}`;
+      const fileResponse = await cloudinary.uploader.upload(
+        base64String,
+        { folder: 'discord_clone/api_uploads' },
+      );
+      console.log('File response', fileResponse);
+      const { secure_url: secureUrl } = fileResponse;
+      newServer.avatar = secureUrl;
+    }
 
     await getConnection().transaction(async (transactionEntityManager) => {
       await transactionEntityManager.save(newServer);
