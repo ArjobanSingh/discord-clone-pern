@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { toast } from 'react-toastify';
 import Typography from '@mui/material/Typography';
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
@@ -13,6 +14,10 @@ import {
   OverviewContainer,
   TypeSelect,
   UploadButton,
+  EmptyBanner,
+  StyledCloudIcon,
+  UploadBannerWrapper,
+  Overlay,
 } from './styles';
 import useServerData from '../../../customHooks/useServerData';
 import { getCharacterName, stopPropagation } from '../../../utils/helperFunctions';
@@ -24,17 +29,25 @@ import { useSnackbarValues } from '../SnackbarProvider';
 import { isEmpty } from '../../../utils/validators';
 import { updateServerRequested } from '../../../redux/actions/servers';
 import { getUpdateServerData } from '../../../redux/reducers';
+import StyledImage from '../../../common/StyledImage';
+import { MAX_FILE_SIZE } from '../../../constants/Message';
 
-const isDescriptionChanged = (prevDesc, newDesc) => {
-  // if saved description was null, and current description is empty string,
-  // basically both are empty
-  if (!prevDesc && !newDesc) return false;
-  return prevDesc !== newDesc;
+const isValueChanged = (prevValue, newValue) => {
+  // check if prevValue and newValue are both falsy then nothing changed
+  if (!prevValue && !newValue) return false;
+  return prevValue !== newValue;
+};
+
+const mapHtmlNamesToValues = {
+  'new-server-avatar': 'avatar',
+  'new-server-banner': 'banner',
 };
 
 // TODO: handle file uploads
 const ServerOverview = (props) => {
-  const { reset, setReset, setIsSnackbarOpen } = useSnackbarValues();
+  const {
+    reset, setReset, setIsSnackbarOpen, isSnackbarOpen,
+  } = useSnackbarValues();
   const { serverId } = useParams();
   const dispatch = useDispatch();
 
@@ -48,12 +61,14 @@ const ServerOverview = (props) => {
     avatar,
     type,
     description,
+    banner,
   } = serverDetails;
 
   const [serverName, setServerName] = useState(name);
   const [serverType, setServerType] = useState(type);
   const [serverDescription, setServerDescription] = useState(description ?? '');
   const [errors, setErrors] = useState({});
+  const [filesObj, setFilesObj] = useState({});
 
   useDidUpdate(() => {
     if (reset) {
@@ -62,16 +77,25 @@ const ServerOverview = (props) => {
       setServerDescription(description ?? '');
       setErrors({});
       setReset(false);
+      setFilesObj((prev) => {
+        Object.values(prev).forEach((file) => {
+          if (file?.fileUrl) URL.revokeObjectURL(file.fileUrl);
+        });
+        return {};
+      });
     }
   }, [reset, name, type, description]);
 
   useDidUpdate(() => {
-    // TODO: Handle socket update notification
+    // TODO: Handle socket update notification, or preserve saved server
+    // details till this edit screen is open with useMemo hack
     // maybe will debounce if face any problems
     const debouncedFunc = () => {
       if (serverName !== name
         || serverType !== type
-        || isDescriptionChanged(description, serverDescription)
+        || filesObj.avatar // if any of new banner or avatar present, something changed
+        || filesObj.banner
+        || isValueChanged(description, serverDescription)
       ) {
         setIsSnackbarOpen(true);
         return;
@@ -81,9 +105,39 @@ const ServerOverview = (props) => {
     debouncedFunc();
 
     return debouncedFunc.cancel;
-  }, [serverName, serverType, serverDescription, name, type, description]);
+  }, [serverName, serverType, serverDescription, name, type, description, filesObj]);
 
-  const handleImageUpload = () => {};
+  const handleImageUpload = (e) => {
+    const [currentFile] = e.target.files || e.nativeEvent?.target?.files;
+    const { name: htmlName } = e.target;
+    if (!currentFile || !htmlName) {
+      toast.error('Some error occurred, Please try again');
+      return;
+    }
+
+    const { size, type: fileType } = currentFile;
+
+    if (!fileType.match('image.*')) {
+      toast.error('Only Image files are supported');
+      return;
+    }
+
+    if (size > MAX_FILE_SIZE) {
+      toast.error('Max file size is 3mb');
+      return;
+    }
+    const fileName = mapHtmlNamesToValues[htmlName];
+    const newFileUrl = URL.createObjectURL(currentFile);
+
+    setFilesObj((prev) => {
+      const prevFileUrl = prev[fileName]?.fileUrl;
+      if (prevFileUrl) URL.revokeObjectURL(prevFileUrl);
+      return {
+        ...prev,
+        [fileName]: { originalFile: currentFile, fileUrl: newFileUrl },
+      };
+    });
+  };
 
   const updateServerDetails = () => {
     const newErrorObj = {};
@@ -119,6 +173,8 @@ const ServerOverview = (props) => {
     dispatch(updateServerRequested(serverId, data));
   };
 
+  const avatarUrl = filesObj.avatar?.fileUrl || avatar;
+  const bannerUrl = filesObj.banner?.fileUrl || banner;
   return (
     <>
       <OverviewContainer>
@@ -134,7 +190,7 @@ const ServerOverview = (props) => {
             flex="1"
           >
             <AvatarContainer>
-              <IconAvatar src={avatar}>
+              <IconAvatar src={avatarUrl}>
                 <Typography
                   variant="h6"
                   fontSize="2.5rem"
@@ -142,7 +198,20 @@ const ServerOverview = (props) => {
                   {getCharacterName(name)}
                 </Typography>
               </IconAvatar>
-              <FileInput type="file" accept="image/*" onChange={handleImageUpload} />
+              {!!avatarUrl && (
+                <Overlay>
+                  <Typography textAlign="center" color="text.primary">
+                    Update avatar
+                  </Typography>
+                </Overlay>
+              )}
+              <FileInput
+                name="new-server-avatar"
+                type="file"
+                multiple={false}
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
             </AvatarContainer>
             <div>
               <Typography
@@ -156,7 +225,13 @@ const ServerOverview = (props) => {
               >
                 <div>
                   Upload Image
-                  <FileInput type="file" accept="image/*" onChange={handleImageUpload} />
+                  <FileInput
+                    name="new-server-avatar"
+                    type="file"
+                    multiple={false}
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                  />
                 </div>
               </UploadButton>
             </div>
@@ -246,6 +321,61 @@ const ServerOverview = (props) => {
           </Box>
         </Box>
         <Divider sx={{ backgroundColor: 'text.secondaryDark' }} />
+
+        <Box
+          gap={(theme) => theme.spacing(4)}
+          display="flex"
+          flexWrap="wrap"
+          marginBottom={isSnackbarOpen ? '50px' : ''}
+        >
+          <Box flex="1">
+            <Typography margin="0 0 10px" color="text.secondary">
+              Server banner background
+            </Typography>
+
+            <Typography component="p" margin="0 0 10px" color="text.secondaryDark" variant="body2">
+              This image will display at the top of your channels list.
+            </Typography>
+
+            <Typography margin="0 0 10px" color="text.secondaryDark" variant="body2">
+              The recommended minimum size is 960x540 and recommended aspect ratio is 16:9
+            </Typography>
+          </Box>
+
+          <Box flex="1">
+            <EmptyBanner>
+              {bannerUrl ? (
+                <>
+                  <StyledImage
+                    width="100%"
+                    height="100%"
+                    objectFit="cover"
+                    src={bannerUrl}
+                  />
+                  <Overlay>
+                    <Typography textAlign="center" color="text.primary">
+                      Update banner
+                    </Typography>
+                  </Overlay>
+                </>
+              ) : (
+                <UploadBannerWrapper>
+                  <StyledCloudIcon />
+                  <Typography color="text.secondary">
+                    Upload Banner
+                  </Typography>
+                </UploadBannerWrapper>
+              )}
+              <FileInput
+                name="new-server-banner"
+                type="file"
+                accept="image/*"
+                multiple={false}
+                onChange={handleImageUpload}
+              />
+            </EmptyBanner>
+          </Box>
+        </Box>
       </OverviewContainer>
       <UnsavedSnackBar handleSubmit={updateServerDetails} isSubmitting={isLoading} />
     </>

@@ -4,6 +4,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import {
+  FullHeightContainer,
   ListContainer, MainContent, ServerOptionsDrawer, SettingsContainer, SettingsNav,
 } from './styles';
 import useMobileDrawerState from '../../customHooks/useMobileDrawerState';
@@ -46,53 +47,55 @@ const ServerSettings = (props) => {
         </SettingsNav>
       </ServerOptionsDrawer>
 
-      <SettingsContainer>
-        <ListContainer>
-          <SettingsNav>
-            <ServerOptions
-              setOpenedTab={setOpenedTab}
+      <FullHeightContainer>
+        <SettingsContainer>
+          <ListContainer>
+            <SettingsNav>
+              <ServerOptions
+                setOpenedTab={setOpenedTab}
+                openedTab={openedTab}
+                currentRole={currentRole}
+              />
+            </SettingsNav>
+          </ListContainer>
+          <MainContent>
+            <OptionContent
               openedTab={openedTab}
-              currentRole={currentRole}
             />
-          </SettingsNav>
-        </ListContainer>
-        <MainContent>
-          <OptionContent
-            openedTab={openedTab}
-          />
-        </MainContent>
+          </MainContent>
 
-        <IconButton
-          color="inherit"
-          aria-label="open/close server options"
-          size="small"
-          onClick={openDrawer}
-          sx={{
-            display: { xs: 'bock', md: 'none' },
-            position: 'absolute',
-            left: '0',
-            color: 'text.secondaryDark',
-            border: '1px solid currentColor',
-          }}
-        >
-          <MenuIcon />
-        </IconButton>
+          <IconButton
+            color="inherit"
+            aria-label="open/close server options"
+            size="small"
+            onClick={openDrawer}
+            sx={{
+              display: { xs: 'bock', md: 'none' },
+              position: 'absolute',
+              left: '0',
+              color: 'text.secondaryDark',
+              border: '1px solid currentColor',
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
 
-        <IconButton
-          color="inherit"
-          aria-label="close server settings"
-          size="small"
-          onClick={closeServerSettings}
-          sx={{
-            position: 'absolute',
-            right: '0',
-            color: 'text.secondaryDark',
-            border: '1px solid currentColor',
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </SettingsContainer>
+          <IconButton
+            color="inherit"
+            aria-label="close server settings"
+            size="small"
+            onClick={closeServerSettings}
+            sx={{
+              position: 'absolute',
+              right: '0',
+              color: 'text.secondaryDark',
+              border: '1px solid currentColor',
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </SettingsContainer>
+      </FullHeightContainer>
     </SnackbarProvider>
   );
 };

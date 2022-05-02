@@ -24,6 +24,14 @@ export const uploadSingleImage = multer({
   },
 });
 
+export const uploadServerMultipleFiles = uploadSingleImage.fields([{
+  name: 'avatar',
+  maxCount: 1,
+}, {
+  name: 'banner',
+  maxCount: 1,
+}]);
+
 export const uploadServerAvatar = uploadSingleImage.single('avatar');
 
 export default uploadFile;

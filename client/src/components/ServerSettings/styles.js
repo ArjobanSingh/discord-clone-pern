@@ -3,10 +3,18 @@ import Drawer, { drawerClasses } from '@mui/material/Drawer';
 
 export const SettingsContainer = styled.div(({ theme }) => `
   width: 100%;
-  height: 100%;
   position: relative;
   display: flex;
+  flex: 1;
 `);
+
+export const FullHeightContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+`;
 
 export const ListContainer = styled.aside(({ theme }) => `
   flex: 0.9;

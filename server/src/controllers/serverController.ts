@@ -27,7 +27,6 @@ export const createServer = async (
     const user = await User.findOne(userId);
     const { avatar, description } = body;
 
-    console.log('server avatar', req.file);
     const newServer = new Server();
     newServer.name = body.name;
     newServer.owner = user;
@@ -306,7 +305,7 @@ export const updateServer = async (
 ) => {
   try {
     const {
-      id: serverId, type, name, description, banner, avatar,
+      id: serverId, type, name, description,
     } = req.body;
 
     if (!serverId || !isUUID(serverId)) {
@@ -346,9 +345,9 @@ export const updateServer = async (
     server.name = name;
     server.description = description;
 
-    // TODO: test undefined, null logos
-    server.banner = banner;
-    server.avatar = avatar;
+    if (req.files) {
+      console.log('req.files', req.files);
+    }
 
     const errors = await validate(server);
 

@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import Avatar from '@mui/material/Avatar';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
@@ -21,10 +22,32 @@ export const IconAvatar = styled(Avatar)(({
   
   `);
 
+export const Overlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  place-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: grid;
+`;
+
 export const AvatarContainer = styled.div`
   position: relative;
   height: 100px;
   width: 100px;
+
+  & ${Overlay} {
+    border-radius: 50%;
+    opacity: 0;
+  }
+
+  &:hover {
+    & ${Overlay} {
+      opacity: 1;
+    }
+  }
 `;
 
 export const FileInput = styled.input`
@@ -159,3 +182,34 @@ export const RoleChip = styled.div(({ theme, isUserRoleSuperior }) => `
   border-radius: ${theme.shape.borderRadius}px;
   cursor: ${isUserRoleSuperior ? 'pointer' : ''};
 `);
+
+export const EmptyBanner = styled.div(({ theme }) => `
+  width: 320px;
+  height: 180px;
+  background-color: #4f545c;
+  border-radius: ${theme.shape.borderRadius}px;
+  position: relative;
+
+  & ${Overlay} {
+    opacity: 0;
+  }
+
+  &:hover {
+    & ${Overlay} {
+      opacity: 1;
+    }
+  }
+`);
+
+export const UploadBannerWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const StyledCloudIcon = styled(CloudUploadIcon)`
+  font-size: 60px;
+`;
