@@ -18,9 +18,12 @@ import {
   StyledCloudIcon,
   UploadBannerWrapper,
   Overlay,
+  RemoveFile,
 } from './styles';
 import useServerData from '../../../customHooks/useServerData';
-import { getCharacterName, stopPropagation, transformCloudinaryUrl } from '../../../utils/helperFunctions';
+import {
+  getCharacterName, handleEnter, stopPropagation, transformCloudinaryUrl,
+} from '../../../utils/helperFunctions';
 import StyledTextField from '../../../common/StyledTextfield';
 import { ServerTypes, serverValidation } from '../../../constants/servers';
 import useDidUpdate from '../../../customHooks/useDidUpdate';
@@ -68,8 +71,8 @@ const ServerOverview = () => {
   const [serverDescription, setServerDescription] = useState(description ?? '');
   const [errors, setErrors] = useState({});
   const [filesObj, setFilesObj] = useState({
-    avatar: { fileUrl: avatar },
-    banner: { fileUrl: banner },
+    avatar: { fileUrl: avatar ?? null },
+    banner: { fileUrl: banner ?? null },
   });
 
   useDidUpdate(() => {
@@ -105,11 +108,9 @@ const ServerOverview = () => {
     const debouncedFunc = () => {
       if (serverName !== name
         || serverType !== type
-        || filesObj.banner.originalFile
-        || filesObj.avatar.originalFile
         || isValueChanged(description, serverDescription)
-        // || isValueChanged(filesObj.banner.fileUrl, banner)
-        // || isValueChanged(filesObj.avatar.fileUrl, avatar)
+        || isValueChanged(filesObj.banner.fileUrl, banner)
+        || isValueChanged(filesObj.avatar.fileUrl, avatar)
       ) {
         setIsSnackbarOpen(true);
         return;
@@ -127,6 +128,8 @@ const ServerOverview = () => {
     type,
     description,
     filesObj,
+    banner,
+    avatar,
   ]);
 
   const handleImageUpload = (e) => {
@@ -157,6 +160,23 @@ const ServerOverview = () => {
       return {
         ...prev,
         [fileName]: { originalFile: currentFile, fileUrl: newFileUrl },
+      };
+    });
+  };
+
+  const removeFile = (e) => {
+    const htmlName = e.target.getAttribute('name');
+    if (!htmlName) {
+      toast.error('Some error occurred, Please try again');
+      return;
+    }
+    const fileName = mapHtmlNamesToValues[htmlName];
+    setFilesObj((prev) => {
+      const prevFileUrl = prev[fileName]?.fileUrl;
+      if (prevFileUrl) URL.revokeObjectURL(prevFileUrl);
+      return {
+        ...prev,
+        [fileName]: { fileUrl: null },
       };
     });
   };
@@ -196,7 +216,7 @@ const ServerOverview = () => {
   };
 
   const avatarUrl = filesObj.avatar.fileUrl;
-  const bannerUrl = filesObj.banner.fileUrl.includes('cloudinary')
+  const bannerUrl = filesObj.banner.fileUrl?.includes('cloudinary')
     ? transformCloudinaryUrl(filesObj.banner.fileUrl, 480, 270)
     : filesObj.banner.fileUrl;
 
@@ -214,30 +234,44 @@ const ServerOverview = () => {
             gap={(theme) => theme.spacing(2)}
             flex="1"
           >
-            <AvatarContainer>
-              <IconAvatar src={avatarUrl}>
-                <Typography
-                  variant="h6"
-                  fontSize="2.5rem"
-                >
-                  {getCharacterName(name)}
-                </Typography>
-              </IconAvatar>
-              {!!avatarUrl && (
+            <Box display="flex" flexDirection="column" alignItems="center" gap="10px">
+              <AvatarContainer>
+                <IconAvatar src={avatarUrl}>
+                  <Typography
+                    variant="h6"
+                    fontSize="2.5rem"
+                  >
+                    {getCharacterName(name)}
+                  </Typography>
+                </IconAvatar>
+                {!!avatarUrl && (
                 <Overlay>
                   <Typography textAlign="center" color="text.primary">
                     Update avatar
                   </Typography>
                 </Overlay>
+                )}
+                <FileInput
+                  name="new-server-avatar"
+                  type="file"
+                  multiple={false}
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                />
+              </AvatarContainer>
+
+              {!!avatarUrl && (
+                <RemoveFile
+                  name="new-server-avatar"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={handleEnter(removeFile)}
+                  onClick={removeFile}
+                >
+                  Remove
+                </RemoveFile>
               )}
-              <FileInput
-                name="new-server-avatar"
-                type="file"
-                multiple={false}
-                accept="image/*"
-                onChange={handleImageUpload}
-              />
-            </AvatarContainer>
+            </Box>
             <div>
               <Typography
                 variant="body2"
@@ -367,8 +401,8 @@ const ServerOverview = () => {
             </Typography>
           </Box>
 
-          <Box flex="1">
-            <EmptyBanner>
+          <Box flex="1" display="flex" flexDirection="column" alignItems="center" gap="10px">
+            <EmptyBanner addShadow={!!bannerUrl}>
               {bannerUrl ? (
                 <>
                   <StyledImage
@@ -376,6 +410,7 @@ const ServerOverview = () => {
                     height="100%"
                     objectFit="cover"
                     src={bannerUrl}
+                    borderRadius="inherit"
                   />
                   <Overlay>
                     <Typography textAlign="center" color="text.primary">
@@ -399,6 +434,17 @@ const ServerOverview = () => {
                 onChange={handleImageUpload}
               />
             </EmptyBanner>
+            {!!bannerUrl && (
+              <RemoveFile
+                name="new-server-banner"
+                role="button"
+                tabIndex={0}
+                onKeyDown={handleEnter(removeFile)}
+                onClick={removeFile}
+              >
+                Remove
+              </RemoveFile>
+            )}
           </Box>
         </Box>
       </OverviewContainer>

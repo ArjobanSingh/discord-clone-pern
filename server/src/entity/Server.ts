@@ -59,8 +59,18 @@ export default class Server extends BaseEntity {
 
   @Column({ nullable: true })
   @IsOptional()
+  @IsString()
+  avatarPublicId: string;
+
+  @Column({ nullable: true })
+  @IsOptional()
   @IsUrl()
   banner: string;
+
+  @Column({ nullable: true })
+  @IsOptional()
+  @IsString()
+  bannerPublicId: string;
 
   // this class will store foreign id for User class
   @ManyToOne((type) => User, (user) => user.ownedServers, {

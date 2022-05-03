@@ -1,4 +1,3 @@
-import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
@@ -7,12 +6,17 @@ import Button from '@mui/material/Button';
 import { UnsavedWrapper } from './styles';
 import { useSnackbarValues } from './SnackbarProvider';
 
-// TODO: add loader
 const UnsavedSnackBar = ({ handleSubmit, isSubmitting }) => {
   const { isSnackbarOpen, setReset, setIsSnackbarOpen } = useSnackbarValues();
   const handleReset = () => {
+    if (isSubmitting) return;
     setReset(true);
     setIsSnackbarOpen(false);
+  };
+
+  const submitChanges = (e) => {
+    if (isSubmitting) return;
+    handleSubmit(e);
   };
 
   return (
@@ -27,11 +31,17 @@ const UnsavedSnackBar = ({ handleSubmit, isSubmitting }) => {
           Careful — you have unsaved changes!
         </Typography>
         <Box display="flex" gap={(theme) => theme.spacing(1)}>
-          <Button variant="text" color="info" onClick={handleReset}>
+          <Button
+            disabled={isSubmitting}
+            aria-disabled={isSubmitting}
+            variant="text"
+            color="info"
+            onClick={handleReset}
+          >
             Reset
           </Button>
 
-          <Button variant="contained" color="success" onClick={handleSubmit}>
+          <Button variant="contained" color="success" onClick={submitChanges}>
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </Button>
         </Box>

@@ -122,12 +122,14 @@ const calculateAspectRatioFit = (srcWidth: number, srcHeight: number, maxWidth =
   return { width: Math.round(srcWidth * ratio), height: Math.round(srcHeight * ratio) };
 };
 
+type UpdateReturnType = (string | null)[];
+
 const updateServerFile = async (
   newFileArr: Express.Multer.File[],
   serverObj: Server,
   fileColumnKey: 'banner' | 'avatar',
   isNewValueEmpty: boolean,
-): Promise<string | null> => {
+): Promise<UpdateReturnType> => {
   if (Array.isArray(newFileArr) && newFileArr[0]) {
     const [{ buffer: fileBuffer }] = newFileArr;
     const jpegBuffer = await sharp(fileBuffer)
@@ -137,15 +139,18 @@ const updateServerFile = async (
     const base64String = `data:image/jpeg;base64,${jpegBuffer.toString('base64')}`;
     const fileResponse = await cloudinary.uploader.upload(
       base64String,
-      { folder: 'discord_clone/api_uploads' },
+      { folder: 'discord_clone/api_uploads/server-files' },
     );
-    const { secure_url: secureUrl } = fileResponse;
-    return secureUrl;
+    const { secure_url: secureUrl, public_id: publicId } = fileResponse;
+    return [secureUrl, publicId];
   }
 
   // if newFile was not present, and user sent empty value in body
   // for this key, so remove the already saved value from database
-  return isNewValueEmpty ? null : serverObj[fileColumnKey];
+  const publicIdKey = `${fileColumnKey}PublicId`;
+  return isNewValueEmpty
+    ? [null, null]
+    : [serverObj[fileColumnKey], serverObj[publicIdKey]];
 };
 
 export {

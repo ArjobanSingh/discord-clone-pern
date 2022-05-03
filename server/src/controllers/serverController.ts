@@ -63,7 +63,7 @@ export const createServer = async (
       const base64String = `data:image/jpeg;base64,${jpegBuffer.toString('base64')}`;
       const fileResponse = await cloudinary.uploader.upload(
         base64String,
-        { folder: 'discord_clone/api_uploads' },
+        { folder: 'discord_clone/api_uploads/server-files' },
       );
       const { secure_url: secureUrl } = fileResponse;
       newServer.avatar = secureUrl;
@@ -346,8 +346,20 @@ export const updateServer = async (
     const newAvatarPromise = updateServerFile(files.avatar, server, 'avatar', !avatar);
     const newBannerPromise = updateServerFile(files.banner, server, 'banner', !banner);
 
-    server.avatar = await newAvatarPromise;
-    server.banner = await newBannerPromise;
+    const [newAvatarUrl, newAvatarPublicId] = await newAvatarPromise;
+    const [newBannerUrl, newBannerPublicId] = await newBannerPromise;
+
+    const { avatarPublicId, bannerPublicId } = server;
+
+    // if we updated or removed banner/avatar, delete previous banner/avatar from hosting
+    const prevAvatarPublicId = newAvatarPublicId !== avatarPublicId ? avatarPublicId : undefined;
+    const prevBannerPublicId = newBannerPublicId !== bannerPublicId ? bannerPublicId : undefined;
+
+    server.avatar = newAvatarUrl;
+    server.avatarPublicId = newAvatarPublicId;
+
+    server.banner = newBannerUrl;
+    server.bannerPublicId = newBannerPublicId;
 
     const errors = await validate(server);
 
@@ -358,23 +370,11 @@ export const updateServer = async (
 
     await server.save();
 
-    // const [response, responseLength] = await getConnection().query(`
-    //   update server s
-    //   set "type" =
-    //     case
-    //     when s."ownerId" = $1 then $2
-    //     else s.type
-    //   end
-    //   where s.id = $3
-    //   returning s.id;
-    // `, [req.userId, type, serverId]);
-
-    // if (!response || !responseLength) {
-    //   next(new CustomError('Server not found', 404));
-    //   return;
-    // }
-
     res.json(server);
+
+    // after response has been sent, delete previous avatar/banner if present
+    if (prevAvatarPublicId) cloudinary.uploader.destroy(prevAvatarPublicId);
+    if (prevBannerPublicId) cloudinary.uploader.destroy(prevBannerPublicId);
   } catch (err) {
     next(err);
   }

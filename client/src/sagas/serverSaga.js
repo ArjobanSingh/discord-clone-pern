@@ -124,7 +124,7 @@ const setFileToFormData = (formData, key, fileObj) => {
   }
 
   // if nothing of those two added means either file removed
-  // or already was not present
+  // or already was not present, do not set it in formData
 };
 
 function* updateServer(actionData) {

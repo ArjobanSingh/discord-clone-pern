@@ -183,12 +183,13 @@ export const RoleChip = styled.div(({ theme, isUserRoleSuperior }) => `
   cursor: ${isUserRoleSuperior ? 'pointer' : ''};
 `);
 
-export const EmptyBanner = styled.div(({ theme }) => `
+export const EmptyBanner = styled.div(({ theme, addShadow }) => `
   width: 320px;
   height: 180px;
   background-color: #4f545c;
   border-radius: ${theme.shape.borderRadius}px;
   position: relative;
+  box-shadow: ${addShadow ? theme.shadows[6] : ''};
 
   & ${Overlay} {
     opacity: 0;
@@ -213,3 +214,14 @@ export const UploadBannerWrapper = styled.div`
 export const StyledCloudIcon = styled(CloudUploadIcon)`
   font-size: 60px;
 `;
+
+export const RemoveFile = styled.div(({ theme }) => `
+  color: ${theme.palette.text.secondaryDark};
+  font-size: ${theme.typography.body1.fontSize};
+  font-weight: ${theme.typography.fontWeightMedium};
+  cursor: pointer;
+
+  &:hover {
+    color: ${theme.palette.text.primary};
+  }
+`);

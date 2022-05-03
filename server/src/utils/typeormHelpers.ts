@@ -13,7 +13,9 @@ export const getUserData = async (
   const conditionValue = userId || email;
   const response: UserType[] = await getConnection().query(`
     SELECT u.id, u.name, u.email, u.status, u."profilePicture", u.password,
-    json_agg(json_build_object('serverName', s.name, 'serverId', s.id, 'ownerId', s."ownerId")) as servers
+    json_agg(json_build_object(
+      'serverName', s.name, 'serverId', s.id, 'ownerId', s."ownerId", 'avatar', s.avatar
+    )) as servers
     FROM users "u"
     LEFT JOIN server_member "sm" ON  u.id = sm."userId"
     LEFT JOIN server "s" ON s.id = sm."serverId"
