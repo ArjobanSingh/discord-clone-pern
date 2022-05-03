@@ -5,13 +5,18 @@ import {
 } from './styles';
 import { DEFAULT_SERVER_ICON } from '../../constants/images';
 import { EllipsisDiv, FlexDiv } from '../../common/StyledComponents';
+import { transformCloudinaryUrl } from '../../utils/helperFunctions';
 
 const SingleServerTile = (props) => {
   const { server } = props;
+  const bannerUrl = server.banner
+    ? transformCloudinaryUrl(server.banner, 480, 270)
+    : DEFAULT_SERVER_ICON;
+
   return (
     <ItemWrapper>
       <ImageWrapper>
-        <GridImage src={server.banner || DEFAULT_SERVER_ICON} alt="server icon" />
+        <GridImage src={bannerUrl} alt="server icon" />
       </ImageWrapper>
       <ContentWrapper>
         <Typography

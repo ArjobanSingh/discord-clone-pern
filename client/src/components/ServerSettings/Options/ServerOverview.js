@@ -20,7 +20,7 @@ import {
   Overlay,
 } from './styles';
 import useServerData from '../../../customHooks/useServerData';
-import { getCharacterName, stopPropagation } from '../../../utils/helperFunctions';
+import { getCharacterName, stopPropagation, transformCloudinaryUrl } from '../../../utils/helperFunctions';
 import StyledTextField from '../../../common/StyledTextfield';
 import { ServerTypes, serverValidation } from '../../../constants/servers';
 import useDidUpdate from '../../../customHooks/useDidUpdate';
@@ -43,8 +43,7 @@ const mapHtmlNamesToValues = {
   'new-server-banner': 'banner',
 };
 
-// TODO: handle file uploads
-const ServerOverview = (props) => {
+const ServerOverview = () => {
   const {
     reset, setReset, setIsSnackbarOpen, isSnackbarOpen,
   } = useSnackbarValues();
@@ -68,7 +67,19 @@ const ServerOverview = (props) => {
   const [serverType, setServerType] = useState(type);
   const [serverDescription, setServerDescription] = useState(description ?? '');
   const [errors, setErrors] = useState({});
-  const [filesObj, setFilesObj] = useState({});
+  const [filesObj, setFilesObj] = useState({
+    avatar: { fileUrl: avatar },
+    banner: { fileUrl: banner },
+  });
+
+  useDidUpdate(() => {
+    if (!isLoading && !error) {
+      // did update runs after any update to deps, and not on first mount/render
+      // so if this ran, and loading and error is false, means api was hit, and
+      // now it has successfully completed, so reset to new state
+      setReset(true);
+    }
+  }, [isLoading, error]);
 
   useDidUpdate(() => {
     if (reset) {
@@ -79,12 +90,13 @@ const ServerOverview = (props) => {
       setReset(false);
       setFilesObj((prev) => {
         Object.values(prev).forEach((file) => {
+          // in case it was local object url
           if (file?.fileUrl) URL.revokeObjectURL(file.fileUrl);
         });
-        return {};
+        return { banner: { fileUrl: banner }, avatar: { fileUrl: avatar } };
       });
     }
-  }, [reset, name, type, description]);
+  }, [reset, name, type, description, banner, avatar]);
 
   useDidUpdate(() => {
     // TODO: Handle socket update notification, or preserve saved server
@@ -93,9 +105,11 @@ const ServerOverview = (props) => {
     const debouncedFunc = () => {
       if (serverName !== name
         || serverType !== type
-        || filesObj.avatar // if any of new banner or avatar present, something changed
-        || filesObj.banner
+        || filesObj.banner.originalFile
+        || filesObj.avatar.originalFile
         || isValueChanged(description, serverDescription)
+        // || isValueChanged(filesObj.banner.fileUrl, banner)
+        // || isValueChanged(filesObj.avatar.fileUrl, avatar)
       ) {
         setIsSnackbarOpen(true);
         return;
@@ -105,7 +119,15 @@ const ServerOverview = (props) => {
     debouncedFunc();
 
     return debouncedFunc.cancel;
-  }, [serverName, serverType, serverDescription, name, type, description, filesObj]);
+  }, [
+    serverName,
+    serverType,
+    serverDescription,
+    name,
+    type,
+    description,
+    filesObj,
+  ]);
 
   const handleImageUpload = (e) => {
     const [currentFile] = e.target.files || e.nativeEvent?.target?.files;
@@ -164,17 +186,20 @@ const ServerOverview = (props) => {
 
     setErrors({});
 
-    // TODO: add description, logo and banner
     const data = {
       name: serverName,
       type: serverType,
       description: serverDescription,
+      ...filesObj,
     };
     dispatch(updateServerRequested(serverId, data));
   };
 
-  const avatarUrl = filesObj.avatar?.fileUrl || avatar;
-  const bannerUrl = filesObj.banner?.fileUrl || banner;
+  const avatarUrl = filesObj.avatar.fileUrl;
+  const bannerUrl = filesObj.banner.fileUrl.includes('cloudinary')
+    ? transformCloudinaryUrl(filesObj.banner.fileUrl, 480, 270)
+    : filesObj.banner.fileUrl;
+
   return (
     <>
       <OverviewContainer>

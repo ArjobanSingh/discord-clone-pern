@@ -1,4 +1,4 @@
-import { NextFunction, Response } from 'express';
+import { NextFunction, Response, Express } from 'express';
 import {
   isString, isURL, isUUID, validate,
 } from 'class-validator';
@@ -12,7 +12,7 @@ import { createValidationError, CustomError } from '../utils/errors';
 import ServerMember, { enumScore, MemberRole } from '../entity/ServerMember';
 import User from '../entity/User';
 import { AllServersQuery } from '../types/ServerTypes';
-import { getServerForJoinLink } from '../utils/helperFunctions';
+import { getServerForJoinLink, updateServerFile } from '../utils/helperFunctions';
 import Channel from '../entity/Channel';
 import cloudinary from '../cloudinary';
 
@@ -65,7 +65,6 @@ export const createServer = async (
         base64String,
         { folder: 'discord_clone/api_uploads' },
       );
-      console.log('File response', fileResponse);
       const { secure_url: secureUrl } = fileResponse;
       newServer.avatar = secureUrl;
     }
@@ -305,7 +304,12 @@ export const updateServer = async (
 ) => {
   try {
     const {
-      id: serverId, type, name, description,
+      id: serverId,
+      type,
+      name,
+      description,
+      avatar,
+      banner,
     } = req.body;
 
     if (!serverId || !isUUID(serverId)) {
@@ -328,26 +332,22 @@ export const updateServer = async (
       where: { userId: req.userId, serverId },
     });
 
-    if (
-      !serverMember
-      || enumScore[serverMember.role] < enumScore[MemberRole.ADMIN]
-    ) {
-      next(
-        new CustomError(
-          'You do not have required permission for this action',
-          403,
-        ),
-      );
+    if (!serverMember || enumScore[serverMember.role] < enumScore[MemberRole.ADMIN]) {
+      next(new CustomError('You do not have required permission for this action', 403));
       return;
     }
 
     server.type = type;
     server.name = name;
-    server.description = description;
+    server.description = description ?? null;
 
-    if (req.files) {
-      console.log('req.files', req.files);
-    }
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+    const newAvatarPromise = updateServerFile(files.avatar, server, 'avatar', !avatar);
+    const newBannerPromise = updateServerFile(files.banner, server, 'banner', !banner);
+
+    server.avatar = await newAvatarPromise;
+    server.banner = await newBannerPromise;
 
     const errors = await validate(server);
 

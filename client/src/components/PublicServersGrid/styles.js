@@ -13,7 +13,7 @@ export const Grid = styled('div')`
 `;
 
 export const GridTile = styled('div')(({ theme }) => `
-  height: 300px;
+  height: 320px;
   width: 100%;
   background-color: ${theme.palette.background.paper};
   transition: background-color 0.2s ease-out, box-shadow 0.2s;
@@ -29,7 +29,7 @@ export const GridTile = styled('div')(({ theme }) => `
 `);
 
 export const ImageWrapper = styled.div`
-  height: 8.5rem;
+  height: 10rem;
   width: 100%;
   border-radius: inherit;
 `;
@@ -39,6 +39,7 @@ export const GridImage = styled.img`
   height: 100%;
   border-top-left-radius: inherit;
   border-top-right-radius: inherit;
+  object-fit: cover;
 `;
 
 export const ItemWrapper = styled.div`

@@ -1,4 +1,7 @@
+import { Express } from 'express';
 import { nanoid } from 'nanoid';
+import sharp from 'sharp';
+import cloudinary from '../cloudinary';
 import InviteLink from '../entity/InviteLink';
 import { MessageTypeEnum } from '../entity/Message';
 import Server from '../entity/Server';
@@ -119,6 +122,32 @@ const calculateAspectRatioFit = (srcWidth: number, srcHeight: number, maxWidth =
   return { width: Math.round(srcWidth * ratio), height: Math.round(srcHeight * ratio) };
 };
 
+const updateServerFile = async (
+  newFileArr: Express.Multer.File[],
+  serverObj: Server,
+  fileColumnKey: 'banner' | 'avatar',
+  isNewValueEmpty: boolean,
+): Promise<string | null> => {
+  if (Array.isArray(newFileArr) && newFileArr[0]) {
+    const [{ buffer: fileBuffer }] = newFileArr;
+    const jpegBuffer = await sharp(fileBuffer)
+      .jpeg({ mozjpeg: true, quality: 90 })
+      .toBuffer();
+
+    const base64String = `data:image/jpeg;base64,${jpegBuffer.toString('base64')}`;
+    const fileResponse = await cloudinary.uploader.upload(
+      base64String,
+      { folder: 'discord_clone/api_uploads' },
+    );
+    const { secure_url: secureUrl } = fileResponse;
+    return secureUrl;
+  }
+
+  // if newFile was not present, and user sent empty value in body
+  // for this key, so remove the already saved value from database
+  return isNewValueEmpty ? null : serverObj[fileColumnKey];
+};
+
 export {
   createAccessToken,
   createRefreshToken,
@@ -130,4 +159,5 @@ export {
   getMessageType,
   getFileName,
   calculateAspectRatioFit,
+  updateServerFile,
 };

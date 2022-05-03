@@ -1,6 +1,7 @@
 import {
-  all, call, put, select, takeEvery, takeLatest,
+  all, call, put, takeEvery, takeLatest,
 } from 'redux-saga/effects';
+import { toast } from 'react-toastify';
 import axiosInstance from '../utils/axiosConfig';
 import {
   CREATE_SERVER_REQUESTED,
@@ -109,20 +110,47 @@ function* createServer(actionData) {
   }
 }
 
+const setFileToFormData = (formData, key, fileObj) => {
+  // originalFile will only be present while adding new file or updating file
+  if (fileObj.originalFile) {
+    formData.append(key, fileObj.originalFile);
+    return;
+  }
+
+  // if originalFile was not there, but url is present
+  // means no changes in file, just add previous file url
+  if (fileObj.fileUrl) {
+    formData.append(key, fileObj.fileUrl);
+  }
+
+  // if nothing of those two added means either file removed
+  // or already was not present
+};
+
 function* updateServer(actionData) {
   const { data, serverId } = actionData.payload;
+  const {
+    name, type, description, banner, avatar,
+  } = data;
   try {
     const url = ServerApi.UPDATE_SERVER;
-    const { _members, ...serverData } = yield select((state) => getServerState(state, serverId));
-    const content = {
-      ...serverData,
-      ...data,
-    };
-    const response = yield call(axiosInstance.put, url, content);
+
+    const formData = new FormData();
+    formData.append('id', serverId);
+    formData.append('name', name);
+    formData.append('type', type);
+    formData.append('description', description);
+    setFileToFormData(formData, 'banner', banner);
+    setFileToFormData(formData, 'avatar', avatar);
+
+    const response = yield call(axiosInstance.put, url, formData);
     yield put(updateServerSuccess(serverId, response.data));
   } catch (err) {
     yield put(
-      handleError(err, (error) => updateServerFailed(serverId, error)),
+      handleError(err, (error) => {
+        toast.error(error.message || 'Something went wrong while updating server details');
+        return updateServerFailed(serverId, error);
+      }),
     );
   }
 }
