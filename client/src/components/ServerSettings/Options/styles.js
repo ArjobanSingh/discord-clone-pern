@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import CircularProgress from '@mui/material/CircularProgress';
 import Avatar from '@mui/material/Avatar';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
@@ -255,3 +256,17 @@ export const RoleMenuItem = styled(MenuItem)(({ theme, isSelectedRole }) => `
     background-color: ${theme.palette.background.darker};
   }
 `);
+
+// eslint-disable-next-line react/prop-types
+const ExtractedPropButton = ({ isLoading, ...props }) => <Button {...props} />;
+export const ConfirmationButton = styled(ExtractedPropButton)`
+  position: relative;
+
+  .button-text {
+    opacity: ${({ isLoading }) => (isLoading ? '0' : '1')}
+  }
+`;
+
+export const AbsoluteProgress = styled(CircularProgress)`
+  position: absolute;
+`;

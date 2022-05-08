@@ -15,6 +15,7 @@ export const ServerApi = {
   CREATE_SERVER: '/server/create-server',
   UPDATE_SERVER: '/server/update-server',
   UPDATE_ROLE: '/server/update-roles',
+  TRANSFER_OWNERSHIP: '/server/transfer-ownership',
 };
 
 export const InviteApi = {

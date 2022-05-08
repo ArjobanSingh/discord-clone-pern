@@ -136,6 +136,30 @@ export const updateServerRoleSuccess = (serverId, data) => ({
   },
 });
 
+export const updateOwnershipRequested = (serverId, userId) => ({
+  type: C.UPDATE_SERVER_OWNERSHIP_REQUESTED,
+  payload: {
+    serverId,
+    userId,
+  },
+});
+
+export const updateOwnershipSuccess = (serverId, data) => ({
+  type: C.UPDATE_SERVER_OWNERSHIP_SUCCESS,
+  payload: {
+    serverId,
+    data,
+  },
+});
+
+export const updateOwnershipFailed = (serverId, error) => ({
+  type: C.UPDATE_SERVER_OWNERSHIP_FAILED,
+  payload: {
+    serverId,
+    error,
+  },
+});
+
 // export const updateServerRoleFailed = (serverId, error) => ({
 //   type: C.UPDATE_SERVER_ROLE_FAILED,
 //   payload: {

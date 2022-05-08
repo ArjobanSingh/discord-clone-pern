@@ -46,6 +46,7 @@ const ConfirmationModal = (props) => {
     onClose,
     onConfirm,
     confirmTitle,
+    confirmButton,
     confirmButtonProps,
     ...rest
   } = props;
@@ -74,9 +75,11 @@ const ConfirmationModal = (props) => {
           <Button variant="info" color="text.primary" onClick={onClose}>
             Cancel
           </Button>
-          <Button variant="contained" {...confirmButtonProps} onClick={onConfirm}>
-            {confirmTitle}
-          </Button>
+          {confirmButton || (
+            <Button variant="contained" {...confirmButtonProps} onClick={onConfirm}>
+              {confirmTitle}
+            </Button>
+          )}
         </Footer>
       </Container>
     </TransitionModal>
@@ -88,12 +91,14 @@ ConfirmationModal.propTypes = {
   description: PropTypes.string.isRequired,
   onConfirm: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
-  confirmTitle: PropTypes.string,
+  confirmButton: PropTypes.node,
+  confirmTitle: PropTypes.node,
   confirmButtonProps: PropTypes.shape({}),
 };
 
 ConfirmationModal.defaultProps = {
   confirmTitle: 'Confirm',
+  confirmButton: null,
   confirmButtonProps: {},
 };
 

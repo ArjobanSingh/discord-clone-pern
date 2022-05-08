@@ -8,6 +8,7 @@ import {
   EXPLORE_SERVERS_REQUESTED,
   JOIN_SERVER_REQUESTED,
   SERVER_DETAILS_REQUESTED,
+  UPDATE_SERVER_OWNERSHIP_REQUESTED,
   UPDATE_SERVER_REQUESTED,
   UPDATE_SERVER_ROLE_REQUESTED,
 } from '../constants/servers';
@@ -20,6 +21,8 @@ import {
   joinServerSucess,
   serverDetailsFailed,
   serverDetailsSuccess,
+  updateOwnershipFailed,
+  updateOwnershipSuccess,
   updateServerFailed,
   updateServerRoleSuccess,
   updateServerSuccess,
@@ -162,11 +165,26 @@ function* updateUserRoleInServer(actionData) {
     yield call(axiosInstance.put, url, { role, userId, serverId });
     yield put(updateServerRoleSuccess(serverId, { userId, role }));
   } catch (err) {
-    // TODO: handle notification error
-    console.log('Update role error', err, err.message);
     yield put(
-      handleError(err, (error) => updateServerFailed(serverId, error)),
+      handleError(err, (error) => {
+        toast.error(`Error: ${error.message}`);
+        return {}; // no error action for this
+      }),
     );
+  }
+}
+
+function* transferOwnership(actionData) {
+  const { userId, serverId } = actionData.payload;
+  try {
+    const url = `${ServerApi.TRANSFER_OWNERSHIP}/${serverId}`;
+    const response = yield call(axiosInstance.patch, url, { newOwnerId: userId });
+    yield put(updateOwnershipSuccess(response.data.serverId, response.data));
+  } catch (err) {
+    yield put(handleError(err, (error) => {
+      toast.error(`Error updating owner: ${error.message}`);
+      return updateOwnershipFailed(serverId, error.message);
+    }));
   }
 }
 
@@ -178,5 +196,6 @@ export default function* serverSaga() {
     takeEvery(CREATE_SERVER_REQUESTED, createServer),
     takeEvery(UPDATE_SERVER_REQUESTED, updateServer),
     takeEvery(UPDATE_SERVER_ROLE_REQUESTED, updateUserRoleInServer),
+    takeEvery(UPDATE_SERVER_OWNERSHIP_REQUESTED, transferOwnership),
   ]);
 }

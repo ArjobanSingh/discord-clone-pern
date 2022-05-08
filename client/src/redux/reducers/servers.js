@@ -106,6 +106,31 @@ const allServers = (state = {}, action) => {
       };
       return newState;
     }
+    case C.UPDATE_SERVER_OWNERSHIP_SUCCESS: {
+      const { data: { updatedMembers }, serverId } = action.payload;
+
+      const { newOwner, oldOwner } = updatedMembers.reduce((acc, currentItem) => {
+        if (currentItem.role === C.ServerMemberRoles.OWNER) acc.newOwner = currentItem;
+        else acc.oldOwner = currentItem;
+        return acc;
+      }, {});
+
+      return {
+        ...state,
+        [serverId]: {
+          ...state[serverId],
+          members: state[serverId].members.map((member) => {
+            if (member.userId === newOwner.userId) {
+              return { ...member, role: newOwner.role };
+            }
+            if (member.userId === oldOwner.userId) {
+              return { ...member, role: oldOwner.role };
+            }
+            return member;
+          }),
+        },
+      };
+    }
     default:
       return state;
   }
@@ -114,6 +139,7 @@ const allServers = (state = {}, action) => {
 const updateServers = (state = {}, action) => {
   switch (action.type) {
     case C.UPDATE_SERVER_REQUESTED:
+    case C.UPDATE_SERVER_OWNERSHIP_REQUESTED:
       return {
         ...state,
         [action.payload.serverId]: {
@@ -121,12 +147,14 @@ const updateServers = (state = {}, action) => {
           error: null,
         },
       };
-    case C.UPDATE_SERVER_SUCCESS: {
+    case C.UPDATE_SERVER_SUCCESS:
+    case C.UPDATE_SERVER_OWNERSHIP_SUCCESS: {
       const newState = { ...state };
       delete newState[action.payload.serverId];
       return newState;
     }
     case C.UPDATE_SERVER_FAILED:
+    case C.UPDATE_SERVER_OWNERSHIP_FAILED:
       return {
         ...state,
         [action.payload.serverId]: {

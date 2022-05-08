@@ -2,10 +2,11 @@ import { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
+  AbsoluteProgress,
+  ConfirmationButton,
   DarkMenu,
   LineSelect,
   MemberSettingsMenuItem,
@@ -19,8 +20,10 @@ import { ServerMemberRoles, ServerMemberScores } from '../../../constants/server
 import { stopPropagation } from '../../../utils/helperFunctions';
 import useUser from '../../../customHooks/useUser';
 import SingleMember from './SingleMember';
-import { updateServerRoleRequested } from '../../../redux/actions/servers';
+import { updateOwnershipRequested, updateServerRoleRequested } from '../../../redux/actions/servers';
 import ConfirmationModal from '../../../common/ConfirmationModal';
+import { getUpdateServerData } from '../../../redux/reducers';
+import useDidUpdate from '../../../customHooks/useDidUpdate';
 
 const EVERYONE = '@everyone';
 
@@ -53,6 +56,11 @@ const getModalData = (memberSettingsMenuData, modalType) => {
 const ServerMembers = (props) => {
   const { serverId } = useParams();
   const { serverDetails } = useServerData(serverId, false);
+
+  const { isLoading, error } = useSelector(
+    (state) => getUpdateServerData(state, serverId),
+  ) || { isLoading: false, error: null };
+
   const { user } = useUser();
   const dispatch = useDispatch();
 
@@ -98,6 +106,17 @@ const ServerMembers = (props) => {
     });
   };
 
+  const closeConfirmationModal = () => {
+    setConfirmationModalData(null);
+  };
+
+  useDidUpdate(() => {
+    if (!isLoading && !error) {
+      closeConfirmationModal();
+      closeSettingsMenu();
+    }
+  }, [isLoading, error]);
+
   const updateRole = (e) => {
     const { role: newRole } = e.target.closest('li').dataset;
     if (newRole === updateRoleMenuData.currentUserRole) {
@@ -133,10 +152,6 @@ const ServerMembers = (props) => {
     setConfirmationModalData(optionType);
   };
 
-  const closeConfirmationModal = () => {
-    setConfirmationModalData(null);
-  };
-
   const {
     title: modalTitle,
     description: modalDescription,
@@ -145,7 +160,16 @@ const ServerMembers = (props) => {
 
   const onConfirm = () => {
     const optionType = confirmationModalData;
-    console.log({ userId: memberSettingsMenuData.userId });
+    switch (optionType) {
+      case TRANSFER_OWNERSHIP:
+        dispatch(updateOwnershipRequested(serverId, memberSettingsMenuData.userId));
+        break;
+      case KICK_USER:
+        // TODO:
+        break;
+      default:
+        // nothing
+    }
   };
 
   return (
@@ -236,9 +260,19 @@ const ServerMembers = (props) => {
         onClose={closeConfirmationModal}
         title={modalTitle}
         description={modalDescription}
-        confirmTitle={confirmTitle}
         onConfirm={onConfirm}
-        confirmButtonProps={{ color: 'error' }}
+        confirmButton={(
+          <ConfirmationButton
+            variant="contained"
+            onClick={onConfirm}
+            isLoading={isLoading}
+          >
+            <span className="button-text">
+              {confirmTitle}
+            </span>
+            {isLoading && <AbsoluteProgress color="inherit" size={20} />}
+          </ConfirmationButton>
+        )}
       />
     </>
   );
