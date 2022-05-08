@@ -6,6 +6,7 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { grey } from '@mui/material/colors';
+import Menu, { menuClasses } from '@mui/material/Menu';
 
 export const IconAvatar = styled(Avatar)(({
   theme,
@@ -157,12 +158,18 @@ export const MemberItem = styled.div(({ theme }) => `
   align-items: center;
 
   & ${MemberSettingIcon} {
-    display: none;
+    opacity: 0;
   }
 
   &:hover {
     & ${MemberSettingIcon} {
-      display: block;
+      opacity: 1;
+    }
+  }
+
+  &:focus {
+    & ${MemberSettingIcon} {
+      opacity: 1;
     }
   }
 `);
@@ -223,5 +230,28 @@ export const RemoveFile = styled.div(({ theme }) => `
 
   &:hover {
     color: ${theme.palette.text.primary};
+  }
+`);
+
+export const MemberSettingsMenuItem = styled(MenuItem)(({ theme }) => `
+  color: ${theme.palette.error.main};
+
+  &:hover {
+    color: ${theme.palette.text.primary};
+    background-color: ${theme.palette.error.main};
+  }
+`);
+
+export const DarkMenu = styled(Menu)(({ theme }) => `
+  .${menuClasses.paper} {
+    background-color: ${theme.palette.background.darker};
+  }
+`);
+
+export const RoleMenuItem = styled(MenuItem)(({ theme, isSelectedRole }) => `
+  background-color: ${isSelectedRole ? theme.palette.background.darker : 'transparent'};
+
+  &:hover {
+    background-color: ${theme.palette.background.darker};
   }
 `);

@@ -6,6 +6,7 @@ import {
   getServerDetails,
   joinServer,
   leaveServer,
+  transferOwnership,
   updateServer,
   updateServerMemberRoles,
 } from '../controllers/serverController';
@@ -22,5 +23,6 @@ serverRouter.put('/update-server', isAuthenticated, uploadServerMultipleFiles, u
 serverRouter.put('/update-roles', isAuthenticated, updateServerMemberRoles);
 serverRouter.delete('/delete-server/:serverId', isAuthenticated, deleteServer);
 serverRouter.delete('/leave-server/:serverId', isAuthenticated, leaveServer);
+serverRouter.patch('/transfer-ownership/:serverId', isAuthenticated, transferOwnership);
 
 export default serverRouter;

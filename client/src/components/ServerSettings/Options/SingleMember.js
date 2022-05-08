@@ -12,7 +12,9 @@ import { capitalize, handleEnter } from '../../../utils/helperFunctions';
 import { SimpleEllipsis } from '../../../common/StyledComponents';
 
 // TODO: user settings ui and logic
-const SingleMember = ({ loggedInMember, currentMember, setUpdateRoleMenuData }) => {
+const SingleMember = ({
+  loggedInMember, currentMember, setUpdateRoleMenuData, setMembersSettingsMenuData,
+}) => {
   const isUserRoleSuperior = ServerMemberScores[loggedInMember.role]
     > ServerMemberScores[currentMember.role];
 
@@ -22,6 +24,14 @@ const SingleMember = ({ loggedInMember, currentMember, setUpdateRoleMenuData }) 
       anchorEl: e.currentTarget,
       userId: currentMember.userId,
       currentUserRole: currentMember.role,
+    });
+  };
+
+  const openMemberSettingsMenu = (e) => {
+    setMembersSettingsMenuData({
+      anchorEl: e.currentTarget,
+      userId: currentMember.userId,
+      userName: currentMember.userName,
     });
   };
 
@@ -59,7 +69,7 @@ const SingleMember = ({ loggedInMember, currentMember, setUpdateRoleMenuData }) 
             {capitalize(currentMember.role)}
           </Typography>
         </RoleChip>
-        {isUserRoleSuperior && <MemberSettingIcon />}
+        {isUserRoleSuperior && <MemberSettingIcon onClick={openMemberSettingsMenu} />}
       </MemberItem>
     </>
   );
@@ -77,6 +87,7 @@ SingleMember.propTypes = {
     userId: PropTypes.string.isRequired,
   }).isRequired,
   setUpdateRoleMenuData: PropTypes.func.isRequired,
+  setMembersSettingsMenuData: PropTypes.func.isRequired,
 };
 
 export default SingleMember;

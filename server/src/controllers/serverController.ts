@@ -487,3 +487,76 @@ export const updateServerMemberRoles = async (
     next(err);
   }
 };
+
+export const transferOwnership = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { serverId } = req.params;
+    const { newOwnerId } = req.body;
+    if (!isUUID(serverId)) {
+      next(new CustomError('Server not found', 404));
+      return;
+    }
+
+    if (!isUUID(newOwnerId)) {
+      next(new CustomError('Invalid owner Id', 400));
+      return;
+    }
+
+    // this will find the members of current server,
+    // if there will be no server with serverId, or members not part of this
+    // server it will return empty array, so checking all things
+    const serverMembers = await ServerMember.find({
+      where: { userId: In([req.userId, newOwnerId]), serverId },
+      take: 2,
+    });
+
+    if (!serverMembers?.length) {
+      next(new CustomError('Server not found', 404));
+      return;
+    }
+
+    if (serverMembers.length !== 2) {
+      next(new CustomError('Server members not found', 404));
+      return;
+    }
+
+    const oldOwner = serverMembers.find((mem) => mem.userId === req.userId);
+    const newOwner = serverMembers.find((mem) => mem.userId === newOwnerId);
+
+    if (oldOwner.role !== MemberRole.OWNER) {
+      next(new CustomError('Forbidden: You are not an owner', 403));
+      return;
+    }
+
+    await getConnection().transaction(async (transactionEntityManager) => {
+      const preOwnerPromise = transactionEntityManager.update(ServerMember, {
+        userId: oldOwner.userId,
+        serverId,
+      }, {
+        role: MemberRole.ADMIN,
+      });
+
+      const newOwnerPromise = transactionEntityManager.update(ServerMember, { userId: newOwner.userId, serverId }, {
+        role: MemberRole.OWNER,
+      });
+
+      const serverPromise = transactionEntityManager.update(Server, serverId, {
+        ownerId: newOwner.userId,
+      });
+      await preOwnerPromise;
+      await newOwnerPromise;
+      await serverPromise;
+    });
+
+    // TODO: socket
+    res.json({
+      updatedMembers: [
+        { userId: newOwner.userId, role: MemberRole.OWNER },
+        { userId: oldOwner.userId, role: MemberRole.ADMIN },
+      ],
+      serverId,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

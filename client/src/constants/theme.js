@@ -24,7 +24,7 @@ export const LIGHT_THEME_OPTIONS = {
       darker: darken('#fafafa', 0.2),
     },
     text: {
-      secondary: grey[600],
+      secondary: grey[700],
       secondaryDark: grey[800],
     },
   },
@@ -60,7 +60,7 @@ export const DARK_THEME_OPTIONS = {
     text: {
       primary: '#fff',
       secondaryDark: grey[500],
-      secondary: grey[300],
+      secondary: grey[400],
     },
   },
   typography: {
