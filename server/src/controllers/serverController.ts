@@ -2,6 +2,7 @@ import { NextFunction, Response, Express } from 'express';
 import {
   isString, isURL, isUUID, validate,
 } from 'class-validator';
+import { Server as SocketServer } from 'socket.io';
 import sharp from 'sharp';
 import {
   FindManyOptions, getConnection, In, LessThan,
@@ -15,6 +16,7 @@ import { AllServersQuery } from '../types/ServerTypes';
 import { getServerForJoinLink, updateServerFile } from '../utils/helperFunctions';
 import Channel from '../entity/Channel';
 import cloudinary from '../cloudinary';
+import * as C from '../../../common/socket-io-constants';
 
 export const createServer = async (
   req: CustomRequest,
@@ -548,14 +550,78 @@ export const transferOwnership = async (req: CustomRequest, res: Response, next:
       await serverPromise;
     });
 
-    // TODO: socket
-    res.json({
+    const responseJSON = {
       updatedMembers: [
         { userId: newOwner.userId, role: MemberRole.OWNER },
         { userId: oldOwner.userId, role: MemberRole.ADMIN },
       ],
       serverId,
+    };
+
+    res.json(responseJSON);
+    const io: SocketServer = req.app.get('io');
+    io.to(serverId).emit(C.SERVER_OWNER_TRANSFERRED, responseJSON);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const kickUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { serverId, userId } = req.params;
+
+    // this will find the members of current server,
+    // if there will be no server with serverId, or members not part of this
+    // server it will return empty array, so checking all things
+    const serverMembers = await ServerMember.find({
+      where: { userId: In([req.userId, userId]), serverId },
+      take: 2,
     });
+
+    if (!serverMembers?.length) {
+      next(new CustomError('Server not found', 404));
+      return;
+    }
+
+    if (serverMembers.length !== 2) {
+      next(new CustomError('Server members not found', 404));
+      return;
+    }
+
+    // requesting user: the one making this api request to update user role
+    const requestingUser = serverMembers.find((u) => u.userId === req.userId);
+
+    // requested user: the user, whose roles have to be updated
+    const requestedUser = serverMembers.find((u) => u.userId === userId);
+
+    // eg: mod cannot kick any other user with equal or higher role
+    if (enumScore[requestingUser.role] <= enumScore[requestedUser.role]) {
+      next(new CustomError('Forbidden: You do not have access to kick this user', 403));
+      return;
+    }
+
+    await getConnection().transaction(async (transactionEntityManager) => {
+      const removeUserPromise = transactionEntityManager.delete(ServerMember, {
+        serverId,
+        userId,
+      });
+      const countUpdatePromise = transactionEntityManager.update(Server, serverId, {
+        memberCount: () => '"memberCount" - 1',
+      });
+
+      await removeUserPromise;
+      await countUpdatePromise;
+    });
+
+    const responseObj = {
+      userId,
+      serverId,
+    };
+
+    res.json(responseObj);
+
+    const io: SocketServer = req.app.get('io');
+    io.to(serverId).emit(C.SERVER_USER_KICKED_OUT, responseObj);
   } catch (err) {
     next(err);
   }

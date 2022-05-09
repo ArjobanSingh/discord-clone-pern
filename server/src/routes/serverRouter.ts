@@ -5,6 +5,7 @@ import {
   getAllServers,
   getServerDetails,
   joinServer,
+  kickUser,
   leaveServer,
   transferOwnership,
   updateServer,
@@ -24,5 +25,6 @@ serverRouter.put('/update-roles', isAuthenticated, updateServerMemberRoles);
 serverRouter.delete('/delete-server/:serverId', isAuthenticated, deleteServer);
 serverRouter.delete('/leave-server/:serverId', isAuthenticated, leaveServer);
 serverRouter.patch('/transfer-ownership/:serverId', isAuthenticated, transferOwnership);
+serverRouter.delete('/kick-user/:serverId/:userId', isAuthenticated, kickUser);
 
 export default serverRouter;

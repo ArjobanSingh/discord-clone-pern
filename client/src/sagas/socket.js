@@ -3,8 +3,9 @@ import {
 } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import socketHandler from '../services/socket-client';
-import { NEW_CHANNEL_MESSAGE } from '../constants/socket-io';
+import * as C from '../constants/socket-io';
 import { sendChannelMessageSent } from '../redux/actions/channels';
+import { updateOwnershipSuccess } from '../redux/actions/servers';
 
 function createSocketChannel(socket) {
   return eventChannel((emit) => {
@@ -25,10 +26,16 @@ function* handleSocketEvents(socketEvent) {
   const { event, args } = socketEvent;
   const [payload] = args;
 
+  console.log('socket', event, payload);
   switch (event) {
-    case NEW_CHANNEL_MESSAGE: {
+    case C.NEW_CHANNEL_MESSAGE: {
       const { serverId, channelId } = payload;
       yield put(sendChannelMessageSent(serverId, channelId, undefined, payload));
+      break;
+    }
+    case C.SERVER_OWNER_TRANSFERRED: {
+      const { serverId } = payload;
+      yield put(updateOwnershipSuccess(serverId, payload));
       break;
     }
     default:
