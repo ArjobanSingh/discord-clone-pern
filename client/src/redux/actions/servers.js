@@ -160,6 +160,31 @@ export const updateOwnershipFailed = (serverId, error) => ({
   },
 });
 
+export const kickServerMemberRequested = (serverId, userId) => ({
+  type: C.KICK_SERVER_MEMBER_REQUESTED,
+  payload: {
+    serverId,
+    userId,
+  },
+});
+
+export const kickServerMemberFailed = (serverId, error) => ({
+  type: C.KICK_SERVER_MEMBER_FAILED,
+  payload: {
+    serverId,
+    error,
+  },
+});
+
+export const kickServerMemberSuccess = (serverId, userId, loggedInUserId) => ({
+  type: C.KICK_SERVER_MEMBER_SUCCESS,
+  payload: {
+    serverId,
+    userId,
+    loggedInUserId,
+  },
+});
+
 // export const updateServerRoleFailed = (serverId, error) => ({
 //   type: C.UPDATE_SERVER_ROLE_FAILED,
 //   payload: {

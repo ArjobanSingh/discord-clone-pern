@@ -16,6 +16,7 @@ export const ServerApi = {
   UPDATE_SERVER: '/server/update-server',
   UPDATE_ROLE: '/server/update-roles',
   TRANSFER_OWNERSHIP: '/server/transfer-ownership',
+  KICK_MEMBER: '/server/kick-user',
 };
 
 export const InviteApi = {

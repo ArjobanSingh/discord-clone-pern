@@ -33,7 +33,7 @@ const useServerData = (serverId, makeApiRequest = false) => {
       // remove that server data from explore server state
       dispatch(resetExploreServerData());
     }
-  }, [serverId]);
+  }, [serverId, isExploringServer]);
 
   return {
     serverDetails: serverDetails || { isFetchingData: true, name: '', id: serverId },

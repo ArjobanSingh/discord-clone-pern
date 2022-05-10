@@ -131,6 +131,23 @@ const allServers = (state = {}, action) => {
         },
       };
     }
+    case C.KICK_SERVER_MEMBER_SUCCESS: {
+      const { serverId, userId, loggedInUserId } = action.payload;
+      if (loggedInUserId === userId) {
+        // current logged in user got kicked out
+        const newState = { ...state };
+        delete newState[serverId];
+        return newState;
+      }
+      return {
+        ...state,
+        [serverId]: {
+          ...state[serverId],
+          members: state[serverId].members
+            .filter((member) => member.userId !== userId),
+        },
+      };
+    }
     default:
       return state;
   }
@@ -140,6 +157,7 @@ const updateServers = (state = {}, action) => {
   switch (action.type) {
     case C.UPDATE_SERVER_REQUESTED:
     case C.UPDATE_SERVER_OWNERSHIP_REQUESTED:
+    case C.KICK_SERVER_MEMBER_REQUESTED:
       return {
         ...state,
         [action.payload.serverId]: {
@@ -148,13 +166,15 @@ const updateServers = (state = {}, action) => {
         },
       };
     case C.UPDATE_SERVER_SUCCESS:
-    case C.UPDATE_SERVER_OWNERSHIP_SUCCESS: {
+    case C.UPDATE_SERVER_OWNERSHIP_SUCCESS:
+    case C.KICK_SERVER_MEMBER_SUCCESS: {
       const newState = { ...state };
       delete newState[action.payload.serverId];
       return newState;
     }
     case C.UPDATE_SERVER_FAILED:
     case C.UPDATE_SERVER_OWNERSHIP_FAILED:
+    case C.KICK_SERVER_MEMBER_FAILED:
       return {
         ...state,
         [action.payload.serverId]: {

@@ -20,7 +20,7 @@ import { ServerMemberRoles, ServerMemberScores } from '../../../constants/server
 import { stopPropagation } from '../../../utils/helperFunctions';
 import useUser from '../../../customHooks/useUser';
 import SingleMember from './SingleMember';
-import { updateOwnershipRequested, updateServerRoleRequested } from '../../../redux/actions/servers';
+import { kickServerMemberRequested, updateOwnershipRequested, updateServerRoleRequested } from '../../../redux/actions/servers';
 import ConfirmationModal from '../../../common/ConfirmationModal';
 import { getUpdateServerData } from '../../../redux/reducers';
 import useDidUpdate from '../../../customHooks/useDidUpdate';
@@ -165,7 +165,7 @@ const ServerMembers = (props) => {
         dispatch(updateOwnershipRequested(serverId, memberSettingsMenuData.userId));
         break;
       case KICK_USER:
-        // TODO:
+        dispatch(kickServerMemberRequested(serverId, memberSettingsMenuData.userId));
         break;
       default:
         // nothing

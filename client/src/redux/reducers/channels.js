@@ -1,4 +1,5 @@
 import * as C from '../../constants/channels';
+import * as S from '../../constants/servers';
 
 /*
   State schema: {
@@ -22,6 +23,15 @@ export default (state = {}, action) => {
           return acc;
         }, {}),
       };
+    case S.KICK_SERVER_MEMBER_SUCCESS: {
+      const { serverId, userId, loggedInUserId } = action.payload;
+      if (userId === loggedInUserId) {
+        const newState = { ...state };
+        delete newState[serverId];
+        return newState;
+      }
+      return state;
+    }
     default:
       return state;
   }

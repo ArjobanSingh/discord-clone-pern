@@ -5,7 +5,7 @@ import { eventChannel } from 'redux-saga';
 import socketHandler from '../services/socket-client';
 import * as C from '../constants/socket-io';
 import { sendChannelMessageSent } from '../redux/actions/channels';
-import { updateOwnershipSuccess } from '../redux/actions/servers';
+import { kickServerMemberSuccess, updateOwnershipSuccess } from '../redux/actions/servers';
 
 function createSocketChannel(socket) {
   return eventChannel((emit) => {
@@ -22,7 +22,7 @@ function createSocketChannel(socket) {
 }
 
 function* handleSocketEvents(socketEvent) {
-  // const { user } = yield select((state) => state.user);
+  const { user: loggedInUser } = yield select((state) => state.user);
   const { event, args } = socketEvent;
   const [payload] = args;
 
@@ -36,6 +36,12 @@ function* handleSocketEvents(socketEvent) {
     case C.SERVER_OWNER_TRANSFERRED: {
       const { serverId } = payload;
       yield put(updateOwnershipSuccess(serverId, payload));
+      break;
+    }
+    case C.SERVER_USER_KICKED_OUT: {
+      const { serverId, userId } = payload;
+      console.log('what is loggedInUser', loggedInUser);
+      yield put(kickServerMemberSuccess(serverId, userId, loggedInUser.id));
       break;
     }
     default:

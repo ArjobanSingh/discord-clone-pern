@@ -1,5 +1,5 @@
 import {
-  all, call, put, takeEvery, takeLatest,
+  all, call, put, takeEvery, takeLatest, select,
 } from 'redux-saga/effects';
 import { toast } from 'react-toastify';
 import axiosInstance from '../utils/axiosConfig';
@@ -11,6 +11,7 @@ import {
   UPDATE_SERVER_OWNERSHIP_REQUESTED,
   UPDATE_SERVER_REQUESTED,
   UPDATE_SERVER_ROLE_REQUESTED,
+  KICK_SERVER_MEMBER_REQUESTED,
 } from '../constants/servers';
 import {
   createServerFailed,
@@ -19,6 +20,8 @@ import {
   exploreServersSuccess,
   joinServerFailed,
   joinServerSucess,
+  kickServerMemberFailed,
+  kickServerMemberSuccess,
   serverDetailsFailed,
   serverDetailsSuccess,
   updateOwnershipFailed,
@@ -188,6 +191,20 @@ function* transferOwnership(actionData) {
   }
 }
 
+function* kickServerMember(actionData) {
+  const { userId, serverId } = actionData.payload;
+  try {
+    const { user: loggedInUser } = yield select((state) => state.user);
+    const url = `${ServerApi.KICK_MEMBER}/${serverId}/${userId}`;
+    yield call(axiosInstance.delete, url);
+    yield put(kickServerMemberSuccess(serverId, userId, loggedInUser.id));
+  } catch (err) {
+    yield put(handleError(err, (error) => {
+      toast.error(`Error Kicking user: ${error.message}`);
+      return kickServerMemberFailed(serverId, error.message);
+    }));
+  }
+}
 export default function* serverSaga() {
   yield all([
     takeEvery(SERVER_DETAILS_REQUESTED, getServerDetails),
@@ -197,5 +214,6 @@ export default function* serverSaga() {
     takeEvery(UPDATE_SERVER_REQUESTED, updateServer),
     takeEvery(UPDATE_SERVER_ROLE_REQUESTED, updateUserRoleInServer),
     takeEvery(UPDATE_SERVER_OWNERSHIP_REQUESTED, transferOwnership),
+    takeEvery(KICK_SERVER_MEMBER_REQUESTED, kickServerMember),
   ]);
 }
