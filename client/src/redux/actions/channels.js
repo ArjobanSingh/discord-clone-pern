@@ -25,22 +25,22 @@ export const sendChannelMessageRequested = (serverId, channelId, messageData) =>
   },
 });
 
-export const sendChannelMessageFailed = (serverId, channelId, tempMessageId, error) => ({
+export const sendChannelMessageFailed = (serverId, channelId, localMessageKey, error) => ({
   type: C.SEND_CHANNEL_MESSAGE_FAILED,
   payload: {
     serverId,
     channelId,
-    tempMessageId,
+    localMessageKey,
     error,
   },
 });
 
-export const sendChannelMessageSent = (serverId, channelId, tempMessageId, messageData) => ({
+export const sendChannelMessageSent = (serverId, channelId, localMessageKey, messageData) => ({
   type: C.SEND_CHANNEL_MESSAGE_SUCCESS,
   payload: {
     serverId,
     channelId,
-    tempMessageId,
+    localMessageKey,
     messageData,
   },
 });
@@ -53,17 +53,19 @@ export const channelMessagesRequested = (serverId, channelId) => ({
   },
 });
 
-export const channelMessagesSuccess = (channelId, data) => ({
+export const channelMessagesSuccess = (serverId, channelId, data) => ({
   type: C.CHANNEL_MESSAGES_SUCCESS,
   payload: {
+    serverId,
     channelId,
     data,
   },
 });
 
-export const channelMessagesFailed = (channelId, error) => ({
+export const channelMessagesFailed = (serverId, channelId, error) => ({
   type: C.CHANNEL_MESSAGES_FAILED,
   payload: {
+    serverId,
     channelId,
     error,
   },
@@ -72,30 +74,33 @@ export const channelMessagesFailed = (channelId, error) => ({
 export const channelMoreMessagesRequested = (serverId, channelId) => ({
   type: C.CHANNEL_MORE_MESSAGES_REQUESTED,
   payload: {
-    channelId,
     serverId,
+    channelId,
   },
 });
 
-export const channelMoreMessagesSuccess = (channelId, data) => ({
+export const channelMoreMessagesSuccess = (serverId, channelId, data) => ({
   type: C.CHANNEL_MORE_MESSAGES_SUCCESS,
   payload: {
+    serverId,
     channelId,
     data,
   },
 });
 
-export const channelMoreMessagesFailed = (channelId, error) => ({
+export const channelMoreMessagesFailed = (serverId, channelId, error) => ({
   type: C.CHANNEL_MORE_MESSAGES_FAILED,
   payload: {
+    serverId,
     channelId,
     error,
   },
 });
 
-export const removeChannelMessageObjectUrl = (channelId, messageId) => ({
+export const removeChannelMessageObjectUrl = (serverId, channelId, messageId) => ({
   type: C.REMOVE_CHANNEL_MESSAGE_OBJECT_URL,
   payload: {
+    serverId,
     channelId,
     messageId,
   },

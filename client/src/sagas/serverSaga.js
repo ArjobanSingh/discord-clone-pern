@@ -197,7 +197,7 @@ function* kickServerMember(actionData) {
     const { user: loggedInUser } = yield select((state) => state.user);
     const url = `${ServerApi.KICK_MEMBER}/${serverId}/${userId}`;
     yield call(axiosInstance.delete, url);
-    yield put(kickServerMemberSuccess(serverId, userId, loggedInUser.id));
+    yield put(kickServerMemberSuccess(serverId, userId, userId === loggedInUser.id));
   } catch (err) {
     yield put(handleError(err, (error) => {
       toast.error(`Error Kicking user: ${error.message}`);

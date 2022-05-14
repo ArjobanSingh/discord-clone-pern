@@ -75,6 +75,6 @@ export const getChannelData = (state, serverId, channelId) => (
   fromChannels.getChannelData(state.channels, serverId, channelId)
 );
 
-export const getChannelMessagesData = (state, channelId) => (
-  fromChannelsChat.getChannelMessagesData(state.channelsChat, channelId)
+export const getChannelMessagesData = (state, serverId, channelId) => (
+  fromChannelsChat.getChannelMessagesData(state.channelsChat, serverId, channelId)
 );

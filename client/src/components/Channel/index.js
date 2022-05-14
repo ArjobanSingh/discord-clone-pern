@@ -60,7 +60,7 @@ const Channel = (props) => {
   // const params = useParams();
   const { serverId, channelId } = useParams();
   const channel = useSelector((state) => getChannelData(state, serverId, channelId));
-  const messagesData = useSelector((state) => getChannelMessagesData(state, channelId))
+  const messagesData = useSelector((state) => getChannelMessagesData(state, serverId, channelId))
     ?? emptyChannel;
   const dispatch = useDispatch();
 
@@ -121,8 +121,8 @@ const Channel = (props) => {
   }, [dispatch, serverId, channelId]);
 
   const removeObjectUrl = useCallback((messageId) => {
-    dispatch(removeChannelMessageObjectUrl(channelId, messageId));
-  }, [dispatch, channelId]);
+    dispatch(removeChannelMessageObjectUrl(serverId, channelId, messageId));
+  }, [dispatch, serverId, channelId]);
 
   // TODO: for now only deleting failed messages,
   // server delete support will be added in future

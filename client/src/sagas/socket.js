@@ -41,7 +41,7 @@ function* handleSocketEvents(socketEvent) {
     case C.SERVER_USER_KICKED_OUT: {
       const { serverId, userId } = payload;
       console.log('what is loggedInUser', loggedInUser);
-      yield put(kickServerMemberSuccess(serverId, userId, loggedInUser.id));
+      yield put(kickServerMemberSuccess(serverId, userId, userId === loggedInUser.id));
       break;
     }
     default:

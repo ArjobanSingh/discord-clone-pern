@@ -176,12 +176,12 @@ export const kickServerMemberFailed = (serverId, error) => ({
   },
 });
 
-export const kickServerMemberSuccess = (serverId, userId, loggedInUserId) => ({
+export const kickServerMemberSuccess = (serverId, userId, isLoggedInUser) => ({
   type: C.KICK_SERVER_MEMBER_SUCCESS,
   payload: {
     serverId,
     userId,
-    loggedInUserId,
+    isLoggedInUser,
   },
 });
 

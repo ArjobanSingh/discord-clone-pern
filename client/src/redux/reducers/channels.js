@@ -24,8 +24,8 @@ export default (state = {}, action) => {
         }, {}),
       };
     case S.KICK_SERVER_MEMBER_SUCCESS: {
-      const { serverId, userId, loggedInUserId } = action.payload;
-      if (userId === loggedInUserId) {
+      const { serverId, isLoggedInUser } = action.payload;
+      if (isLoggedInUser) {
         const newState = { ...state };
         delete newState[serverId];
         return newState;

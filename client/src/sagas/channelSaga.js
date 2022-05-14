@@ -29,16 +29,16 @@ const socket = socketHandler.getSocket();
 function* getChannelMessages(actionData) {
   const { channelId, serverId } = actionData.payload;
   try {
-    const previousChannelState = yield select((state) => getChannelMessagesData(state, channelId));
+    const previousChannelState = yield select((state) => getChannelMessagesData(state, serverId, channelId));
     // if messages already not present than only fetch again
     if (isEmpty(previousChannelState?.data)) {
       const url = `${ChannelApi.GET_CHANNEL_MESSAGES}/${serverId}/${channelId}`;
       const response = yield call(axiosInstance.get, url);
-      yield put(channelMessagesSuccess(channelId, response.data.messages.reverse()));
+      yield put(channelMessagesSuccess(serverId, channelId, response.data.messages.reverse()));
     }
   } catch (err) {
     yield put(handleError(err, (error) => (
-      channelMessagesFailed(channelId, error)
+      channelMessagesFailed(serverId, channelId, error)
     )));
   }
 }
@@ -47,16 +47,16 @@ function* getChannelMessages(actionData) {
 function* getMoreChannelMessages(actionData) {
   const { channelId, serverId } = actionData.payload;
   try {
-    const oldestMessage = yield select((state) => getChannelMessagesData(state, channelId).data[0]);
+    const oldestMessage = yield select((state) => getChannelMessagesData(state, serverId, channelId).data[0]);
     const { createdAt } = oldestMessage;
     const url = `${ChannelApi.GET_CHANNEL_MESSAGES}/${serverId}/${channelId}?cursor=${createdAt}`;
     const response = yield call(axiosInstance.get, url);
     // yield call(() => new Promise((r) => setTimeout(r, 3000)));
-    yield put(channelMoreMessagesSuccess(channelId, response.data.messages.reverse()));
+    yield put(channelMoreMessagesSuccess(serverId, channelId, response.data.messages.reverse()));
   } catch (err) {
     yield put(handleError(err, (error) => {
       toast.error(error.message);
-      return channelMoreMessagesFailed(channelId, error);
+      return channelMoreMessagesFailed(serverId, channelId, error);
     }));
   }
 }
@@ -86,12 +86,12 @@ function* sendChannelMessage(actionData) {
       newMessageData.blobUrl = blobUrl;
     }
 
-    yield put(sendChannelMessageSent(serverId, channelId, restMessageData.id, newMessageData));
+    yield put(sendChannelMessageSent(serverId, channelId, localKey, newMessageData));
   } catch (err) {
     console.log('Message sending error: ', err, err.message);
     // TODO: handle error
     yield put(handleError(err, (error) => (
-      sendChannelMessageFailed(serverId, channelId, restMessageData.id, error)
+      sendChannelMessageFailed(serverId, channelId, restMessageData.localKey, error)
     )));
   }
 }

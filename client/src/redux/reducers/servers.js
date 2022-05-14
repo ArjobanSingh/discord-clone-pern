@@ -132,8 +132,8 @@ const allServers = (state = {}, action) => {
       };
     }
     case C.KICK_SERVER_MEMBER_SUCCESS: {
-      const { serverId, userId, loggedInUserId } = action.payload;
-      if (loggedInUserId === userId) {
+      const { serverId, userId, isLoggedInUser } = action.payload;
+      if (isLoggedInUser) {
         // current logged in user got kicked out
         const newState = { ...state };
         delete newState[serverId];
