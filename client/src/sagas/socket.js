@@ -6,6 +6,7 @@ import socketHandler from '../services/socket-client';
 import * as C from '../constants/socket-io';
 import { sendChannelMessageSent } from '../redux/actions/channels';
 import { kickServerMemberSuccess, updateOwnershipSuccess } from '../redux/actions/servers';
+import { setNavigateState } from '../redux/actions/navigate';
 
 function createSocketChannel(socket) {
   return eventChannel((emit) => {
@@ -40,8 +41,15 @@ function* handleSocketEvents(socketEvent) {
     }
     case C.SERVER_USER_KICKED_OUT: {
       const { serverId, userId } = payload;
-      console.log('what is loggedInUser', loggedInUser);
-      yield put(kickServerMemberSuccess(serverId, userId, userId === loggedInUser.id));
+      const isLoggedInUser = userId === loggedInUser.id;
+      const isSameServerOpened = window.location.pathname.includes(`/channels/${serverId}`);
+
+      if (isLoggedInUser && isSameServerOpened) {
+        // if current user kicked out from server, and current opened
+        // server is the same one, navigate user to index route
+        yield put(setNavigateState(['/', { replace: true }]));
+      }
+      yield put(kickServerMemberSuccess(serverId, userId, isLoggedInUser));
       break;
     }
     default:

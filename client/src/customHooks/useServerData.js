@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addExploreServerData, resetExploreServerData, serverDetailsRequested } from '../redux/actions/servers';
 import { getExploreServerData, getServerDetails } from '../redux/reducers';
@@ -10,6 +10,11 @@ const useServerData = (serverId, makeApiRequest = false) => {
 
   const serverDetails = userServerDetails || exploreServerDetails;
   const isExploringServer = !!exploreServerDetails;
+  const isExploringServerRef = useRef(isExploringServer);
+
+  useEffect(() => {
+    isExploringServerRef.current = isExploringServer;
+  }, [isExploringServer]);
 
   useEffect(() => {
     if (!serverId || !makeApiRequest) return;
@@ -28,12 +33,12 @@ const useServerData = (serverId, makeApiRequest = false) => {
   }, [serverDetails, makeApiRequest]);
 
   useEffect(() => () => {
-    if (isExploringServer) {
+    if (isExploringServerRef.current) {
       // if user was exploring some public server, and changed route
       // remove that server data from explore server state
-      dispatch(resetExploreServerData());
+      dispatch(resetExploreServerData(serverId));
     }
-  }, [serverId, isExploringServer]);
+  }, [serverId]);
 
   return {
     serverDetails: serverDetails || { isFetchingData: true, name: '', id: serverId },

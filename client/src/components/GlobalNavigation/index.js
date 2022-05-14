@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
 // import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import useDidUpdate from '../../customHooks/useDidUpdate';
 import { resetNavigationState } from '../../redux/actions/navigate';
 import { getNavigationState } from '../../redux/reducers';
 
@@ -10,14 +10,12 @@ const GlobalNavigation = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    console.log('outer', { navigateState });
+  useDidUpdate(() => {
     if (navigateState) {
-      console.log('inner', { navigateState });
       navigate(...navigateState);
       dispatch(resetNavigationState());
     }
-  }, [navigateState]);
+  }, [navigateState, navigate]);
 
   return null;
 };

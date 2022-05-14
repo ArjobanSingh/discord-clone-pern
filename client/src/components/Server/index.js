@@ -6,7 +6,9 @@ import Typography from '@mui/material/Typography';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useEffect, useMemo, useState } from 'react';
 import useServerData from '../../customHooks/useServerData';
-import { PreviewBar, StyledButton } from './styles';
+import {
+  InnerServerContainer, MainServerContent, PreviewBar, StyledButton,
+} from './styles';
 import JoinPublicServer from './JoinPublicServer';
 import ServerHeader from '../ServerHeader';
 import { isEmpty } from '../../utils/validators';
@@ -33,7 +35,7 @@ const Server = (props) => {
     isExploringServer,
     isMembersDrawerOpen,
     members: serverDetails.members,
-  }), [isMembersDrawerOpen, serverDetails.members]);
+  }), [isMembersDrawerOpen, serverDetails.members, isExploringServer]);
 
   const goBack = () => {
     navigate('/guild-discovery');
@@ -85,11 +87,13 @@ const Server = (props) => {
 
   if (isEmpty(channels)) {
     return (
-      <>
+      <InnerServerContainer>
         {previewBarUI}
         {serverHeaderUi(true)}
-        <NoChannels setOpenedChannel={setOpenedChannel} />
-      </>
+        <MainServerContent>
+          <NoChannels setOpenedChannel={setOpenedChannel} />
+        </MainServerContent>
+      </InnerServerContainer>
     );
   }
 
@@ -97,11 +101,13 @@ const Server = (props) => {
 
   if (params.channelId) {
     return (
-      <>
+      <InnerServerContainer>
         {previewBarUI}
         {serverHeaderUi(false)}
-        <Outlet context={outletContextValue} />
-      </>
+        <MainServerContent>
+          <Outlet context={outletContextValue} />
+        </MainServerContent>
+      </InnerServerContainer>
     );
   }
 

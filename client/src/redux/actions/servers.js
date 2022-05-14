@@ -76,8 +76,11 @@ export const addExploreServerData = (data) => ({
   payload: { data },
 });
 
-export const resetExploreServerData = () => ({
+export const resetExploreServerData = (serverId) => ({
   type: C.RESET_EXPLORE_SERVER,
+  payload: {
+    serverId,
+  },
 });
 
 export const createServerRequested = (data, uniqueIdentifier) => ({

@@ -32,6 +32,13 @@ export default (state = {}, action) => {
       }
       return state;
     }
+    case S.RESET_EXPLORE_SERVER: {
+      const { serverId } = action.payload;
+      if (!state[serverId]) return state;
+      const newState = { ...state };
+      delete newState[serverId];
+      return newState;
+    }
     default:
       return state;
   }

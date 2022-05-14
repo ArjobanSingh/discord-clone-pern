@@ -7,6 +7,18 @@ export const ServerContainer = styled.div`
   overflow: hidden;
 `;
 
+export const InnerServerContainer = styled.div`
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+`;
+
+export const MainServerContent = styled.div`
+  flex: 1;
+`;
+
 export const PreviewBar = styled.div`
   width: 100%;
   background-color: ${({ theme }) => theme.palette.primary.main};

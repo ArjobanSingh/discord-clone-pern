@@ -33,7 +33,7 @@ import {
 import { handleError } from '../utils/helperFunctions';
 import { ServerApi } from '../utils/apiEndpoints';
 import { setNavigateState } from '../redux/actions/navigate';
-import { getServerDetails as getServerState } from '../redux/reducers';
+// import { getServerDetails as getServerState } from '../redux/reducers';
 import { saveAllChannels } from '../redux/actions/channels';
 import socketClient from '../services/socket-client';
 
@@ -99,7 +99,6 @@ function* createServer(actionData) {
     if (description) formData.append('description', description);
     if (file?.originalFile) formData.append('avatar', file.originalFile);
 
-    console.log({ formData });
     const response = yield call(axiosInstance.post, url, formData);
     yield put(saveAllChannels(response.data.id, response.data.channels ?? []));
     yield put(createServerSuccess(response.data.id, response.data));
@@ -197,7 +196,17 @@ function* kickServerMember(actionData) {
     const { user: loggedInUser } = yield select((state) => state.user);
     const url = `${ServerApi.KICK_MEMBER}/${serverId}/${userId}`;
     yield call(axiosInstance.delete, url);
-    yield put(kickServerMemberSuccess(serverId, userId, userId === loggedInUser.id));
+    const isLoggedInUser = userId === loggedInUser.id;
+
+    // although here user cannot kick himself, but leave server
+    // which is handled in other saga
+    const isSameServerOpened = window.location.pathname.includes(`/channels/${serverId}`);
+    if (isLoggedInUser && isSameServerOpened) {
+      // if current user kicked out from server, and current opened
+      // server is the same one, navigate user to index route
+      yield put(setNavigateState(['/', { replace: true }]));
+    }
+    yield put(kickServerMemberSuccess(serverId, userId, isLoggedInUser));
   } catch (err) {
     yield put(handleError(err, (error) => {
       toast.error(`Error Kicking user: ${error.message}`);

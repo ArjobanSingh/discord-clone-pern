@@ -105,6 +105,7 @@ const Channel = (props) => {
   }
 
   const sendMessage = async (content) => {
+    if (isExploringServer) return;
     const messageObj = content;
     if (dimensionsSupportedTypes.includes(messageObj.type)) {
       messageObj.fileDimensions = await getFileDimensions(messageObj);
@@ -145,6 +146,7 @@ const Channel = (props) => {
             sendMessage={sendMessage}
             loadMoreMessages={getMoreChannelMessages}
             retryFailedMessage={retryFailedMessage}
+            hideInput={isExploringServer}
           />
         </MessageProvider>
       </MainContent>

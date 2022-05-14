@@ -5,20 +5,20 @@ export const membersDrawerWidth = 250;
 
 export const ChannelContainer = styled.div`
   display: flex;
-  height: calc(100% - 50px);
+  /* height: calc(100% - 50px); */
+  height: 100%;
   width: 100%;
 `;
 
+// margin-right: -${membersDrawerWidth}px;
+// breakpoint { margin-right: ${isDrawerOpen ? '0' : `-${membersDrawerWidth}px`}; }
 export const MainContent = styled.main(({ isDrawerOpen, theme }) => `
-  /* margin-right: -${membersDrawerWidth}px;
-  width: 100%; */
   flex-grow: 1;
   width: 100%;
 
   transition: margin 225ms cubic-bezier(0, 0, 0.2, 1) 0ms,
               width 225ms cubic-bezier(0, 0, 0.2, 1) 0ms;
   ${theme.breakpoints.up('sm')} {
-    /* margin-right: ${isDrawerOpen ? '0' : `-${membersDrawerWidth}px`}; */
     width: ${isDrawerOpen ? `calc(100% - ${membersDrawerWidth}px)` : '100%'};
   }
 `);

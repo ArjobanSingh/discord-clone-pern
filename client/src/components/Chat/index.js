@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
 import { nanoid } from 'nanoid';
 import {
-  useCallback,
-  useEffect, useLayoutEffect, useRef, useState,
+  useRef, useState,
 } from 'react';
 import { toast } from 'react-toastify';
 import {
@@ -13,7 +12,7 @@ import { MessageStatus, MessageType } from '../../constants/Message';
 import { isEmpty } from '../../utils/validators';
 import Messages from '../Messages';
 import useUser from '../../customHooks/useUser';
-import { scrollToBottom } from '../../utils/helperFunctions';
+// import { scrollToBottom } from '../../utils/helperFunctions';
 import useDidUpdate from '../../customHooks/useDidUpdate';
 
 // chat component should be independent of channel/server logic
@@ -23,6 +22,7 @@ const Chat = (props) => {
     sendMessage,
     messagesData,
     loadMoreMessages,
+    hideInput,
   } = props;
 
   const {
@@ -101,7 +101,7 @@ const Chat = (props) => {
     if (error) return <div>TODO: Error fetching messages...Retry</div>; // TODO
     return (
       <>
-        <MessagesContainer>
+        <MessagesContainer hideInput={hideInput}>
           {isEmpty(data) ? <div>No messages in this channel yet</div>
             : (
               <Messages
@@ -116,15 +116,17 @@ const Chat = (props) => {
               />
             )}
         </MessagesContainer>
-        <InputContainer>
-          <InputEditor
-            replyMessage={replyMessage}
-            setReplyMessage={setReplyMessage}
-            prepareMessage={prepareMessage}
-            files={files}
-            setFiles={setFiles}
-          />
-        </InputContainer>
+        {!hideInput && (
+          <InputContainer>
+            <InputEditor
+              replyMessage={replyMessage}
+              setReplyMessage={setReplyMessage}
+              prepareMessage={prepareMessage}
+              files={files}
+              setFiles={setFiles}
+            />
+          </InputContainer>
+        )}
       </>
     );
   };
@@ -147,6 +149,7 @@ Chat.propTypes = {
     moreError: PropTypes.string,
   }).isRequired,
   loadMoreMessages: PropTypes.func.isRequired,
+  hideInput: PropTypes.bool.isRequired,
 };
 
 export default Chat;

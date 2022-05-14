@@ -1,4 +1,5 @@
 import * as C from '../../constants/channels';
+import * as S from '../../constants/servers';
 import { MessageStatus } from '../../constants/Message';
 import { isEmpty } from '../../utils/validators';
 
@@ -215,6 +216,24 @@ const channelsChat = (state = {}, action) => {
           },
         },
       };
+    }
+    case S.KICK_SERVER_MEMBER_SUCCESS: {
+      const { serverId, isLoggedInUser } = action.payload;
+      if (isLoggedInUser) {
+        // if current logged in user got kicked out from some server
+        // delete chat details for that server
+        const newState = { ...state };
+        delete newState[serverId];
+        return newState;
+      }
+      return state;
+    }
+    case S.RESET_EXPLORE_SERVER: {
+      const { serverId } = action.payload;
+      if (!state[serverId]) return state;
+      const newState = { ...state };
+      delete newState[serverId];
+      return newState;
     }
     default:
       return state;
