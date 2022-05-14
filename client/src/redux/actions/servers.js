@@ -188,6 +188,29 @@ export const kickServerMemberSuccess = (serverId, userId, isLoggedInUser) => ({
   },
 });
 
+export const leaveServerMemberRequested = (serverId) => ({
+  type: C.LEAVE_SERVER_MEMBER_REQUESTED,
+  payload: {
+    serverId,
+  },
+});
+
+export const leaveServerMemberFailed = (serverId, error) => ({
+  type: C.LEAVE_SERVER_MEMBER_FAILED,
+  payload: {
+    serverId,
+    error,
+  },
+});
+
+export const leaveServerMemberSuccess = (serverId, userId, isLoggedInUser) => ({
+  type: C.LEAVE_SERVER_MEMBER_SUCCESS,
+  payload: {
+    serverId,
+    userId,
+    isLoggedInUser,
+  },
+});
 // export const updateServerRoleFailed = (serverId, error) => ({
 //   type: C.UPDATE_SERVER_ROLE_FAILED,
 //   payload: {

@@ -131,10 +131,11 @@ const allServers = (state = {}, action) => {
         },
       };
     }
-    case C.KICK_SERVER_MEMBER_SUCCESS: {
+    case C.KICK_SERVER_MEMBER_SUCCESS:
+    case C.LEAVE_SERVER_MEMBER_SUCCESS: {
       const { serverId, userId, isLoggedInUser } = action.payload;
       if (isLoggedInUser) {
-        // current logged in user got kicked out
+        // current logged in user got kicked out or left server
         const newState = { ...state };
         delete newState[serverId];
         return newState;

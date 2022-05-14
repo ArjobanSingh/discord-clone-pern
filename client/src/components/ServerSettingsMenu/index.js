@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
 import Dialog from '@mui/material/Dialog';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Typography from '@mui/material/Typography';
 import Zoom from '@mui/material/Zoom';
+import { useParams } from 'react-router-dom';
 import { ServerMemberRoles } from '../../constants/servers';
 import { handleEnter } from '../../utils/helperFunctions';
 import ServerSettings from '../ServerSettings';
+import { leaveServerMemberRequested } from '../../redux/actions/servers';
 
 const {
   OWNER,
@@ -42,6 +45,8 @@ const settings = [{
 
 const ServerSettingsMenu = (props) => {
   const { currentRole } = props;
+  const { serverId } = useParams();
+  const dispatch = useDispatch();
 
   const [isServerDetailsOpen, setIsServerDetailsOpen] = useState(false);
 
@@ -49,7 +54,9 @@ const ServerSettingsMenu = (props) => {
     setIsServerDetailsOpen(true);
   };
   const createChannel = () => {};
-  const leaveServer = () => {};
+  const leaveServer = () => {
+    dispatch(leaveServerMemberRequested(serverId));
+  };
 
   const clickHanlders = {
     [SERVER_SETTINGS]: openServerSettings,

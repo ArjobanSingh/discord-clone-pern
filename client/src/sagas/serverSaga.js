@@ -12,6 +12,7 @@ import {
   UPDATE_SERVER_REQUESTED,
   UPDATE_SERVER_ROLE_REQUESTED,
   KICK_SERVER_MEMBER_REQUESTED,
+  LEAVE_SERVER_MEMBER_REQUESTED,
 } from '../constants/servers';
 import {
   createServerFailed,
@@ -22,6 +23,8 @@ import {
   joinServerSucess,
   kickServerMemberFailed,
   kickServerMemberSuccess,
+  leaveServerMemberFailed,
+  leaveServerMemberSuccess,
   serverDetailsFailed,
   serverDetailsSuccess,
   updateOwnershipFailed,
@@ -30,10 +33,10 @@ import {
   updateServerRoleSuccess,
   updateServerSuccess,
 } from '../redux/actions/servers';
+// import { getServerDetails as getServerState } from '../redux/reducers';
 import { handleError } from '../utils/helperFunctions';
 import { ServerApi } from '../utils/apiEndpoints';
 import { setNavigateState } from '../redux/actions/navigate';
-// import { getServerDetails as getServerState } from '../redux/reducers';
 import { saveAllChannels } from '../redux/actions/channels';
 import socketClient from '../services/socket-client';
 
@@ -214,6 +217,25 @@ function* kickServerMember(actionData) {
     }));
   }
 }
+
+function* leaveServer(actionData) {
+  const { serverId } = actionData.payload;
+  try {
+    const { user } = yield select((state) => state.user);
+    const url = `${ServerApi.LEAVE_SERVER}/${serverId}`;
+    yield call(axiosInstance.delete, url);
+    const isSameServerOpened = window.location.pathname.includes(`/channels/${serverId}`);
+    if (isSameServerOpened) {
+      yield put(setNavigateState(['/', { replace: true }]));
+    }
+    yield put(leaveServerMemberSuccess(serverId, user.userId, true));
+  } catch (err) {
+    yield put(handleError(err, (error) => {
+      toast.error(`Error leaving server: ${error.message}`);
+      return leaveServerMemberFailed(serverId, error.message);
+    }));
+  }
+}
 export default function* serverSaga() {
   yield all([
     takeEvery(SERVER_DETAILS_REQUESTED, getServerDetails),
@@ -224,5 +246,6 @@ export default function* serverSaga() {
     takeEvery(UPDATE_SERVER_ROLE_REQUESTED, updateUserRoleInServer),
     takeEvery(UPDATE_SERVER_OWNERSHIP_REQUESTED, transferOwnership),
     takeEvery(KICK_SERVER_MEMBER_REQUESTED, kickServerMember),
+    takeEvery(LEAVE_SERVER_MEMBER_REQUESTED, leaveServer),
   ]);
 }

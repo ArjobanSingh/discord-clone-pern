@@ -189,16 +189,27 @@ export const leaveServer = async (
     }
 
     await getConnection().transaction(async (transactionEntityManager) => {
-      await transactionEntityManager.delete(ServerMember, {
+      const deleteMemberPromise = transactionEntityManager.delete(ServerMember, {
         serverId,
         userId: req.userId,
       });
-      await transactionEntityManager.update(Server, serverId, {
+      const serverUpdatePromise = transactionEntityManager.update(Server, serverId, {
         memberCount: () => '"memberCount" - 1',
       });
+
+      await deleteMemberPromise;
+      await serverUpdatePromise;
     });
 
-    res.status(204).json();
+    const responseObj = {
+      userId: req.userId,
+      serverId,
+    };
+
+    res.json(responseObj);
+
+    const io: SocketServer = req.app.get('io');
+    io.to(serverId).emit(C.SERVER_MEMBER_LEFT, responseObj);
   } catch (err) {
     next(err);
   }

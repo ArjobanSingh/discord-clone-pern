@@ -23,7 +23,8 @@ export default (state = {}, action) => {
           return acc;
         }, {}),
       };
-    case S.KICK_SERVER_MEMBER_SUCCESS: {
+    case S.KICK_SERVER_MEMBER_SUCCESS:
+    case S.LEAVE_SERVER_MEMBER_SUCCESS: {
       const { serverId, isLoggedInUser } = action.payload;
       if (isLoggedInUser) {
         const newState = { ...state };
