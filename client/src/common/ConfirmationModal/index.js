@@ -87,8 +87,8 @@ const ConfirmationModal = (props) => {
 };
 
 ConfirmationModal.propTypes = {
-  title: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
+  title: PropTypes.node.isRequired,
+  description: PropTypes.node.isRequired,
   onConfirm: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
   confirmButton: PropTypes.node,

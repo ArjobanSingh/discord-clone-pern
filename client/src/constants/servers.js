@@ -56,6 +56,7 @@ export const SERVER_SETTINGS = {
   OVERVIEW: 'Overview',
   MEMBERS: 'Members',
   BANS: 'Bans',
+  DELETE_SERVER: 'Delete Server',
 };
 
 export const UPDATE_SERVER_ROLE_REQUESTED = 'UPDATE_SERVER_ROLE_REQUESTED';

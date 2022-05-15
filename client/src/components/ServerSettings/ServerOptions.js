@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
 import { useParams } from 'react-router-dom';
 import { SERVER_SETTINGS, ServerMemberRoles } from '../../constants/servers';
 import { SimpleEllipsis } from '../../common/StyledComponents';
@@ -8,29 +9,52 @@ import useServerData from '../../customHooks/useServerData';
 import { OptionsList, OptionWrapper } from './styles';
 
 const { OWNER, ADMIN, MODERATOR } = ServerMemberRoles;
+const ActionTypes = {
+  NEW_SCREEN: 'NEW_SCREEN',
+  DIRECT_ACTION: 'DIRECT_ACTION',
+};
+const DividerType = 'Divider';
 
 const options = [{
   title: SERVER_SETTINGS.OVERVIEW,
   roles: [OWNER, ADMIN],
+  actionType: ActionTypes.NEW_SCREEN,
 },
 {
   title: SERVER_SETTINGS.MEMBERS,
   roles: [OWNER, ADMIN, MODERATOR],
+  actionType: ActionTypes.NEW_SCREEN,
+},
+// {
+//   title: SERVER_SETTINGS.BANS,
+//   roles: [OWNER, ADMIN, MODERATOR],
+//   actionType: ActionTypes.NEW_SCREEN,
+// },
+{
+  title: DividerType,
+  key: 'Divider-1',
 },
 {
-  title: SERVER_SETTINGS.BANS,
-  roles: [OWNER, ADMIN, MODERATOR],
+  title: SERVER_SETTINGS.DELETE_SERVER,
+  roles: [OWNER],
+  actionType: ActionTypes.DIRECT_ACTION,
 }];
 
 const ServerOptions = (props) => {
-  const { currentRole, openedTab, setOpenedTab } = props;
+  const {
+    currentRole, openedTab, setOpenedTab, openDeleteModal,
+  } = props;
   const { serverId } = useParams();
 
   const { serverDetails: { name: serverName } } = useServerData(serverId, false);
 
   const handleOptionClick = (e) => {
-    const { item } = e.target.closest('li').dataset;
-    setOpenedTab(item);
+    const { item, actiontype: actionType } = e.target.closest('li').dataset;
+    if (actionType === ActionTypes.NEW_SCREEN) setOpenedTab(item);
+    else {
+      // for now only delete server
+      openDeleteModal();
+    }
   };
 
   return (
@@ -48,12 +72,21 @@ const ServerOptions = (props) => {
       </Typography>
       <OptionsList>
         {options.map((option) => {
+          if (option.title === DividerType) {
+            return (
+              <Divider
+                sx={{ backgroundColor: 'text.secondaryDark' }}
+                key={option.key}
+              />
+            );
+          }
           if (!option.roles.includes(currentRole)) return null;
           return (
             <OptionWrapper
               selected={option.title === openedTab}
               key={option.title}
               data-item={option.title}
+              data-actiontype={option.actionType}
               onClick={handleOptionClick}
             >
               <Typography
@@ -74,6 +107,7 @@ ServerOptions.propTypes = {
   currentRole: PropTypes.oneOf(Object.keys(ServerMemberRoles)).isRequired,
   openedTab: PropTypes.string.isRequired,
   setOpenedTab: PropTypes.func.isRequired,
+  openDeleteModal: PropTypes.func.isRequired,
 };
 
 export default ServerOptions;

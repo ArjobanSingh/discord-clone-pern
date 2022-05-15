@@ -45,7 +45,7 @@ export default class Channel extends BaseEntity {
   @IsEnum(ChannelTypeEnum)
   type: ChannelTypeEnum;
 
-  @ManyToOne((type) => Server, (server) => server.channels)
+  @ManyToOne((type) => Server, (server) => server.channels, { onDelete: 'CASCADE' })
   server: Server;
 
   @Column('uuid')

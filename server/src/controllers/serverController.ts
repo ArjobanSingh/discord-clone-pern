@@ -393,6 +393,7 @@ export const updateServer = async (
   }
 };
 
+// TODO: delete avatar and banner on delete
 export const deleteServer = async (
   req: CustomRequest,
   res: Response,
