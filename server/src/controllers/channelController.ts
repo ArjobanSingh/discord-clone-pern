@@ -303,7 +303,7 @@ export const createChannel = async (req: CustomRequest, res: Response, next: Nex
     res.status(201).json(channel);
 
     const io: SocketServer = req.app.get('io');
-    io.to(serverId).emit(C.SERVER_CHANNEL_CREATED, channel);
+    io.to(serverId).emit(C.SERVER_CHANNEL_CREATED, { channel });
   } catch (err) {
     next(err);
   }

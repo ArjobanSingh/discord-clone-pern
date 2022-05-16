@@ -8,11 +8,52 @@ export const saveAllChannels = (serverId, channels) => ({
   },
 });
 
-export const addChannel = (serverId, channel) => ({
+export const addChannelRequested = (serverId, data) => ({
+  type: C.ADD_CHANNEL_REQUESTED,
+  payload: {
+    serverId,
+    data,
+  },
+});
+
+export const addChannelFailed = (serverId, error) => ({
+  type: C.ADD_CHANNEL_FAILED,
+  payload: {
+    serverId,
+    error,
+  },
+});
+
+export const addChannelSuccess = (serverId, channel) => ({
   type: C.ADD_CHANNEL_SUCCESS,
   payload: {
     serverId,
     channel,
+  },
+});
+
+export const deleteChannelRequested = (serverId, channelId) => ({
+  type: C.DELETE_CHANNEL_REQUESTED,
+  payload: {
+    serverId,
+    channelId,
+  },
+});
+
+export const deleteChannelFailed = (serverId, channelId, error) => ({
+  type: C.DELETE_CHANNEL_FAILED,
+  payload: {
+    serverId,
+    channelId,
+    error,
+  },
+});
+
+export const deleteChannelSuccess = (serverId, channelId) => ({
+  type: C.DELETE_CHANNEL_SUCCESS,
+  payload: {
+    serverId,
+    channelId,
   },
 });
 

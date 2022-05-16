@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import { ADD_CHANNEL_SUCCESS, DELETE_CHANNEL_SUCCESS } from '../../constants/channels';
 import * as C from '../../constants/servers';
 import { APP_URL } from '../../utils/axiosConfig';
 
@@ -155,6 +156,40 @@ const allServers = (state = {}, action) => {
 
       const newState = { ...state };
       delete newState[serverId];
+      return newState;
+    }
+    case ADD_CHANNEL_SUCCESS: {
+      const { serverId, channel } = action.payload;
+      if (!state[serverId]) return state;
+
+      const newState = { ...state };
+      const newChannels = [];
+
+      let isChannelAlreadyPresent = false;
+      newState[serverId].channels.forEach((currentChannel) => {
+        if (currentChannel.id === channel.id) {
+          isChannelAlreadyPresent = true;
+        }
+        newChannels.push(currentChannel);
+      });
+
+      if (!isChannelAlreadyPresent) newChannels.push(channel);
+
+      newState[serverId] = {
+        ...newState[serverId],
+        channels: newChannels,
+      };
+      return newState;
+    }
+    case DELETE_CHANNEL_SUCCESS: {
+      const { serverId, channelId } = action.payload;
+      if (!state[serverId]) return state;
+
+      const newState = { ...state };
+      newState[serverId] = {
+        ...newState[serverId],
+        channels: newState[serverId].channels.filter((channel) => channel.id !== channelId),
+      };
       return newState;
     }
     default:

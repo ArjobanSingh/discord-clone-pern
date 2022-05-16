@@ -41,6 +41,9 @@ const InviteModal = (props) => {
         const sessionExpireError = handleError(err, (error) => {
           setIsFetchError(true);
           setJoinUrl(error.message || 'Something went wrong');
+
+          // explicitly undefined, just for readibility
+          return undefined;
         });
         if (sessionExpireError) dispatch(sessionExpireError);
       }

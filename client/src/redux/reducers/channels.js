@@ -23,6 +23,18 @@ export default (state = {}, action) => {
           return acc;
         }, {}),
       };
+    case C.ADD_CHANNEL_SUCCESS: {
+      const { serverId, channel } = action.payload;
+      if (state[serverId][channel.id]) return state;
+
+      return {
+        ...state,
+        [serverId]: {
+          ...state[serverId],
+          [channel.id]: channel,
+        },
+      };
+    }
     case S.KICK_SERVER_MEMBER_SUCCESS:
     case S.LEAVE_SERVER_MEMBER_SUCCESS: {
       const { serverId, isLoggedInUser } = action.payload;

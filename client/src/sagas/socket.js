@@ -5,7 +5,7 @@ import { eventChannel } from 'redux-saga';
 import { toast } from 'react-toastify';
 import socketHandler from '../services/socket-client';
 import * as C from '../constants/socket-io';
-import { sendChannelMessageSent } from '../redux/actions/channels';
+import { addChannelSuccess, deleteChannelSuccess, sendChannelMessageSent } from '../redux/actions/channels';
 import {
   deleteServerSuccess,
   kickServerMemberSuccess,
@@ -88,6 +88,16 @@ function* handleSocketEvents(socketEvent) {
         }
         yield put(deleteServerSuccess(serverId));
       }
+      break;
+    }
+    case C.SERVER_CHANNEL_CREATED: {
+      const { channel } = payload;
+      yield put(addChannelSuccess(channel.serverId, channel));
+      break;
+    }
+    case C.SERVER_CHANNEL_DELETED: {
+      const { serverId, channelId } = payload;
+      yield put(deleteChannelSuccess(serverId, channelId));
       break;
     }
     default:
