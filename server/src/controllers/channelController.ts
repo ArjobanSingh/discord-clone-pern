@@ -1,4 +1,4 @@
-import { validate } from 'class-validator';
+import { isUUID, validate } from 'class-validator';
 import { NextFunction, Response } from 'express';
 import { Server as SocketServer } from 'socket.io';
 import sharp from 'sharp';
@@ -14,8 +14,8 @@ import Message, { MessageTypeEnum } from '../entity/Message';
 import CustomRequest from '../interfaces/CustomRequest';
 import { createValidationError, CustomError } from '../utils/errors';
 import MessageData from '../types/ChannelMessageInput';
-import { ServerTypeEnum } from '../entity/Server';
-import ServerMember from '../entity/ServerMember';
+import Server, { ServerTypeEnum } from '../entity/Server';
+import ServerMember, { enumScore, MemberRole } from '../entity/ServerMember';
 import { getFileName, getMessageType } from '../utils/helperFunctions';
 
 export const sendChannelMessage = async (req: CustomRequest, res: Response, next: NextFunction) => {
@@ -254,6 +254,98 @@ export const getChannelMessages = async (req: CustomRequest, res: Response, next
     }
 
     res.json({ messages });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const createChannel = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { type, name, serverId } = req.body;
+    if (!serverId || !isUUID(serverId)) {
+      next(new CustomError('Invalid serverId', 400));
+      return;
+    }
+    const serverMember = await ServerMember.findOne({ serverId, userId: req.userId });
+    if (!serverMember) {
+      next(new CustomError('You are not part of this server', 403));
+      return;
+    }
+
+    // only admin and owner can create channels
+    if (enumScore[serverMember.role] < enumScore[MemberRole.ADMIN]) {
+      next(new CustomError('You do not have permission for creating channel in this server', 403));
+      return;
+    }
+
+    const channel = new Channel();
+    channel.name = name;
+    channel.serverId = serverId;
+    if (type) channel.type = type;
+
+    const errors = await validate(channel);
+
+    if (errors.length) {
+      next(createValidationError(errors));
+      return;
+    }
+
+    // either save or fail both
+    await getConnection().transaction(async (transactionEntityManager) => {
+      const addChannelPromise = transactionEntityManager.save(channel);
+      const updateServerPromise = transactionEntityManager.update(Server, serverId, {
+        channelCount: () => '"channelCount" + 1',
+      });
+      await addChannelPromise;
+      await updateServerPromise;
+    });
+
+    res.status(201).json(channel);
+
+    const io: SocketServer = req.app.get('io');
+    io.to(serverId).emit(C.SERVER_CHANNEL_CREATED, channel);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const deleteChannel = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const { serverId, channelId } = req.params;
+
+    const serverMember = await ServerMember.findOne({ serverId, userId: req.userId });
+    if (!serverMember) {
+      next(new CustomError('You are not part of this server', 403));
+      return;
+    }
+
+    // only admin and owner can delete channels
+    if (enumScore[serverMember.role] < enumScore[MemberRole.ADMIN]) {
+      next(new CustomError('You do not have permission for deleting this channel', 403));
+      return;
+    }
+
+    await getConnection().transaction(async (transactionEntityManager) => {
+      const removeChannelPromise = transactionEntityManager.delete(Channel, {
+        channelId,
+        serverId,
+      });
+      const countUpdatePromise = transactionEntityManager.update(Server, serverId, {
+        channelCount: () => '"channelCount" - 1',
+      });
+
+      await removeChannelPromise;
+      await countUpdatePromise;
+    });
+
+    const responseObj = {
+      serverId,
+      channelId,
+    };
+    res.json(responseObj);
+
+    const io: SocketServer = req.app.get('io');
+    io.to(serverId).emit(C.SERVER_CHANNEL_DELETED, responseObj);
   } catch (err) {
     next(err);
   }

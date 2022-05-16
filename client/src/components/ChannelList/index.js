@@ -2,7 +2,7 @@
 import {
   memo, useState, useMemo,
 } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
@@ -189,12 +189,14 @@ const ChannelList = (props) => {
 
               <Collapse in={channelsState[key].isExpanded} timeout="auto" unmountOnExit>
                 {data.channels.map((channel) => (
-                  <ChannelItem key={channel.id} isChannelOpened={channel.id === params.channelId}>
-                    <Tag />
-                    <Typography>
-                      {channel.name}
-                    </Typography>
-                  </ChannelItem>
+                  <Link to={`${params.serverId}/${channel.id}`} key={channel.id}>
+                    <ChannelItem isChannelOpened={channel.id === params.channelId}>
+                      <Tag />
+                      <Typography>
+                        {channel.name}
+                      </Typography>
+                    </ChannelItem>
+                  </Link>
                 ))}
               </Collapse>
             </ChannelTypeContainer>

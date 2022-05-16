@@ -23,6 +23,7 @@ const Messages = forwardRef((props, ref) => {
     isLoadingMore,
     replyMessage,
     setReplyMessage,
+    chatBoxId,
   } = props;
 
   const containerRef = useRef();
@@ -43,8 +44,13 @@ const Messages = forwardRef((props, ref) => {
   }));
 
   useEffect(() => {
+    // on chat box change, reset lastScrollHeight for case
+    // if previous chat box's(previous channel) more api was
+    // in progress and user change chatBox(channel)
     scrollToContainerBottom();
-  }, []);
+    lastScrollHeight.current = undefined;
+    lastScrollPositions.current = {};
+  }, [chatBoxId]);
 
   useDidUpdate(() => {
     // basically when we have completed loading more messages
@@ -146,6 +152,7 @@ Messages.propTypes = {
   moreError: PropTypes.bool.isRequired,
   replyMessage: PropTypes.shape({}).isRequired,
   setReplyMessage: PropTypes.func.isRequired,
+  chatBoxId: PropTypes.string.isRequired,
 };
 
 export default Messages;

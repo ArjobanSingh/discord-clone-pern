@@ -154,7 +154,7 @@ function* createServer(actionData) {
   }
 }
 
-const setFileToFormData = (formData, key, fileObj) => {
+function setFileToFormData(formData, key, fileObj) {
   // originalFile will only be present while adding new file or updating file
   if (fileObj.originalFile) {
     formData.append(key, fileObj.originalFile);
@@ -169,7 +169,7 @@ const setFileToFormData = (formData, key, fileObj) => {
 
   // if nothing of those two added means either file removed
   // or already was not present, do not set it in formData
-};
+}
 
 function* updateServer(actionData) {
   const { data, serverId } = actionData.payload;

@@ -79,6 +79,8 @@ const Channel = (props) => {
     }
   }, [serverId, channelId]);
 
+  useEffect(() => () => { console.log('Channel unmounted'); }, []);
+
   const membersInHierarchy = useMemo(() => {
     const result = {
       [ServerMemberRoles.OWNER]: [],
@@ -147,6 +149,7 @@ const Channel = (props) => {
             loadMoreMessages={getMoreChannelMessages}
             retryFailedMessage={retryFailedMessage}
             hideInput={isExploringServer}
+            chatBoxId={channelId}
           />
         </MessageProvider>
       </MainContent>

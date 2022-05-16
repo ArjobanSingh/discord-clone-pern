@@ -1,6 +1,7 @@
 import {
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MaxLength,
   MinLength,
@@ -42,6 +43,7 @@ export default class Channel extends BaseEntity {
     enum: ChannelTypeEnum,
     default: ChannelTypeEnum.TEXT,
   })
+  @IsOptional()
   @IsEnum(ChannelTypeEnum)
   type: ChannelTypeEnum;
 

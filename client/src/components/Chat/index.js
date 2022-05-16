@@ -23,6 +23,9 @@ const Chat = (props) => {
     messagesData,
     loadMoreMessages,
     hideInput,
+    // in group chat it would be channelId, in user chat in future
+    // it would other user id
+    chatBoxId,
   } = props;
 
   const {
@@ -113,6 +116,7 @@ const Chat = (props) => {
                 replyMessage={replyMessage}
                 getMoreMessages={getMoreMessages}
                 setReplyMessage={setReplyMessage}
+                chatBoxId={chatBoxId}
               />
             )}
         </MessagesContainer>
@@ -150,6 +154,7 @@ Chat.propTypes = {
   }).isRequired,
   loadMoreMessages: PropTypes.func.isRequired,
   hideInput: PropTypes.bool.isRequired,
+  chatBoxId: PropTypes.string.isRequired,
 };
 
 export default Chat;
