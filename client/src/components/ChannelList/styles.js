@@ -1,7 +1,32 @@
 import styled from 'styled-components';
 import Menu, { menuClasses } from '@mui/material/Menu';
+import AddIcon from '@mui/icons-material/Add';
+import ListItemButton from '@mui/material/ListItemButton';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ListItemText from '@mui/material/ListItemText';
 import { INVITE_USERS_ICON } from '../../constants/images';
+
+export const StyledAddIcon = styled(AddIcon)`
+  color: ${({ theme }) => theme.palette.text.secondary};
+
+  &:hover {
+    color: ${({ theme }) => theme.palette.text.primary};
+  }
+`;
+
+export const StyledListButton = styled(ListItemButton)`
+  &:hover {
+    background-color: inherit;
+  }
+`;
+
+export const StyledListText = styled(ListItemText)`
+  color: ${({ theme }) => theme.palette.text.secondary};
+
+  &:hover {
+    color: ${({ theme }) => theme.palette.text.primary};
+  }
+`;
 
 export const ChannelListContainer = styled.div`
   height: 100%;
@@ -15,7 +40,7 @@ export const InviteSectionWrapper = styled.section`
   border-bottom: 0.5px solid ${({ theme }) => theme.palette.divider};
   text-align: center;
   position: relative;
-  background: url(${INVITE_USERS_ICON}) no-repeat center 20px
+  background: url(${INVITE_USERS_ICON}) no-repeat center 20px;
 `;
 
 export const InviteSection = styled.div`
@@ -70,9 +95,14 @@ export const ListContainer = styled.div(({ isInviteBoxVisible }) => `
 
 export const ExpandableIcon = styled(({ isExpanded, ...rest }) => <ArrowForwardIosIcon {...rest} />)`
   transform: ${({ isExpanded }) => (isExpanded ? 'rotate(90deg)' : '')};
+  color: ${({ theme }) => theme.palette.text.secondary};
   transition: transform .3s;
   font-size: 0.75rem;
-  margin-right: ${({ theme }) => theme.spacing(1)}
+  margin-right: ${({ theme }) => theme.spacing(1)};
+
+  &:hover {
+    color: ${({ theme }) => theme.palette.text.primary};
+  }
 `;
 
 export const ChannelItem = styled.div(({ theme, isChannelOpened }) => `
@@ -93,5 +123,5 @@ export const ChannelItem = styled.div(({ theme, isChannelOpened }) => `
 
 export const ChannelTypeContainer = styled.div`
   width: 100%;
-  margin-bottom: ${({ theme }) => theme.spacing(2)};
+  margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;

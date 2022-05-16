@@ -6,8 +6,6 @@ import { Link, useParams } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
 import Box from '@mui/material/Box';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Button from '@mui/material/Button';
@@ -20,17 +18,20 @@ import {
   InviteSection,
   InviteSectionWrapper,
   ListContainer,
+  StyledAddIcon,
+  StyledListButton,
+  StyledListText,
   StyledMenu,
 } from './styles';
 import TransitionModal from '../../common/TransitionModal';
 import InviteModal from '../InviteModal';
 import useUser from '../../customHooks/useUser';
-import { Roles } from '../../constants/serverMembers';
-import { ServerTypes } from '../../constants/servers';
+import { ServerMemberRoles, ServerMemberScores, ServerTypes } from '../../constants/servers';
 import useServerData from '../../customHooks/useServerData';
 import ServerSettingsMenu from '../ServerSettingsMenu';
 import Tag from '../../common/Tag';
 import { ChannelType } from '../../constants/channels';
+import CreateChannelModal from '../CreateChannelModal';
 
 const anchorOrigin = {
   vertical: 'bottom',
@@ -42,12 +43,17 @@ const transformOrigin = {
   horizontal: 'right',
 };
 
+const ModalTypes = {
+  INVITE: 'INVITE',
+  CREATE_CHANNEL: 'CREATE_CHANNEL',
+};
+
 const ChannelList = (props) => {
   const params = useParams();
   const { serverDetails, noServerFound } = useServerData(params.serverId);
   const { user } = useUser();
 
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [modalState, setModalState] = useState(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [isTextChannelExpanded, setIsTextChannelExpanded] = useState(true);
   const [isAudioChannelExpanded, setIsAudioChannelExpanded] = useState(true);
@@ -90,11 +96,11 @@ const ChannelList = (props) => {
   };
 
   const openInviteModal = () => {
-    setIsInviteModalOpen(true);
+    setModalState(ModalTypes.INVITE);
   };
 
-  const closeInviteModal = () => {
-    setIsInviteModalOpen(false);
+  const closeModal = () => {
+    setModalState(null);
   };
 
   const closeSettingsMenu = () => {
@@ -109,10 +115,39 @@ const ChannelList = (props) => {
     return <div>No such server found</div>;
   }
 
+  const openChannelModal = (e) => {
+    e.stopPropagation();
+    setModalState(ModalTypes.CREATE_CHANNEL);
+  };
+
   // TODO: correct loading when fetching server members
   const hideOptions = !serverMember
-    || (serverMember.role === Roles.USER && serverDetails.type === ServerTypes.PRIVATE);
+    || (serverMember.role === ServerMemberRoles.USER && serverDetails.type === ServerTypes.PRIVATE);
 
+  const canCreateChannel = serverMember
+    ? ServerMemberScores[serverMember.role] >= ServerMemberScores[ServerMemberRoles.ADMIN]
+    : false;
+
+  const getModalBody = () => {
+    switch (modalState) {
+      case ModalTypes.INVITE:
+        return hideOptions
+          ? null
+          : (
+            <InviteModal
+              serverId={serverDetails.id}
+              closeModal={closeModal}
+              inviteUrls={serverDetails.inviteUrls}
+            />
+          );
+      case ModalTypes.CREATE_CHANNEL:
+        return canCreateChannel
+          ? (<CreateChannelModal />)
+          : null;
+      default:
+        return null;
+    }
+  };
   return (
     <>
       <ChannelListContainer>
@@ -182,10 +217,11 @@ const ChannelList = (props) => {
         <ListContainer isInviteBoxVisible={!hideOptions}>
           {Object.entries(channelListData).map(([key, data]) => (
             <ChannelTypeContainer key={key}>
-              <ListItemButton onClick={channelsState[key].onChange}>
+              <StyledListButton onClick={channelsState[key].onChange}>
                 <ExpandableIcon isExpanded={channelsState[key].isExpanded} />
-                <ListItemText primary={data.title} />
-              </ListItemButton>
+                <StyledListText primary={data.title} />
+                {canCreateChannel && <StyledAddIcon onClick={openChannelModal} />}
+              </StyledListButton>
 
               <Collapse in={channelsState[key].isExpanded} timeout="auto" unmountOnExit>
                 {data.channels.map((channel) => (
@@ -207,19 +243,16 @@ const ChannelList = (props) => {
       </ChannelListContainer>
       {!hideOptions && (
         <TransitionModal
-          open={isInviteModalOpen}
-          onClose={closeInviteModal}
-          aria-labelledby="invite-modal-title"
+          open={!!modalState}
+          onClose={closeModal}
+          // aria-labelledby="invite-modal-title"
         >
           <div>
-            <InviteModal
-              serverId={serverDetails.id}
-              closeModal={closeInviteModal}
-              inviteUrls={serverDetails.inviteUrls}
-            />
+            {getModalBody()}
           </div>
         </TransitionModal>
       )}
+
       <StyledMenu
         open={!!menuAnchorEl}
         anchorEl={menuAnchorEl}
