@@ -14,6 +14,7 @@ import {
   KICK_SERVER_MEMBER_REQUESTED,
   LEAVE_SERVER_MEMBER_REQUESTED,
   DELETE_SERVER_REQUESTED,
+  ServerMemberRoles,
 } from '../constants/servers';
 import {
   createServerFailed,
@@ -41,14 +42,25 @@ import { ServerApi } from '../utils/apiEndpoints';
 import { setNavigateState } from '../redux/actions/navigate';
 import { saveAllChannels } from '../redux/actions/channels';
 import socketClient from '../services/socket-client';
+import { getUser } from '../redux/reducers';
+
+async function fetchServerDetails(serverId, throwError = true) {
+  try {
+    const url = `${ServerApi.GET_SERVER}/${serverId}`;
+    const response = await axiosInstance.get(url);
+    return response.data;
+  } catch (err) {
+    if (throwError) throw err;
+    return null;
+  }
+}
 
 function* getServerDetails(actionData) {
   const { serverId, isExploringServer } = actionData.payload;
   try {
-    const url = `${ServerApi.GET_SERVER}/${serverId}`;
-    const response = yield call(axiosInstance.get, url);
-    yield put(saveAllChannels(serverId, response.data.channels ?? []));
-    yield put(serverDetailsSuccess(response.data, isExploringServer));
+    const server = yield call(fetchServerDetails, serverId);
+    yield put(saveAllChannels(serverId, server.channels ?? []));
+    yield put(serverDetailsSuccess(server, isExploringServer));
   } catch (err) {
     yield put(handleError(err, (error, { status: errStatus }) => (
       serverDetailsFailed(serverId, isExploringServer, { ...error, errStatus })
@@ -65,7 +77,29 @@ function* joinServer(actionData) {
     if (inviteLink) url = `${url}&inviteLink=${inviteLink}`;
 
     yield call(axiosInstance.post, url);
-    yield put(joinServerSucess(serverId, server));
+    let latestServerDetails = yield call(fetchServerDetails, serverId, false);
+
+    if (latestServerDetails) {
+      // update channels with latest server channels we got from api
+      yield put(saveAllChannels(serverId, latestServerDetails.channels ?? []));
+    } else {
+      // for some reason fetch server details api failed, just append
+      // our newly added member to old server details we have, which
+      // we got while exploring this public server
+      const { name, id, profilePicture } = yield select((state) => getUser(state).user);
+      const ourMemberDetails = {
+        userName: name,
+        userId: id,
+        profilePicture,
+        role: ServerMemberRoles.USER,
+      };
+      latestServerDetails = {
+        ...server,
+        members: [...server.members, ourMemberDetails],
+      };
+    }
+
+    yield put(joinServerSucess(serverId, latestServerDetails));
     yield put(setNavigateState([`/channels/${serverId}`, { replace: !!inviteLink }]));
     socketClient.connectSingleServer(serverId);
   } catch (err) {

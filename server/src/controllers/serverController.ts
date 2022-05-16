@@ -5,7 +5,7 @@ import {
 import { Server as SocketServer } from 'socket.io';
 import sharp from 'sharp';
 import {
-  FindManyOptions, getConnection, In, LessThan,
+  FindManyOptions, getConnection, getRepository, In, LessThan,
 } from 'typeorm';
 import Server, { ServerTypeEnum } from '../entity/Server';
 import CustomRequest from '../interfaces/CustomRequest';
@@ -86,7 +86,7 @@ export const createServer = async (
         {
           userName: user.name,
           userId: user.id,
-          email: user.email,
+          // email: user.email,
           profilePicture: user.profilePicture,
           role: MemberRole.OWNER,
         },
@@ -150,10 +150,12 @@ export const joinServer = async (
 
     // either save or fail both
     await getConnection().transaction(async (transactionEntityManager) => {
-      await transactionEntityManager.insert(ServerMember, serverMember);
-      await transactionEntityManager.update(Server, server.id, {
+      const addMemberPromise = transactionEntityManager.insert(ServerMember, serverMember);
+      const updateServerPromise = transactionEntityManager.update(Server, server.id, {
         memberCount: () => '"memberCount" + 1',
       });
+      await addMemberPromise;
+      await updateServerPromise;
     });
 
     res.status(204).json();
