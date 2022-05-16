@@ -13,10 +13,12 @@ import {
   UPDATE_SERVER_ROLE_REQUESTED,
   KICK_SERVER_MEMBER_REQUESTED,
   LEAVE_SERVER_MEMBER_REQUESTED,
+  DELETE_SERVER_REQUESTED,
 } from '../constants/servers';
 import {
   createServerFailed,
   createServerSuccess,
+  deleteServerSuccess,
   exploreServersFailed,
   exploreServersSuccess,
   joinServerFailed,
@@ -236,6 +238,24 @@ function* leaveServer(actionData) {
     }));
   }
 }
+
+function* deleteServer(actionData) {
+  const { serverId } = actionData.payload;
+  try {
+    const url = `${ServerApi.DELETE_SERVER}/${serverId}`;
+    yield call(axiosInstance.delete, url);
+    const isSameServerOpened = window.location.pathname.includes(`/channels/${serverId}`);
+    if (isSameServerOpened) {
+      yield put(setNavigateState(['/', { replace: true }]));
+    }
+    yield put(deleteServerSuccess(serverId));
+  } catch (err) {
+    yield put(handleError(err, (error) => {
+      toast.error(`Error Deleting server: ${error.message}`);
+      return {};
+    }));
+  }
+}
 export default function* serverSaga() {
   yield all([
     takeEvery(SERVER_DETAILS_REQUESTED, getServerDetails),
@@ -247,5 +267,6 @@ export default function* serverSaga() {
     takeEvery(UPDATE_SERVER_OWNERSHIP_REQUESTED, transferOwnership),
     takeEvery(KICK_SERVER_MEMBER_REQUESTED, kickServerMember),
     takeEvery(LEAVE_SERVER_MEMBER_REQUESTED, leaveServer),
+    takeEvery(DELETE_SERVER_REQUESTED, deleteServer),
   ]);
 }

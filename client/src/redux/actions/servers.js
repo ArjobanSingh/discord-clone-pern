@@ -211,6 +211,21 @@ export const leaveServerMemberSuccess = (serverId, userId, isLoggedInUser) => ({
     isLoggedInUser,
   },
 });
+
+export const deleteServerRequested = (serverId) => ({
+  type: C.DELETE_SERVER_REQUESTED,
+  payload: {
+    serverId,
+  },
+});
+
+export const deleteServerSuccess = (serverId) => ({
+  type: C.DELETE_SERVER_SUCCESS,
+  payload: {
+    serverId,
+  },
+});
+
 // export const updateServerRoleFailed = (serverId, error) => ({
 //   type: C.UPDATE_SERVER_ROLE_FAILED,
 //   payload: {

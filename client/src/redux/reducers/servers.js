@@ -149,6 +149,14 @@ const allServers = (state = {}, action) => {
         },
       };
     }
+    case C.DELETE_SERVER_SUCCESS: {
+      const { serverId } = action.payload;
+      if (!state[serverId]) return state;
+
+      const newState = { ...state };
+      delete newState[serverId];
+      return newState;
+    }
     default:
       return state;
   }

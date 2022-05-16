@@ -42,7 +42,7 @@ const options = [{
 
 const ServerOptions = (props) => {
   const {
-    currentRole, openedTab, setOpenedTab, openDeleteModal,
+    currentRole, openedTab, openNewOption,
   } = props;
   const { serverId } = useParams();
 
@@ -50,11 +50,7 @@ const ServerOptions = (props) => {
 
   const handleOptionClick = (e) => {
     const { item, actiontype: actionType } = e.target.closest('li').dataset;
-    if (actionType === ActionTypes.NEW_SCREEN) setOpenedTab(item);
-    else {
-      // for now only delete server
-      openDeleteModal();
-    }
+    openNewOption(actionType === ActionTypes.NEW_SCREEN ? item : undefined);
   };
 
   return (
@@ -106,8 +102,7 @@ const ServerOptions = (props) => {
 ServerOptions.propTypes = {
   currentRole: PropTypes.oneOf(Object.keys(ServerMemberRoles)).isRequired,
   openedTab: PropTypes.string.isRequired,
-  setOpenedTab: PropTypes.func.isRequired,
-  openDeleteModal: PropTypes.func.isRequired,
+  openNewOption: PropTypes.func.isRequired,
 };
 
 export default ServerOptions;

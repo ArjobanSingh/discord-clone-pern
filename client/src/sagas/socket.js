@@ -6,7 +6,12 @@ import { toast } from 'react-toastify';
 import socketHandler from '../services/socket-client';
 import * as C from '../constants/socket-io';
 import { sendChannelMessageSent } from '../redux/actions/channels';
-import { kickServerMemberSuccess, leaveServerMemberSuccess, updateOwnershipSuccess } from '../redux/actions/servers';
+import {
+  deleteServerSuccess,
+  kickServerMemberSuccess,
+  leaveServerMemberSuccess,
+  updateOwnershipSuccess,
+} from '../redux/actions/servers';
 import { setNavigateState } from '../redux/actions/navigate';
 import { getServerDetails } from '../redux/reducers';
 
@@ -67,6 +72,22 @@ function* handleSocketEvents(socketEvent) {
         yield put(setNavigateState(['/', { replace: true }]));
       }
       yield put(leaveServerMemberSuccess(serverId, userId, isLoggedInUser));
+      break;
+    }
+    case C.SERVER_DELETED: {
+      const { serverId } = payload;
+      const isSameServerOpened = window.location.pathname.includes(`/channels/${serverId}`);
+      const serverToDelete = yield select((state) => getServerDetails(state, serverId));
+      if (serverToDelete) {
+        // if not this server, already deleted
+        const { name } = serverToDelete;
+        toast.info(`${name} server has been deleted`);
+
+        if (isSameServerOpened) {
+          yield put(setNavigateState(['/', { replace: true }]));
+        }
+        yield put(deleteServerSuccess(serverId));
+      }
       break;
     }
     default:

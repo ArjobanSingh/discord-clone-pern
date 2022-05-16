@@ -229,7 +229,8 @@ const channelsChat = (state = {}, action) => {
       }
       return state;
     }
-    case S.RESET_EXPLORE_SERVER: {
+    case S.RESET_EXPLORE_SERVER:
+    case S.DELETE_SERVER_SUCCESS: {
       const { serverId } = action.payload;
       if (!state[serverId]) return state;
       const newState = { ...state };

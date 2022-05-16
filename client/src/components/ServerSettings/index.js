@@ -4,6 +4,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import IconButton from '@mui/material/IconButton';
 import { useParams } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import {
   FullHeightContainer,
   ListContainer, MainContent, ServerOptionsDrawer, SettingsContainer, SettingsNav,
@@ -15,11 +16,13 @@ import OptionContent from './OptionContent';
 import SnackbarProvider from './SnackbarProvider';
 import ConfirmationModal from '../../common/ConfirmationModal';
 import useServerData from '../../customHooks/useServerData';
+import { deleteServerRequested } from '../../redux/actions/servers';
 
 const ServerSettings = (props) => {
   const { closeServerSettings, currentRole } = props;
   const { serverId } = useParams();
   const { serverDetails } = useServerData(serverId, false);
+  const dispatch = useDispatch();
 
   const {
     mobileOpen,
@@ -47,7 +50,20 @@ const ServerSettings = (props) => {
     setIsDeleteModalVisible(true);
   };
 
-  const onDeleteServer = () => {};
+  const onDeleteServer = () => {
+    dispatch(deleteServerRequested(serverId));
+  };
+
+  const openNewOption = (newTabOption) => {
+    if (newTabOption) {
+      setOpenedTab(newTabOption);
+    } else {
+      // if newTabOption not available means action type button
+      // for now only delete server modal action
+      openDeleteModal();
+    }
+    closeDrawer();
+  };
 
   return (
     <SnackbarProvider value={snackbarValue}>
@@ -57,10 +73,9 @@ const ServerSettings = (props) => {
       >
         <SettingsNav>
           <ServerOptions
-            setOpenedTab={setOpenedTab}
             openedTab={openedTab}
             currentRole={currentRole}
-            openDeleteModal={openDeleteModal}
+            openNewOption={openNewOption}
           />
         </SettingsNav>
       </ServerOptionsDrawer>
@@ -70,10 +85,9 @@ const ServerSettings = (props) => {
           <ListContainer>
             <SettingsNav>
               <ServerOptions
-                setOpenedTab={setOpenedTab}
                 openedTab={openedTab}
                 currentRole={currentRole}
-                openDeleteModal={openDeleteModal}
+                openNewOption={openNewOption}
               />
             </SettingsNav>
           </ListContainer>

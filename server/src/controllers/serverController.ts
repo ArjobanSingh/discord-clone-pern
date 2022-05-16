@@ -418,8 +418,18 @@ export const deleteServer = async (
       next(new CustomError('Forbidden', 403));
       return;
     }
+    const { avatarPublicId, bannerPublicId } = server;
+
     await Server.delete(serverId);
+
     res.status(204).json();
+
+    const io: SocketServer = req.app.get('io');
+    io.to(serverId).emit(C.SERVER_DELETED, { serverId });
+
+    // after response has been sent, delete previous avatar/banner if present
+    if (avatarPublicId) cloudinary.uploader.destroy(avatarPublicId);
+    if (bannerPublicId) cloudinary.uploader.destroy(bannerPublicId);
   } catch (err) {
     next(err);
   }

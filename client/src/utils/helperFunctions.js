@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify';
 import { MessageType } from '../constants/Message';
 import { logoutSuccess } from '../redux/actions/auth';
 
@@ -37,7 +38,10 @@ export function handleError(err, callback) {
   if (!err.response) return callback({ message: err.message }, err);
 
   const { status, data } = err.response;
-  if (status === 401) return logoutSuccess();
+  if (status === 401) {
+    toast.error('Session expired, Please log in again');
+    return logoutSuccess();
+  }
   return callback(data.error, err);
 }
 
