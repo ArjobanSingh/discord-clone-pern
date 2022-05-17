@@ -33,6 +33,7 @@ import Tag from '../../common/Tag';
 import { ChannelType } from '../../constants/channels';
 import CreateChannelModal from '../CreateChannelModal';
 import StyledTooltip from '../../common/StyledToolTip';
+import useDidUpdate from '../../customHooks/useDidUpdate';
 
 const anchorOrigin = {
   vertical: 'bottom',
@@ -145,6 +146,7 @@ const ChannelList = (props) => {
         return canCreateChannel
           ? (
             <CreateChannelModal
+              serverId={serverDetails.id}
               closeModal={closeModal}
             />
           )

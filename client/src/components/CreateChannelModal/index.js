@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
+import CircularProgress from '@mui/material/CircularProgress';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import RadioGroup from '@mui/material/RadioGroup';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../../utils/axiosConfig';
 import {
   Container,
   Form,
@@ -16,6 +20,11 @@ import {
 import { ChannelType } from '../../constants/channels';
 import Tag from '../../common/Tag';
 import StyledTextfield from '../../common/StyledTextfield';
+import useIsMounted from '../../customHooks/useIsMounted';
+import Error from '../../common/Error';
+import { handleError } from '../../utils/helperFunctions';
+import { ChannelApi } from '../../utils/apiEndpoints';
+import { addChannelSuccess } from '../../redux/actions/channels';
 
 const inputNames = {
   channelType: 'channel-type-buttons-group',
@@ -35,9 +44,17 @@ const radios = [{
 }];
 
 const CreateChannelModal = (props) => {
-  const { closeModal } = props;
+  const { closeModal, serverId } = props;
+  const isMounted = useIsMounted();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [channelType, setChannelType] = useState(ChannelType.TEXT);
   const [channelName, setChannelName] = useState('');
+  const [createChannelData, setCreateChannelData] = useState({
+    isCreatingChannel: false,
+    error: null,
+  });
 
   const handleChange = (e) => {
     const { value, name } = e.target;
@@ -47,12 +64,40 @@ const CreateChannelModal = (props) => {
     }
   };
 
-  const createChannel = () => {};
+  const createChannel = async (e) => {
+    e.preventDefault();
+    if (!channelName?.trim()) return;
+    try {
+      setCreateChannelData({ isCreatingChannel: true, error: null });
+      const url = ChannelApi.CREATE_CHANNEL;
+      const payload = { serverId, type: channelType, name: channelName };
+      const response = await axiosInstance.post(url, payload);
+      dispatch(addChannelSuccess(response.data.serverId, response.data));
+      if (isMounted.current) {
+        navigate(`/channels/${response.data.serverId}/${response.data.id}`);
+        closeModal();
+      }
+    } catch (err) {
+      if (isMounted.current) {
+        const sessionExpireError = handleError(err, (error) => {
+          setCreateChannelData({
+            isCreatingChannel: false,
+            error: error.message || 'Something went wrong',
+          });
+          // explicitly undefined, just for readibility
+          return undefined;
+        });
+        if (sessionExpireError) dispatch(sessionExpireError);
+      }
+    }
+  };
+
+  const { error, isCreatingChannel } = createChannelData;
 
   return (
     <Container>
       <ModalBody>
-        <Form>
+        <Form id="create-channel-form" onSubmit={createChannel}>
           <Box
             display="flex"
             width="100%"
@@ -105,6 +150,7 @@ const CreateChannelModal = (props) => {
             />
           </Box>
         </Form>
+        {!!error && <Error>{error}</Error>}
       </ModalBody>
       <ModalFooter>
         <Button
@@ -116,9 +162,14 @@ const CreateChannelModal = (props) => {
         </Button>
         <Button
           variant="contained"
-          onClick={createChannel}
+          disabled={!channelName?.trim()}
+          form="create-channel-form"
+          type="submit"
+          sx={{ width: '131px', height: '36px' }}
         >
-          Create Channel
+          {isCreatingChannel
+            ? <CircularProgress color="inherit" size={20} />
+            : 'Create Channel'}
         </Button>
       </ModalFooter>
     </Container>
@@ -127,6 +178,7 @@ const CreateChannelModal = (props) => {
 
 CreateChannelModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
+  serverId: PropTypes.string.isRequired,
 };
 
 export default CreateChannelModal;
