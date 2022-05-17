@@ -32,6 +32,7 @@ import ServerSettingsMenu from '../ServerSettingsMenu';
 import Tag from '../../common/Tag';
 import { ChannelType } from '../../constants/channels';
 import CreateChannelModal from '../CreateChannelModal';
+import StyledTooltip from '../../common/StyledToolTip';
 
 const anchorOrigin = {
   vertical: 'bottom',
@@ -142,7 +143,11 @@ const ChannelList = (props) => {
           );
       case ModalTypes.CREATE_CHANNEL:
         return canCreateChannel
-          ? (<CreateChannelModal />)
+          ? (
+            <CreateChannelModal
+              closeModal={closeModal}
+            />
+          )
           : null;
       default:
         return null;
@@ -220,7 +225,14 @@ const ChannelList = (props) => {
               <StyledListButton onClick={channelsState[key].onChange}>
                 <ExpandableIcon isExpanded={channelsState[key].isExpanded} />
                 <StyledListText primary={data.title} />
-                {canCreateChannel && <StyledAddIcon onClick={openChannelModal} />}
+                {canCreateChannel && (
+                <StyledTooltip
+                  placement="top"
+                  title="Create Channel"
+                >
+                  <StyledAddIcon onClick={openChannelModal} />
+                </StyledTooltip>
+                )}
               </StyledListButton>
 
               <Collapse in={channelsState[key].isExpanded} timeout="auto" unmountOnExit>

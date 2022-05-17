@@ -5,17 +5,19 @@ const Svg = styled.svg`
   width: 1em;
   height: 1em;
   color: currentColor;
+  font-size: ${({ fontSize }) => fontSize};
 `;
 
 const Tag = (props) => (
   <Svg
-    width="24"
-    height="24"
+    // width="24"
+    // height="24"
     viewBox="0 0 24 24"
     className="icon-2xnN2Y"
     x="0"
     y="0"
     aria-hidden="true"
+    {...props}
   >
     <path
       fill="currentColor"
