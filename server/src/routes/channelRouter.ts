@@ -13,6 +13,6 @@ const channelRouter = Router();
 channelRouter.post('/send-message', isAuthenticated, uploadFile, sendChannelMessage);
 channelRouter.get('/:serverId/:channelId', isAuthenticated, getChannelMessages);
 channelRouter.post('/create-channel', isAuthenticated, createChannel);
-channelRouter.delete('/delete-channel/:serverId/:channelId', deleteChannel);
+channelRouter.delete('/delete-channel/:serverId/:channelId', isAuthenticated, deleteChannel);
 
 export default channelRouter;

@@ -270,6 +270,7 @@ const ServerMembers = (props) => {
             variant="contained"
             onClick={onConfirm}
             isLoading={isLoading}
+            color="error"
           >
             <span className="button-text">
               {confirmTitle}

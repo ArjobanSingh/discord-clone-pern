@@ -327,7 +327,7 @@ export const deleteChannel = async (req: CustomRequest, res: Response, next: Nex
 
     await getConnection().transaction(async (transactionEntityManager) => {
       const removeChannelPromise = transactionEntityManager.delete(Channel, {
-        channelId,
+        id: channelId,
         serverId,
       });
       const countUpdatePromise = transactionEntityManager.update(Server, serverId, {

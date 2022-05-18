@@ -97,6 +97,11 @@ function* handleSocketEvents(socketEvent) {
     }
     case C.SERVER_CHANNEL_DELETED: {
       const { serverId, channelId } = payload;
+      const isSameChannelOpened = window.location.pathname.includes(`/channels/${serverId}/${channelId}`);
+
+      if (isSameChannelOpened === channelId) {
+        yield put(setNavigateState([`/channels/${serverId}`, { replace: true }]));
+      }
       yield put(deleteChannelSuccess(serverId, channelId));
       break;
     }

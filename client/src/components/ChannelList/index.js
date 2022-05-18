@@ -2,14 +2,18 @@
 import {
   memo, useState, useMemo,
 } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import Collapse from '@mui/material/Collapse';
 import Box from '@mui/material/Box';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
-import { Header } from '../../common/StyledComponents';
+import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
+import { Header, SimpleEllipsis } from '../../common/StyledComponents';
+import axiosInstance from '../../utils/axiosConfig';
 import {
   ChannelItem,
   ChannelListContainer,
@@ -34,6 +38,11 @@ import { ChannelType } from '../../constants/channels';
 import CreateChannelModal from '../CreateChannelModal';
 import StyledTooltip from '../../common/StyledToolTip';
 import useDidUpdate from '../../customHooks/useDidUpdate';
+import ConfirmationModal from '../../common/ConfirmationModal';
+import { handleError } from '../../utils/helperFunctions';
+import { ChannelApi } from '../../utils/apiEndpoints';
+import { deleteChannelSuccess } from '../../redux/actions/channels';
+import { AbsoluteProgress, ConfirmationButton } from '../ServerSettings/Options/styles';
 
 const anchorOrigin = {
   vertical: 'bottom',
@@ -54,11 +63,15 @@ const ChannelList = (props) => {
   const params = useParams();
   const { serverDetails, noServerFound } = useServerData(params.serverId);
   const { user } = useUser();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [modalState, setModalState] = useState(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [isTextChannelExpanded, setIsTextChannelExpanded] = useState(true);
   const [isAudioChannelExpanded, setIsAudioChannelExpanded] = useState(true);
+  const [deleteChannelModalData, setDeleteChannelModalData] = useState(null);
+  const [isDeletingChannel, setIsDeletingChannel] = useState(false);
 
   const serverMember = useMemo(() => (
     serverDetails?.members?.find((member) => member.userId === user.id)
@@ -129,6 +142,44 @@ const ChannelList = (props) => {
   const canCreateChannel = serverMember
     ? ServerMemberScores[serverMember.role] >= ServerMemberScores[ServerMemberRoles.ADMIN]
     : false;
+
+  const canDeleteChannel = canCreateChannel;
+
+  const openDeleteChannelModal = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const { id: channelId, name: channelName } = e.target.closest('button').dataset;
+    setDeleteChannelModalData({ channelId, channelName });
+  };
+
+  const closeDeleteChannelModal = () => {
+    setDeleteChannelModalData(null);
+    setIsDeletingChannel(false);
+  };
+
+  const deleteChannel = async () => {
+    const { serverId } = params;
+    const { channelId } = deleteChannelModalData;
+    try {
+      setIsDeletingChannel(true);
+      const url = `${ChannelApi.DELETE_CHANNEL}/${serverId}/${channelId}`;
+      const { data } = await axiosInstance.delete(url);
+
+      // after success, directly navigate to server url
+      // it will automatically open the first channel of current server
+      if (params.channelId === data.channelId) {
+        navigate(`/channels/${data.serverId}`, { replace: true });
+      }
+      dispatch(deleteChannelSuccess(data.serverId, data.channelId));
+    } catch (err) {
+      const sessionExpireError = handleError(err, (error) => {
+        toast.error(`Error while deleting channel: ${error.message}`);
+      });
+      if (sessionExpireError) dispatch(sessionExpireError);
+    } finally {
+      closeDeleteChannelModal();
+    }
+  };
 
   const getModalBody = () => {
     switch (modalState) {
@@ -242,9 +293,31 @@ const ChannelList = (props) => {
                   <Link to={`${params.serverId}/${channel.id}`} key={channel.id}>
                     <ChannelItem isChannelOpened={channel.id === params.channelId}>
                       <Tag />
-                      <Typography>
-                        {channel.name}
+                      <Typography
+                        flex="1"
+                        component="div"
+                        maxWidth={canDeleteChannel ? 'calc(100% - 48px)' : 'calc(100% - 24px)'}
+                      >
+                        <SimpleEllipsis>
+                          {channel.name}
+                        </SimpleEllipsis>
                       </Typography>
+                      {canDeleteChannel
+                      && (
+                      <StyledTooltip
+                        placement="top"
+                        title="Delete Channel"
+                      >
+                        <IconButton
+                          onClick={openDeleteChannelModal}
+                          data-id={channel.id}
+                          data-name={channel.name}
+                          size="small"
+                        >
+                          <DeleteIcon sx={{ fontSize: '1rem' }} />
+                        </IconButton>
+                      </StyledTooltip>
+                      )}
                     </ChannelItem>
                   </Link>
                 ))}
@@ -265,6 +338,38 @@ const ChannelList = (props) => {
             {getModalBody()}
           </div>
         </TransitionModal>
+      )}
+
+      {canDeleteChannel && (
+        <ConfirmationModal
+          open={!!deleteChannelModalData}
+          onClose={closeDeleteChannelModal}
+          title="Delete Channel"
+          onConfirm={deleteChannel}
+          confirmTitle={isDeletingChannel ? 'Deleting...' : 'Delete'}
+          confirmButton={(
+            <ConfirmationButton
+              variant="contained"
+              onClick={deleteChannel}
+              isLoading={isDeletingChannel}
+              color="error"
+            >
+              <span className="button-text">
+                Delete channel
+              </span>
+              {isDeletingChannel && <AbsoluteProgress color="inherit" size={20} />}
+            </ConfirmationButton>
+          )}
+          description={(
+            <>
+              Are you sure you want to delete
+              {' '}
+              <strong>{deleteChannelModalData?.channelName}</strong>
+              {' '}
+              channel?
+            </>
+          )}
+        />
       )}
 
       <StyledMenu
