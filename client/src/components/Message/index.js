@@ -1,5 +1,5 @@
 import {
-  memo, useCallback, useLayoutEffect, useRef, useState,
+  memo, useCallback, useLayoutEffect, useMemo, useRef, useState,
 } from 'react';
 import { toast } from 'react-toastify';
 import ReplyIcon from '@mui/icons-material/Reply';
@@ -24,7 +24,7 @@ import {
 import Logo from '../../common/Logo';
 import useUser from '../../customHooks/useUser';
 import {
-  downloadFile, formatDate, getTime, sameDay,
+  downloadFile, formatDate, getTime, sameDay, stringToColor,
 } from '../../utils/helperFunctions';
 import DateMessage from '../MessageTypes/DateMessage';
 import ReferenceMessage from '../MessageTypes/ReferenceMessage';
@@ -79,6 +79,8 @@ const Message = (props) => {
       scrollToContainerBottom();
     }
   }, [status]);
+
+  const userNameColor = useMemo(() => stringToColor(user.name), [user.name]);
 
   const isMessageSentToday = sameDay(Date.now(), message.createdAt);
   //   const isMessageByCurrentUser = user.id === currentUser.id;
@@ -178,7 +180,8 @@ const Message = (props) => {
             <Box display="flex" gap="10px" alignItems="center">
               <Typography
                 variant="subtitle1"
-                color="primary.main"
+                // color="primary.main"
+                color={userNameColor}
                 lineHeight="1.2"
                 fontWeight="fontWeightBold"
               >
@@ -210,6 +213,52 @@ const Message = (props) => {
     );
   };
 
+  const failedMessageOptions = () => (
+    <>
+      <div>
+        <StyledTooltip
+          fontSize={appTheme.typography.subtitle1.fontSize}
+          placement="top"
+          title="Retry message"
+        >
+          <RefreshIcon onClick={retryMessage} />
+        </StyledTooltip>
+      </div>
+      <div>
+        <StyledTooltip
+          fontSize={appTheme.typography.subtitle1.fontSize}
+          placement="top"
+          title="Delete message"
+        >
+          <DeleteIcon onClick={deleteCurrentMessage} />
+        </StyledTooltip>
+      </div>
+    </>
+  );
+
+  const sentMessageOptions = () => (
+    <>
+      <div>
+        <StyledTooltip
+          fontSize={appTheme.typography.subtitle1.fontSize}
+          placement="top"
+          title="Reply"
+        >
+          <ReplyIcon onClick={handleReply} />
+        </StyledTooltip>
+      </div>
+      <div>
+        <StyledTooltip
+          fontSize={appTheme.typography.subtitle1.fontSize}
+          placement="top"
+          title="More"
+        >
+          <MoreHorizIcon />
+        </StyledTooltip>
+      </div>
+    </>
+  );
+
   return (
     <>
       {!isSameDay && (
@@ -226,50 +275,8 @@ const Message = (props) => {
         {status !== MessageStatus.SENDING && (
           <OptionsContainer>
             {status === MessageStatus.FAILED
-              ? (
-                <>
-                  <div>
-                    <StyledTooltip
-                      fontSize={appTheme.typography.subtitle1.fontSize}
-                      placement="top"
-                      title="Retry message"
-                    >
-                      <RefreshIcon onClick={retryMessage} />
-                    </StyledTooltip>
-                  </div>
-                  <div>
-                    <StyledTooltip
-                      fontSize={appTheme.typography.subtitle1.fontSize}
-                      placement="top"
-                      title="Delete message"
-                    >
-                      <DeleteIcon onClick={deleteCurrentMessage} />
-                    </StyledTooltip>
-                  </div>
-                </>
-              )
-              : (
-                <>
-                  <div>
-                    <StyledTooltip
-                      fontSize={appTheme.typography.subtitle1.fontSize}
-                      placement="top"
-                      title="Reply"
-                    >
-                      <ReplyIcon onClick={handleReply} />
-                    </StyledTooltip>
-                  </div>
-                  <div>
-                    <StyledTooltip
-                      fontSize={appTheme.typography.subtitle1.fontSize}
-                      placement="top"
-                      title="More"
-                    >
-                      <MoreHorizIcon />
-                    </StyledTooltip>
-                  </div>
-                </>
-              )}
+              ? failedMessageOptions()
+              : sentMessageOptions()}
           </OptionsContainer>
         )}
       </MessageContainer>
