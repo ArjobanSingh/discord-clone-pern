@@ -6,7 +6,12 @@ import { isEmpty } from '../../utils/validators';
 /*
   State schema: {
     [serverId1]: {
-      [channelId1]: { ...channel1ChatState },
+      [channelId1]: {
+        isLoading: boolean,
+        hasMore: boolean,
+        data: MessageObject[],
+        error: null | string
+       },
       [channelId2]: { ...channel2ChatState },
     },
     [serverId2]: {
@@ -67,21 +72,46 @@ const channelsChat = (state = {}, action) => {
         },
       };
     }
-    case C.RETRY_CHANNEL_FAILED_MESSAGE: {
-      const { serverId, channelId, messageData } = action.payload;
+    case C.CHANNEL_MORE_MESSAGES_REQUESTED: {
+      const { serverId, channelId } = action.payload;
       return {
         ...state,
         [serverId]: {
           ...state[serverId],
           [channelId]: {
             ...state[serverId][channelId],
-            data: state[serverId][channelId].data.map((msg) => {
-              if (msg.id === messageData.id) {
-                // this is failed message which we are retrying
-                return { ...msg, status: MessageStatus.SENDING };
-              }
-              return msg;
-            }),
+            isLoadingMore: true,
+            moreError: null,
+          },
+        },
+      };
+    }
+    case C.CHANNEL_MORE_MESSAGES_SUCCESS: {
+      const { serverId, channelId, data } = action.payload;
+      return {
+        ...state,
+        [serverId]: {
+          ...state[serverId],
+          [channelId]: {
+            ...state[serverId][channelId],
+            isLoadingMore: false,
+            data: [...data, ...state[serverId][channelId].data],
+            // if we got less messages than 50, means no more messages
+            hasMore: !(data.length < 50),
+          },
+        },
+      };
+    }
+    case C.CHANNEL_MORE_MESSAGES_FAILED: {
+      const { serverId, channelId, error } = action.payload;
+      return {
+        ...state,
+        [serverId]: {
+          ...state[serverId],
+          [channelId]: {
+            ...state[serverId][channelId],
+            isLoadingMore: false,
+            moreError: error,
           },
         },
       };
@@ -141,6 +171,25 @@ const channelsChat = (state = {}, action) => {
         },
       };
     }
+    case C.RETRY_CHANNEL_FAILED_MESSAGE: {
+      const { serverId, channelId, messageData } = action.payload;
+      return {
+        ...state,
+        [serverId]: {
+          ...state[serverId],
+          [channelId]: {
+            ...state[serverId][channelId],
+            data: state[serverId][channelId].data.map((msg) => {
+              if (msg.id === messageData.id) {
+                // this is failed message which we are retrying
+                return { ...msg, status: MessageStatus.SENDING };
+              }
+              return msg;
+            }),
+          },
+        },
+      };
+    }
     case C.DELETE_CHANNEL_MESSAGE_REQUESTED: {
       // TODO: with backend delete api, this action hanlder might change
       const { serverId, channelId, messageId } = action.payload;
@@ -151,50 +200,6 @@ const channelsChat = (state = {}, action) => {
           [channelId]: {
             ...state[serverId][channelId],
             data: state[serverId][channelId].data.filter((msg) => msg.id !== messageId),
-          },
-        },
-      };
-    }
-    case C.CHANNEL_MORE_MESSAGES_REQUESTED: {
-      const { serverId, channelId } = action.payload;
-      return {
-        ...state,
-        [serverId]: {
-          ...state[serverId],
-          [channelId]: {
-            ...state[serverId][channelId],
-            isLoadingMore: true,
-            moreError: null,
-          },
-        },
-      };
-    }
-    case C.CHANNEL_MORE_MESSAGES_SUCCESS: {
-      const { serverId, channelId, data } = action.payload;
-      return {
-        ...state,
-        [serverId]: {
-          ...state[serverId],
-          [channelId]: {
-            ...state[serverId][channelId],
-            isLoadingMore: false,
-            data: [...data, ...state[serverId][channelId].data],
-            // if we got less messages than 50, means no more messages
-            hasMore: !(data.length < 50),
-          },
-        },
-      };
-    }
-    case C.CHANNEL_MORE_MESSAGES_FAILED: {
-      const { serverId, channelId, error } = action.payload;
-      return {
-        ...state,
-        [serverId]: {
-          ...state[serverId],
-          [channelId]: {
-            ...state[serverId][channelId],
-            isLoadingMore: false,
-            moreError: error,
           },
         },
       };

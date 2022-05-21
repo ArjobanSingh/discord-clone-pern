@@ -111,10 +111,8 @@ const getMessageType = (type: string): [MessageTypeEnum, string] => {
   return [MessageTypeEnum.FILE, 'auto'];
 };
 
-const getFileName = (originalName: string) => {
-  if (originalName) return `${nanoid()}-${originalName}`;
-  return `${nanoid()}`;
-};
+// if (originalName) return `${nanoid()}-${originalName}`;
+const getFileName = (originalName: string) => `${originalName || nanoid()}`;
 
 const calculateAspectRatioFit = (srcWidth: number, srcHeight: number, maxWidth = 400, maxHeight = 300) => {
   const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);

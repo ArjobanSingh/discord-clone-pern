@@ -9,6 +9,7 @@ import MeServer from '../../components/MeServer';
 import Auth from '../../components/Auth';
 import InvitePage from '../InvitePage';
 import ServerDiscovery from '../../components/ServerDiscovery';
+import RouteNavigator from '../RouteNavigator';
 
 // const Auth = lazy(() => import('./components/Auth'));
 
@@ -46,13 +47,14 @@ const AppRoutes = (props) => (
           </RequireAuth>
         )}
       >
-        <Route path="@me" element={<MeServer />} />
+        {/* <Route path="@me" element={<MeServer />} /> */}
         <Route path=":serverId" element={<Server />}>
           <Route path=":channelId" element={<Channel />} />
         </Route>
-        <Route index element={<Navigate replace to="@me" />} />
+        {/* <Route index element={<Navigate replace to="@me" />} /> */}
       </Route>
-      <Route path="*" element={<Navigate replace to="/channels/@me" />} />
+      {/* <Route path="*" element={<Navigate replace to="/channels/@me" />} /> */}
+      <Route path="*" element={<RequireAuth><RouteNavigator /></RequireAuth>} />
     </Routes>
   </Suspense>
 );

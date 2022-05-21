@@ -86,11 +86,12 @@ export const sendChannelMessageSent = (serverId, channelId, localMessageKey, mes
   },
 });
 
-export const channelMessagesRequested = (serverId, channelId) => ({
+export const channelMessagesRequested = (serverId, channelId, testError) => ({
   type: C.CHANNEL_MESSAGES_REQUESTED,
   payload: {
     channelId,
     serverId,
+    testError,
   },
 });
 

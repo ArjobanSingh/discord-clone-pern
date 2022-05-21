@@ -72,14 +72,16 @@ const Channel = (props) => {
     members,
   } = useOutletContext();
 
+  const fetchChannelMessages = () => {
+    dispatch(channelMessagesRequested(serverId, channelId));
+  };
+
   useEffect(() => {
     if (serverId && channelId) {
       // whenever these change, fetch messages
-      dispatch(channelMessagesRequested(serverId, channelId));
+      fetchChannelMessages();
     }
   }, [serverId, channelId]);
-
-  useEffect(() => () => { console.log('Channel unmounted'); }, []);
 
   const membersInHierarchy = useMemo(() => {
     const result = {
@@ -150,6 +152,7 @@ const Channel = (props) => {
             retryFailedMessage={retryFailedMessage}
             hideInput={isExploringServer}
             chatBoxId={channelId}
+            fetchMessages={fetchChannelMessages}
           />
         </MessageProvider>
       </MainContent>

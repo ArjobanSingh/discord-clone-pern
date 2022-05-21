@@ -18,25 +18,24 @@ const PublicServersGrid = (props) => {
   const viewPublicServer = (e) => {
     const { index } = e.target.closest('.grid-tile').dataset;
     const requestedServer = servers[index];
-    dispatch(addExploreServerData(requestedServer));
+    if (!(userJoinedServers[requestedServer.id])) {
+      dispatch(addExploreServerData(requestedServer));
+    }
     navigate(`/channels/${requestedServer.id}`);
   };
 
   return (
     <Grid>
-      {servers.map((server, index) => {
-        if (userJoinedServers[server.id]) return null;
-        return (
-          <GridTile
-            onClick={viewPublicServer}
-            key={server.id}
-            data-index={index}
-            className="grid-tile"
-          >
-            <SingleServerTile server={server} />
-          </GridTile>
-        );
-      })}
+      {servers.map((server, index) => (
+        <GridTile
+          onClick={viewPublicServer}
+          key={server.id}
+          data-index={index}
+          className="grid-tile"
+        >
+          <SingleServerTile server={server} />
+        </GridTile>
+      ))}
     </Grid>
   );
 };

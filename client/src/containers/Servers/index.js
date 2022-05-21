@@ -35,11 +35,11 @@ const Servers = () => {
         drawerWidth={isDiscoveryPage ? 74 : 320}
       >
         {isLoading || !user
-          ? <div>Servers Drawer Loading Ui..</div>
+          ? <div>TODO: Servers Drawer Loading Ui..</div>
           : <AllServersDrawer isDiscoveryPage={isDiscoveryPage} />}
       </ResponsiveDrawer>
       {isLoading || !user
-        ? <div>Children Outlet Loading Ui..</div>
+        ? <div>TODO: Children Outlet Loading Ui..</div>
         : <ServerContainer><Outlet context={openDrawer} /></ServerContainer>}
     </Box>
   );

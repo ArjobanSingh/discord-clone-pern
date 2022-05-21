@@ -27,18 +27,18 @@ import { isEmpty } from '../utils/validators';
 const socket = socketHandler.getSocket();
 
 function* getChannelMessages(actionData) {
-  const { channelId, serverId } = actionData.payload;
+  const { channelId, serverId, testError } = actionData.payload;
   try {
     const previousChannelState = yield select((state) => getChannelMessagesData(state, serverId, channelId));
     // if messages already not present than only fetch again
     if (isEmpty(previousChannelState?.data)) {
-      const url = `${ChannelApi.GET_CHANNEL_MESSAGES}/${serverId}/${channelId}`;
+      const url = `${ChannelApi.GET_CHANNEL_MESSAGES}/${serverId}/${testError ? undefined : channelId}`;
       const response = yield call(axiosInstance.get, url);
       yield put(channelMessagesSuccess(serverId, channelId, response.data.messages.reverse()));
     }
   } catch (err) {
     yield put(handleError(err, (error) => (
-      channelMessagesFailed(serverId, channelId, error)
+      channelMessagesFailed(serverId, channelId, error.message)
     )));
   }
 }
@@ -89,7 +89,6 @@ function* sendChannelMessage(actionData) {
     yield put(sendChannelMessageSent(serverId, channelId, localKey, newMessageData));
   } catch (err) {
     console.log('Message sending error: ', err, err.message);
-    // TODO: handle error
     yield put(handleError(err, (error) => (
       sendChannelMessageFailed(serverId, channelId, restMessageData.localKey, error)
     )));

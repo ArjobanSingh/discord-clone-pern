@@ -103,12 +103,14 @@ function* joinServer(actionData) {
     yield put(setNavigateState([`/channels/${serverId}`, { replace: !!inviteLink }]));
     socketClient.connectSingleServer(serverId);
   } catch (err) {
-    if (!inviteLink) {
-      // joining server while exploring public server, so also show notification error
-      // TODO: add notification error
-    }
     yield put(
-      handleError(err, (error) => joinServerFailed(serverId, error)),
+      handleError(err, (error) => {
+        if (!inviteLink) {
+          // joining server while exploring public server, so also show notification error
+          toast.error(`Error joining server ${error.message}`);
+        }
+        return joinServerFailed(serverId, error);
+      }),
     );
   }
 }

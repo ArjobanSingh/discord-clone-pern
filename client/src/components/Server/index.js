@@ -43,7 +43,7 @@ const Server = (props) => {
 
   if (noServerFound) {
     return (
-      <div>No server found: 404</div>
+      <div>TODO: No server found: 404</div>
     );
   }
 
@@ -82,8 +82,8 @@ const Server = (props) => {
     />
   );
 
-  if (serverDetails.error) return <div>{serverDetails.error.message}</div>;
-  if (serverDetails.isFetchingData || !serverDetails.members) return <div>Server Loading...</div>;
+  if (serverDetails.error) return <div>TODO: error</div>;
+  if (serverDetails.isFetchingData || !serverDetails.members) return <div>TODO: Server Loading...</div>;
 
   if (isEmpty(channels)) {
     return (

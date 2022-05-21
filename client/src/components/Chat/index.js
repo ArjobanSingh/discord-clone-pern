@@ -14,6 +14,8 @@ import Messages from '../Messages';
 import useUser from '../../customHooks/useUser';
 // import { scrollToBottom } from '../../utils/helperFunctions';
 import useDidUpdate from '../../customHooks/useDidUpdate';
+import ChatLoader from './ChatLoader';
+import ChatError from './ChatError';
 
 // chat component should be independent of channel/server logic
 // to support personal messages in future
@@ -23,6 +25,7 @@ const Chat = (props) => {
     messagesData,
     loadMoreMessages,
     hideInput,
+    fetchMessages,
     // in group chat it would be channelId, in user chat in future
     // it would other user id
     chatBoxId,
@@ -100,8 +103,8 @@ const Chat = (props) => {
   };
 
   const mainJSX = () => {
-    if (isLoading) return <div>TODO: Fetching messages...</div>;
-    if (error) return <div>TODO: Error fetching messages...Retry</div>; // TODO
+    if (isLoading) return <ChatLoader />;
+    if (error) return <ChatError error={error} retry={fetchMessages} />; // TODO
     return (
       <>
         <MessagesContainer hideInput={hideInput}>
@@ -148,13 +151,14 @@ Chat.propTypes = {
     data: PropTypes.arrayOf(PropTypes.object),
     hasMore: PropTypes.bool.isRequired,
     isLoading: PropTypes.bool.isRequired,
-    error: PropTypes.shape({}),
+    error: PropTypes.string,
     isLoadingMore: PropTypes.bool,
     moreError: PropTypes.string,
   }).isRequired,
   loadMoreMessages: PropTypes.func.isRequired,
   hideInput: PropTypes.bool.isRequired,
   chatBoxId: PropTypes.string.isRequired,
+  fetchMessages: PropTypes.func.isRequired,
 };
 
 export default Chat;

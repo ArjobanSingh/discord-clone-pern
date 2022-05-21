@@ -29,3 +29,20 @@ export const DiscoveryContainer = styled.div`
     };
   }
 `;
+
+export const ImageWrapper = styled.div`
+  max-height: 360px;
+  width: 100%;
+  position: relative;
+`;
+
+export const AbsoluteWrapperChild = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`;

@@ -25,6 +25,7 @@ import TransitionModal from '../../common/TransitionModal';
 import CreateServerModal from '../CreateServerModal';
 import useDidUpdate from '../../customHooks/useDidUpdate';
 import { createServerReset } from '../../redux/actions/servers';
+import { isEmpty } from '../../utils/validators';
 
 const AllServersDrawer = ({ isDiscoveryPage }) => {
   const servers = useSelector(getAllServers);
@@ -55,7 +56,7 @@ const AllServersDrawer = ({ isDiscoveryPage }) => {
     <>
       <SidebarContainer>
         <ServerIconList>
-          <NavLink to="/channels/@me">
+          {/* <NavLink to="/channels/@me">
             {({ isActive }) => (
               <AvatarWrapper>
                 <ServerListTooltip title="Home" placement="right">
@@ -69,10 +70,10 @@ const AllServersDrawer = ({ isDiscoveryPage }) => {
                 <VerticalBar selected={isActive} />
               </AvatarWrapper>
             )}
-          </NavLink>
+          </NavLink> */}
 
           <ServersList servers={exploreServers} />
-          <Bar />
+          {!isEmpty(exploreServers) && <Bar />}
           <ServersList servers={servers} />
 
           <AvatarWrapper>

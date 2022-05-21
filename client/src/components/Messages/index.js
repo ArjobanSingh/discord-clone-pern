@@ -46,7 +46,7 @@ const Messages = forwardRef((props, ref) => {
   useEffect(() => {
     // on chat box change, reset lastScrollHeight for case
     // if previous chat box's(previous channel) more api was
-    // in progress and user change chatBox(channel)
+    // in progress and user changed chatBox(channel)
     scrollToContainerBottom();
     lastScrollHeight.current = undefined;
     lastScrollPositions.current = {};
