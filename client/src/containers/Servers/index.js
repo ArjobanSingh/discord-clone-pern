@@ -6,6 +6,8 @@ import useUser from '../../customHooks/useUser';
 import useMobileDrawerState from '../../customHooks/useMobileDrawerState';
 import AllServersDrawer from '../../components/AllServersDrawer';
 import { ServerContainer } from '../../components/Server/styles';
+import ServersListLoading from './ServersListLoading';
+import ServerLoader from '../../components/Server/ServerLoader';
 
 // This wrapper will be used for two global routes /channels/ and /guild-discovery
 const Servers = () => {
@@ -35,11 +37,11 @@ const Servers = () => {
         drawerWidth={isDiscoveryPage ? 74 : 320}
       >
         {isLoading || !user
-          ? <div>TODO: Servers Drawer Loading Ui..</div>
+          ? <ServersListLoading />
           : <AllServersDrawer isDiscoveryPage={isDiscoveryPage} />}
       </ResponsiveDrawer>
       {isLoading || !user
-        ? <div>TODO: Children Outlet Loading Ui..</div>
+        ? <ServerLoader />
         : <ServerContainer><Outlet context={openDrawer} /></ServerContainer>}
     </Box>
   );

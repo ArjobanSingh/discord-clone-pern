@@ -15,7 +15,7 @@ import {
   StyledAvatar,
   VerticalBar,
 } from './styles';
-import Logo from '../../common/Logo';
+// import Logo from '../../common/Logo';
 import ChannelList from '../ChannelList';
 import { getAllExploreServersData, getAllServers } from '../../redux/reducers';
 import Explore from '../../common/Explore';

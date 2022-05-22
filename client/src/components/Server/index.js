@@ -99,14 +99,7 @@ const Server = (props) => {
   }
 
   if (serverDetails.isFetchingData || !serverDetails.members) {
-    return (
-      <InnerServerContainer>
-        {renderServerHeader(true)}
-        <MainServerContent>
-          <ServerLoader />
-        </MainServerContent>
-      </InnerServerContainer>
-    );
+    return <ServerLoader openServerListDrawer={openServerListDrawer} />;
   }
 
   if (isEmpty(channels)) {

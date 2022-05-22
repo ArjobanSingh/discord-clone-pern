@@ -9,6 +9,12 @@ import axiosInstance from '../utils/axiosConfig';
 import { handleError } from '../utils/helperFunctions';
 import socketClient from '../services/socket-client';
 
+// function CustomException() {
+//   this.response = { data: { error: { message: 'Some random errors' } } };
+// }
+
+// const wait = () => new Promise((r) => setTimeout(r, 3000));
+
 function* fetchCurrentUser() {
   try {
     const response = yield call(axiosInstance.get, UserApi.GET_CURRENT_USER);
@@ -17,7 +23,6 @@ function* fetchCurrentUser() {
     yield put(userSuccess(restUserData));
     socketClient.connectAllServers(servers.map((server) => server.serverId));
   } catch (err) {
-    console.log('User error', err.response, err.message);
     yield put(
       handleError(err, (error) => userFailed(error)),
     );
