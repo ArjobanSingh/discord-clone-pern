@@ -43,6 +43,7 @@ import { handleError } from '../../utils/helperFunctions';
 import { ChannelApi } from '../../utils/apiEndpoints';
 import { deleteChannelSuccess } from '../../redux/actions/channels';
 import { AbsoluteProgress, ConfirmationButton } from '../ServerSettings/Options/styles';
+import ChannelListLoader from './ChannelListLoader';
 
 const anchorOrigin = {
   vertical: 'bottom',
@@ -122,29 +123,6 @@ const ChannelList = (props) => {
     setMenuAnchorEl(null);
   };
 
-  if (!params.serverId) {
-    return <div>Me server list</div>;
-  }
-
-  if (noServerFound) {
-    return <div>No such server found</div>;
-  }
-
-  const openChannelModal = (e) => {
-    e.stopPropagation();
-    setModalState(ModalTypes.CREATE_CHANNEL);
-  };
-
-  // TODO: correct loading when fetching server members
-  const hideOptions = !serverMember
-    || (serverMember.role === ServerMemberRoles.USER && serverDetails.type === ServerTypes.PRIVATE);
-
-  const canCreateChannel = serverMember
-    ? ServerMemberScores[serverMember.role] >= ServerMemberScores[ServerMemberRoles.ADMIN]
-    : false;
-
-  const canDeleteChannel = canCreateChannel;
-
   const openDeleteChannelModal = (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -155,6 +133,11 @@ const ChannelList = (props) => {
   const closeDeleteChannelModal = () => {
     setDeleteChannelModalData(null);
     setIsDeletingChannel(false);
+  };
+
+  const openChannelModal = (e) => {
+    e.stopPropagation();
+    setModalState(ModalTypes.CREATE_CHANNEL);
   };
 
   const deleteChannel = async () => {
@@ -181,6 +164,17 @@ const ChannelList = (props) => {
     }
   };
 
+  if (!params.serverId || noServerFound) return <ChannelListLoader />;
+
+  const hideOptions = !serverMember
+    || (serverMember.role === ServerMemberRoles.USER && serverDetails.type === ServerTypes.PRIVATE);
+
+  const canCreateChannel = serverMember
+    ? ServerMemberScores[serverMember.role] >= ServerMemberScores[ServerMemberRoles.ADMIN]
+    : false;
+
+  const canDeleteChannel = canCreateChannel;
+
   const getModalBody = () => {
     switch (modalState) {
       case ModalTypes.INVITE:
@@ -206,6 +200,7 @@ const ChannelList = (props) => {
         return null;
     }
   };
+
   return (
     <>
       <ChannelListContainer>

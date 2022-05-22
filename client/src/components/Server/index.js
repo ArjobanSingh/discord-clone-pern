@@ -4,7 +4,7 @@ import {
 } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import useServerData from '../../customHooks/useServerData';
 import {
   InnerServerContainer, MainServerContent, PreviewBar, StyledButton,
@@ -13,6 +13,9 @@ import JoinPublicServer from './JoinPublicServer';
 import ServerHeader from '../ServerHeader';
 import { isEmpty } from '../../utils/validators';
 import NoChannels from '../NoChannels';
+import NotFound from '../NotFound';
+import ApiError from '../../common/ApiError';
+import ServerLoader from './ServerLoader';
 
 // this component will only render, after we have fetched user details and server list
 const Server = (props) => {
@@ -27,7 +30,12 @@ const Server = (props) => {
     setIsMembersDrawerOpen((prev) => !prev);
   };
 
-  const { serverDetails, noServerFound, isExploringServer } = useServerData(params.serverId, true);
+  const {
+    serverDetails,
+    noServerFound,
+    isExploringServer,
+    retryServerData,
+  } = useServerData(params.serverId, true);
 
   const outletContextValue = useMemo(() => ({
     closeMembersDrawer: () => { setIsMembersDrawerOpen(false); },
@@ -41,55 +49,71 @@ const Server = (props) => {
     navigate('/guild-discovery');
   };
 
-  if (noServerFound) {
-    return (
-      <div>TODO: No server found: 404</div>
-    );
-  }
-
-  const { channels } = serverDetails;
-
-  const previewBarUI = isExploringServer && (
-  <PreviewBar>
-    <StyledButton
-      variant="outlined"
-      size="small"
-      back="true"
-      startIcon={<ArrowBackIcon />}
-      onClick={goBack}
-    >
-      Back
-    </StyledButton>
-
-    <Typography
-      variant="subtitle2"
-      color="text.primary"
-      lineHeight="normal"
-    >
-      You are currently in preview mode. Join this server to start chatting
-    </Typography>
-    <JoinPublicServer
-      server={serverDetails}
-    />
-  </PreviewBar>
-  );
-
-  const serverHeaderUi = (isEmptyChannels) => (
+  const renderServerHeader = (hidenMemberDrawerButton = false) => (
     <ServerHeader
       name={openedChannel.name}
       openServerListDrawer={openServerListDrawer}
-      openMembersDrawer={isEmptyChannels ? undefined : toggleDrawer}
+      openMembersDrawer={hidenMemberDrawerButton
+        ? undefined
+        : toggleDrawer}
     />
   );
 
-  if (serverDetails.error) return <div>TODO: error</div>;
-  if (serverDetails.isFetchingData || !serverDetails.members) return <div>TODO: Server Loading...</div>;
+  const renderPreviewBar = () => isExploringServer && (
+    <PreviewBar>
+      <StyledButton
+        variant="outlined"
+        size="small"
+        back="true"
+        startIcon={<ArrowBackIcon />}
+        onClick={goBack}
+      >
+        Back
+      </StyledButton>
+
+      <Typography
+        variant="subtitle2"
+        color="text.primary"
+        lineHeight="normal"
+      >
+        You are currently in preview mode. Join this server to start chatting
+      </Typography>
+      <JoinPublicServer
+        server={serverDetails}
+      />
+    </PreviewBar>
+  );
+
+  if (noServerFound) return <NotFound />;
+
+  const { channels } = serverDetails;
+
+  if (serverDetails.error) {
+    return (
+      <ApiError
+        errorDescription="Not able to get server details, Please try again later"
+        error={serverDetails.error?.message}
+        retry={retryServerData}
+      />
+    );
+  }
+
+  if (serverDetails.isFetchingData || !serverDetails.members) {
+    return (
+      <InnerServerContainer>
+        {renderServerHeader(true)}
+        <MainServerContent>
+          <ServerLoader />
+        </MainServerContent>
+      </InnerServerContainer>
+    );
+  }
 
   if (isEmpty(channels)) {
     return (
       <InnerServerContainer>
-        {previewBarUI}
-        {serverHeaderUi(true)}
+        {renderPreviewBar()}
+        {renderServerHeader()}
         <MainServerContent>
           <NoChannels setOpenedChannel={setOpenedChannel} />
         </MainServerContent>
@@ -102,8 +126,8 @@ const Server = (props) => {
   if (params.channelId) {
     return (
       <InnerServerContainer>
-        {previewBarUI}
-        {serverHeaderUi(false)}
+        {renderPreviewBar()}
+        {renderServerHeader()}
         <MainServerContent>
           <Outlet context={outletContextValue} />
         </MainServerContent>

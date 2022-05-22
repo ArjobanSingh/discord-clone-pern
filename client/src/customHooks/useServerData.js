@@ -16,13 +16,17 @@ const useServerData = (serverId, makeApiRequest = false) => {
     isExploringServerRef.current = isExploringServer;
   }, [isExploringServer]);
 
+  const fetchServerData = () => {
+    dispatch(serverDetailsRequested(serverDetails.id, isExploringServer));
+  };
+
   useEffect(() => {
     if (!serverId || !makeApiRequest) return;
 
     if (serverDetails) {
       if (!serverDetails.members && !serverDetails.isFetchingData && !serverDetails.error) {
         // fetch only if not full server data and also not fetching or failed already
-        dispatch(serverDetailsRequested(serverDetails.id, isExploringServer));
+        fetchServerData();
       }
       return;
     }
@@ -43,7 +47,8 @@ const useServerData = (serverId, makeApiRequest = false) => {
   return {
     serverDetails: serverDetails || { isFetchingData: true, name: '', id: serverId },
     isExploringServer,
-    noServerFound: serverDetails?.error?.errStatus === 404,
+    noServerFound: serverDetails?.error?.status === 404,
+    retryServerData: fetchServerData,
   };
 };
 

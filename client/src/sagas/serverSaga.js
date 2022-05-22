@@ -62,9 +62,12 @@ function* getServerDetails(actionData) {
     yield put(saveAllChannels(serverId, server.channels ?? []));
     yield put(serverDetailsSuccess(server, isExploringServer));
   } catch (err) {
-    yield put(handleError(err, (error, { status: errStatus }) => (
-      serverDetailsFailed(serverId, isExploringServer, { ...error, errStatus })
-    )));
+    yield put(handleError(err, (error, originalError) => {
+      const errStatus = originalError?.response?.status || originalError.status;
+      return (
+        serverDetailsFailed(serverId, isExploringServer, { ...error, status: errStatus })
+      );
+    }));
   }
 }
 

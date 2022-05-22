@@ -8,11 +8,10 @@ import {
 } from './styles';
 import Message from '../Message';
 import {
-  reachedThresholdBottom, reachedThresholdTop, sameDay, scrollToBottom, stopPropagation,
+  reachedThresholdBottom, reachedThresholdTop, sameDay, scrollToBottom,
 } from '../../utils/helperFunctions';
 import useDidUpdate from '../../customHooks/useDidUpdate';
 import TransitionModal from '../../common/TransitionModal';
-import StyledImage from '../../common/StyledImage';
 import ModalImage from './ModalImage';
 
 const Messages = forwardRef((props, ref) => {
