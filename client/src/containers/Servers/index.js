@@ -24,6 +24,9 @@ const Servers = () => {
 
   if (error) return error.message;
 
+  const renderDrawerLoader = () => (isDiscoveryPage ? <div>Discovery drawer...</div> : <ServersListLoading />);
+  const renderContentLoader = () => (isDiscoveryPage ? <div>Discovery loading...</div> : <ServerLoader />);
+
   return (
     <Box
       display="flex"
@@ -37,11 +40,11 @@ const Servers = () => {
         drawerWidth={isDiscoveryPage ? 74 : 320}
       >
         {isLoading || !user
-          ? <ServersListLoading />
+          ? renderDrawerLoader()
           : <AllServersDrawer isDiscoveryPage={isDiscoveryPage} />}
       </ResponsiveDrawer>
       {isLoading || !user
-        ? <ServerLoader />
+        ? renderContentLoader()
         : <ServerContainer><Outlet context={openDrawer} /></ServerContainer>}
     </Box>
   );

@@ -9,7 +9,7 @@ const RouteNavigator = () => {
   if (isEmpty(userJoinedServers)) return <Navigate replace to="/guild-discovery" />;
 
   const [firstServer] = Object.keys(userJoinedServers);
-  return <Navigate replace to={`/channels/${firstServer.id}`} />;
+  return <Navigate replace to={`/channels/${firstServer}`} />;
 };
 
 RouteNavigator.propTypes = {

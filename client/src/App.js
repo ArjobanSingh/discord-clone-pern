@@ -34,7 +34,7 @@ const Child = () => {
 
   return (
     <>
-      <Button
+      {/* <Button
         sx={{
           position: 'fixed', bottom: '100px', left: '10px', zIndex: '2000',
         }}
@@ -43,7 +43,7 @@ const Child = () => {
         onClick={toggleColorMode}
       >
         toggle theme
-      </Button>
+      </Button> */}
 
       {isAuthenticated && (
         <Button

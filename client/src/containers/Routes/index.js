@@ -1,62 +1,51 @@
-import { Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 import PropTypes from 'prop-types';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import RequireAuth from '../RequireAuth';
-import Servers from '../Servers';
-import Server from '../../components/Server';
-import Channel from '../../components/Channel';
-import MeServer from '../../components/MeServer';
+// import MeServer from '../../components/MeServer';
 import Auth from '../../components/Auth';
 import InvitePage from '../InvitePage';
-import ServerDiscovery from '../../components/ServerDiscovery';
 import RouteNavigator from '../RouteNavigator';
+import ServersFallback from './ServersFallback';
 
-// const Auth = lazy(() => import('./components/Auth'));
+const ServersPage = lazy(() => import('../../pages/ServersPage'));
+const ServerDiscoveryPage = lazy(() => import('../../pages/ServerDiscoveryPage'));
 
 const AppRoutes = (props) => (
-  <Suspense fallback={<div>Loader...</div>}>
-    <Routes>
-      <Route
-        path="/login"
-        element={<Auth />}
-      />
-      <Route
-        path="/guild-discovery"
-        element={(
-          <RequireAuth>
-            <Servers />
-          </RequireAuth>
+  <Routes>
+    <Route
+      path="/login"
+      element={<Auth />}
+    />
+    <Route
+      path="/guild-discovery/*"
+      element={(
+        <Suspense fallback={<div>All Server guild loading</div>}>
+          <ServerDiscoveryPage />
+        </Suspense>
       )}
-      >
-        <Route index element={<ServerDiscovery />} />
-        <Route path="*" element={<Navigate replace to="/guild-discovery" />} />
-      </Route>
-      <Route
-        path="/invite/:inviteId"
-        element={(
-          <RequireAuth>
-            <InvitePage />
-          </RequireAuth>
+    />
+
+    <Route
+      path="/channels/*"
+      element={(
+        <Suspense fallback={<ServersFallback />}>
+          <ServersPage />
+        </Suspense>
       )}
-      />
-      <Route
-        path="channels"
-        element={(
-          <RequireAuth>
-            <Servers />
-          </RequireAuth>
-        )}
-      >
-        {/* <Route path="@me" element={<MeServer />} /> */}
-        <Route path=":serverId" element={<Server />}>
-          <Route path=":channelId" element={<Channel />} />
-        </Route>
-        {/* <Route index element={<Navigate replace to="@me" />} /> */}
-      </Route>
-      {/* <Route path="*" element={<Navigate replace to="/channels/@me" />} /> */}
-      <Route path="*" element={<RequireAuth><RouteNavigator /></RequireAuth>} />
-    </Routes>
-  </Suspense>
+    />
+
+    <Route
+      path="/invite/:inviteId"
+      element={(
+        <RequireAuth>
+          <InvitePage />
+        </RequireAuth>
+      )}
+    />
+    {/* <Route path="*" element={<Navigate replace to="/channels/@me" />} /> */}
+    <Route path="*" element={<RequireAuth><RouteNavigator /></RequireAuth>} />
+  </Routes>
 );
 
 AppRoutes.propTypes = {
