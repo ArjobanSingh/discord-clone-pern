@@ -13,6 +13,12 @@ export const Wrapper = styled.div`
   };
 `;
 
+export const ImageWrapper = styled.div`
+  max-height: 360px;
+  width: 100%;
+  position: relative;
+`;
+
 export const DiscoveryContainer = styled.div`
   flex-direction: column;
   width: 100%;
@@ -22,18 +28,12 @@ export const DiscoveryContainer = styled.div`
   display: flex;
   gap: 20px;
 
-  & > img {
+  & ${ImageWrapper} {
     display: none;
     ${({ theme }) => theme.breakpoints.up('sm')} {
       display: inline;
     };
   }
-`;
-
-export const ImageWrapper = styled.div`
-  max-height: 360px;
-  width: 100%;
-  position: relative;
 `;
 
 export const AbsoluteWrapperChild = styled.div`

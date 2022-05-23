@@ -10,7 +10,11 @@ const Container = styled.div`
 `;
 
 const ListContainer = styled.div`
-  width: 320px;
+  width: 0px;
+
+  ${({ theme }) => theme.breakpoints.up('sm')} {
+    width: 320px;
+  };
 `;
 
 const ContentContainer = styled.div`

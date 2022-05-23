@@ -49,13 +49,11 @@ const Server = (props) => {
     navigate('/guild-discovery');
   };
 
-  const renderServerHeader = (hidenMemberDrawerButton = false) => (
+  const renderServerHeader = () => (
     <ServerHeader
       name={openedChannel.name}
       openServerListDrawer={openServerListDrawer}
-      openMembersDrawer={hidenMemberDrawerButton
-        ? undefined
-        : toggleDrawer}
+      openMembersDrawer={toggleDrawer}
     />
   );
 

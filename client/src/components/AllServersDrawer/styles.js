@@ -7,6 +7,7 @@ export const SidebarContainer = styled('aside')`
   height: 100%;
   overflow: hidden;
   display: flex;
+  border-right: ${({ borderRight }) => borderRight || ''};
 
   ${({ theme }) => theme.breakpoints.down('sm')} {
     margin-top: 50px;

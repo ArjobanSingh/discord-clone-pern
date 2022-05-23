@@ -13,6 +13,7 @@ import {
   AbsoluteWrapperChild, DiscoveryContainer, ImageWrapper, Wrapper,
 } from './styles';
 import { isEmpty } from '../../utils/validators';
+import PublicServersLoader from '../PublicServersGrid/PublicServersLoader';
 
 const ServerDiscovery = (props) => {
   const { data, error } = useSelector(getExploreServersList);
@@ -27,7 +28,7 @@ const ServerDiscovery = (props) => {
 
   const getMainJSX = () => {
     if (error) return <div>TODO: error getting all servers, Retry</div>;
-    if (!data) return <div>TODO: data loading</div>;
+    if (!data) return <PublicServersLoader />;
     if (isEmpty(data)) return <div>TODO: empty public servers</div>;
     return <PublicServersGrid servers={data} />;
   };
@@ -54,7 +55,13 @@ const ServerDiscovery = (props) => {
                 From gaming, to music, to learning, there&apos;s a place for you.
               </Typography>
             </AbsoluteWrapperChild>
-            <img height="100%" width="100%" src={DISCOVER_SERVERS_BACKGROUND} alt="explore servers" />
+            <img
+              className="discovery-banner"
+              height="100%"
+              width="100%"
+              src={DISCOVER_SERVERS_BACKGROUND}
+              alt="explore servers"
+            />
           </ImageWrapper>
           {getMainJSX()}
         </DiscoveryContainer>

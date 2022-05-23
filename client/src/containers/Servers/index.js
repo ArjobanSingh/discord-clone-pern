@@ -6,8 +6,9 @@ import useUser from '../../customHooks/useUser';
 import useMobileDrawerState from '../../customHooks/useMobileDrawerState';
 import AllServersDrawer from '../../components/AllServersDrawer';
 import { ServerContainer } from '../../components/Server/styles';
-import ServersListLoading from './ServersListLoading';
+import ServersListLoading, { ServersAvatarLoader } from './ServersListLoading';
 import ServerLoader from '../../components/Server/ServerLoader';
+import ServerDiscoveryLoader from '../../components/ServerDiscovery/ServerDiscoveryLoader';
 
 // This wrapper will be used for two global routes /channels/ and /guild-discovery
 const Servers = () => {
@@ -24,8 +25,11 @@ const Servers = () => {
 
   if (error) return error.message;
 
-  const renderDrawerLoader = () => (isDiscoveryPage ? <div>Discovery drawer...</div> : <ServersListLoading />);
-  const renderContentLoader = () => (isDiscoveryPage ? <div>Discovery loading...</div> : <ServerLoader />);
+  const renderDrawerLoader = () => (isDiscoveryPage
+    ? <ServersAvatarLoader /> : <ServersListLoading />);
+
+  const renderContentLoader = () => (isDiscoveryPage
+    ? <ServerDiscoveryLoader /> : <ServerLoader />);
 
   return (
     <Box
