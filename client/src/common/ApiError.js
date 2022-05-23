@@ -7,7 +7,7 @@ import ErrorSvg from './ErrorSvg';
 
 const Container = styled.div`
   width: 100%;
-  height: 100%;
+  height: ${({ height }) => height || '100%'};
   position: relative;
 `;
 
@@ -32,8 +32,10 @@ const Centerd = styled.div`
   gap: 1rem;
 `;
 
-const ApiError = ({ error, errorDescription, retry }) => (
-  <Container>
+const ApiError = ({
+  error, errorDescription, retry, ...props
+}) => (
+  <Container {...props}>
     <AbsoluteDiv>
       <Centerd>
         <ErrorSvg width="max(50%, 300px)" height="300px" />

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOutletContext } from 'react-router-dom';
@@ -14,20 +14,25 @@ import {
 } from './styles';
 import { isEmpty } from '../../utils/validators';
 import PublicServersLoader from '../PublicServersGrid/PublicServersLoader';
+import ApiError from '../../common/ApiError';
 
-const ServerDiscovery = (props) => {
+const ServerDiscovery = () => {
   const { data, error } = useSelector(getExploreServersList);
   const dispatch = useDispatch();
   const matches = useMediaQuery((theme) => theme.breakpoints.up('sm'));
   const openServerListDrawer = useOutletContext();
 
   const isExtraSmallScreen = !matches;
-  useEffect(() => {
+
+  const fetchAllPublicServers = () => {
     dispatch(exploreServersRequested());
+  };
+
+  useEffect(() => {
+    fetchAllPublicServers();
   }, []);
 
   const getMainJSX = () => {
-    if (error) return <div>TODO: error getting all servers, Retry</div>;
     if (!data) return <PublicServersLoader />;
     if (isEmpty(data)) return <div>TODO: empty public servers</div>;
     return <PublicServersGrid servers={data} />;
@@ -41,30 +46,41 @@ const ServerDiscovery = (props) => {
         />
       )}
       <Wrapper>
-        <DiscoveryContainer>
-          <ImageWrapper>
-            <AbsoluteWrapperChild>
-              <Typography
-                fontWeight="fontWeightBold"
-                variant="h6"
-                color="text.primary"
-              >
-                Find your community on Discord-Clone
-              </Typography>
-              <Typography variant="body2" color="text.primary">
-                From gaming, to music, to learning, there&apos;s a place for you.
-              </Typography>
-            </AbsoluteWrapperChild>
-            <img
-              className="discovery-banner"
-              height="100%"
-              width="100%"
-              src={DISCOVER_SERVERS_BACKGROUND}
-              alt="explore servers"
+        {error
+          ? (
+            <ApiError
+              error={error?.message || 'Something went wrong'}
+              errorDescription="Not able to get public servers, Please try again later"
+              retry={fetchAllPublicServers}
             />
-          </ImageWrapper>
-          {getMainJSX()}
-        </DiscoveryContainer>
+          )
+          : (
+            <DiscoveryContainer>
+              <ImageWrapper>
+                <AbsoluteWrapperChild>
+                  <Typography
+                    fontWeight="fontWeightBold"
+                    variant="h6"
+                    color="text.primary"
+                  >
+                    Find your community on Discord-Clone
+                  </Typography>
+                  <Typography variant="body2" color="text.primary">
+                    From gaming, to music, to learning, there&apos;s a place for you.
+                  </Typography>
+                </AbsoluteWrapperChild>
+                <img
+                  className="discovery-banner"
+                  height="100%"
+                  width="100%"
+                  src={DISCOVER_SERVERS_BACKGROUND}
+                  alt="explore servers"
+                />
+              </ImageWrapper>
+              {getMainJSX()}
+            </DiscoveryContainer>
+          )}
+
       </Wrapper>
     </>
   );
