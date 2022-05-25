@@ -21,7 +21,9 @@ import ServerLoader from './ServerLoader';
 const Server = (props) => {
   const params = useParams();
   const navigate = useNavigate();
-  const openServerListDrawer = useOutletContext();
+  const {
+    openDrawer: openServerListDrawer,
+  } = useOutletContext();
 
   const [isMembersDrawerOpen, setIsMembersDrawerOpen] = useState(false);
   const [openedChannel, setOpenedChannel] = useState({});

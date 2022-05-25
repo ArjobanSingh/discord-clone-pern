@@ -15,12 +15,16 @@ import {
 import { isEmpty } from '../../utils/validators';
 import PublicServersLoader from '../PublicServersGrid/PublicServersLoader';
 import ApiError from '../../common/ApiError';
+import EmtpyPublicServers from './EmtpyPublicServers';
 
 const ServerDiscovery = () => {
   const { data, error } = useSelector(getExploreServersList);
   const dispatch = useDispatch();
   const matches = useMediaQuery((theme) => theme.breakpoints.up('sm'));
-  const openServerListDrawer = useOutletContext();
+  const {
+    openDrawer: openServerListDrawer,
+    openCreateModal,
+  } = useOutletContext();
 
   const isExtraSmallScreen = !matches;
 
@@ -34,7 +38,7 @@ const ServerDiscovery = () => {
 
   const getMainJSX = () => {
     if (!data) return <PublicServersLoader />;
-    if (isEmpty(data)) return <div>TODO: empty public servers</div>;
+    if (isEmpty(data)) return <EmtpyPublicServers openCreateModal={openCreateModal} />;
     return <PublicServersGrid servers={data} />;
   };
 

@@ -13,14 +13,15 @@ import ServersFallback from './ServersFallback';
 import ServerDiscoveryFallback from './ServerDiscoveryFallback';
 import ChatLoader from '../../components/Chat/ChatLoader';
 
+// hoc to wrap every lazy loading component with Suspense and fallback
 const withSuspense = (Component, Fallback) => (props) => (
   <Suspense fallback={Fallback}>
     <Component {...props} />
   </Suspense>
 );
 
+// lazy loading Inner code extensive components
 const Servers = lazy(() => import('../Servers'));
-
 const LazyLoadingServer = lazy(() => import('../../components/Server'));
 const LazyLoadingChannel = lazy(() => import('../../components/Channel'));
 const LazyLoadingServerDiscovery = lazy(() => import('../../components/ServerDiscovery'));

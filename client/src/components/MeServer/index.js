@@ -3,7 +3,9 @@ import { useOutletContext } from 'react-router-dom';
 import ServerHeader from '../ServerHeader';
 
 const MeServer = (props) => {
-  const openServerListDrawer = useOutletContext();
+  const {
+    openDrawer: openServerListDrawer,
+  } = useOutletContext();
 
   return (
     <>

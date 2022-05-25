@@ -2,10 +2,7 @@ import PropTypes from 'prop-types';
 import {
   NavLink, useParams,
 } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  useState,
-} from 'react';
+import { useSelector } from 'react-redux';
 import {
   AvatarWrapper,
   Bar,
@@ -21,36 +18,22 @@ import { getAllExploreServersData, getAllServers } from '../../redux/reducers';
 import Explore from '../../common/Explore';
 import ServersList from './ServersList';
 import Add from '../../common/AddIcon';
-import TransitionModal from '../../common/TransitionModal';
-import CreateServerModal from '../CreateServerModal';
 import useDidUpdate from '../../customHooks/useDidUpdate';
-import { createServerReset } from '../../redux/actions/servers';
 import { isEmpty } from '../../utils/validators';
 
-const AllServersDrawer = ({ isDiscoveryPage }) => {
+const AllServersDrawer = ({
+  isDiscoveryPage,
+  openCreateModal,
+  closeCreateModal,
+}) => {
   const servers = useSelector(getAllServers);
-  // const socket = useSocketClient();
   const exploreServers = useSelector(getAllExploreServersData);
-  const dispatch = useDispatch();
 
   const { serverId } = useParams();
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-  const openCreateModal = () => {
-    setIsCreateModalOpen(true);
-  };
-
-  const closeCreateModal = () => {
-    setIsCreateModalOpen(false);
-  };
 
   useDidUpdate(() => {
     closeCreateModal();
   }, [serverId]);
-
-  useDidUpdate(() => {
-    if (!isCreateModalOpen) dispatch(createServerReset());
-  }, [isCreateModalOpen]);
 
   return (
     <>
@@ -107,25 +90,14 @@ const AllServersDrawer = ({ isDiscoveryPage }) => {
         </ServerIconList>
         {!isDiscoveryPage && <ChannelList />}
       </SidebarContainer>
-      <TransitionModal
-        open={isCreateModalOpen}
-        onClose={closeCreateModal}
-        aria-labelledby="create-server-title"
-        aria-describedby="create-server-description"
-        disableAutoFocus={false}
-      >
-        <div>
-          <CreateServerModal
-            closeModal={closeCreateModal}
-          />
-        </div>
-      </TransitionModal>
     </>
   );
 };
 
 AllServersDrawer.propTypes = {
   isDiscoveryPage: PropTypes.bool.isRequired,
+  openCreateModal: PropTypes.func.isRequired,
+  closeCreateModal: PropTypes.func.isRequired,
 };
 
 export default AllServersDrawer;
