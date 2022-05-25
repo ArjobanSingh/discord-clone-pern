@@ -1,17 +1,26 @@
 import { combineReducers } from 'redux';
 import * as C from '../../constants/servers';
 
-// TODO: load more servers
-const publicServersList = (state = { data: null, error: null, isLoading: false }, action) => {
+const initialState = {
+  data: null,
+  error: null,
+  isLoading: false,
+  isLoadingMore: false,
+  hasMore: true,
+};
+
+const publicServersList = (state = initialState, action) => {
   switch (action.type) {
     case C.EXPLORE_SERVERS_REQUESTED:
       return {
+        ...state,
         // whenever we refetch all servers, just show saved latest 50 servers only
         // till new request is in progress, and remove all servers which are older than 50th server
         // as it will refetched again when needed
         data: state.data ? state.data.slice(0, 50) : state.data,
         error: null,
         isLoading: true,
+        isLoadingMore: false,
       };
     case C.EXPLORE_SERVERS_FAILED:
       return {
@@ -22,9 +31,28 @@ const publicServersList = (state = { data: null, error: null, isLoading: false }
       };
     case C.EXPLORE_SERVERS_SUCCESS:
       return {
+        ...state,
         data: action.payload.data,
         error: null,
         isLoading: false,
+        hasMore: action.payload.hasMore,
+      };
+    case C.EXPLORE_MORE_SERVERS_REQUESTED:
+      return {
+        ...state,
+        isLoadingMore: true,
+      };
+    case C.EXPLORE_MORE_SERVERS_SUCCESS:
+      return {
+        ...state,
+        hasMore: action.payload.hasMore,
+        isLoadingMore: false,
+        data: [...state.data, ...action.payload.data],
+      };
+    case C.EXPLORE_MORE_SERVERS_FAILED:
+      return {
+        ...state,
+        isLoadingMore: false,
       };
     default:
       return state;

@@ -241,6 +241,8 @@ export const getAllServers = async (
       };
     }
 
+    console.log('Query obj', queryObj);
+
     const servers = await Server.find(queryObj);
     res.json(servers);
   } catch (err) {

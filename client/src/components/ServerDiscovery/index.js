@@ -49,7 +49,7 @@ const ServerDiscovery = () => {
           openServerListDrawer={openServerListDrawer}
         />
       )}
-      <Wrapper>
+      <Wrapper id="server-discovery-container">
         {error
           ? (
             <ApiError

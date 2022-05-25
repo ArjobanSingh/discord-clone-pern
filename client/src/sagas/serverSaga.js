@@ -15,11 +15,14 @@ import {
   LEAVE_SERVER_MEMBER_REQUESTED,
   DELETE_SERVER_REQUESTED,
   ServerMemberRoles,
+  EXPLORE_MORE_SERVERS_REQUESTED,
 } from '../constants/servers';
 import {
   createServerFailed,
   createServerSuccess,
   deleteServerSuccess,
+  exploreMoreServersFailed,
+  exploreMoreServersSuccess,
   exploreServersFailed,
   exploreServersSuccess,
   joinServerFailed,
@@ -42,7 +45,7 @@ import { ServerApi } from '../utils/apiEndpoints';
 import { setNavigateState } from '../redux/actions/navigate';
 import { saveAllChannels } from '../redux/actions/channels';
 import socketClient from '../services/socket-client';
-import { getUser } from '../redux/reducers';
+import { getExploreServersList, getUser } from '../redux/reducers';
 
 async function fetchServerDetails(serverId, throwError = true) {
   try {
@@ -118,15 +121,38 @@ function* joinServer(actionData) {
   }
 }
 
+const FETCH_PUBLIC_SERVERS_LIMIT = 50;
 function* getPublicServers() {
   try {
     const url = ServerApi.GET_SERVER;
     const response = yield call(axiosInstance.get, url);
-    yield put(exploreServersSuccess(response.data));
+    yield put(exploreServersSuccess(
+      response.data,
+      response.data.length >= FETCH_PUBLIC_SERVERS_LIMIT,
+    ));
   } catch (err) {
     yield put(
       handleError(err, (error) => exploreServersFailed(error)),
     );
+  }
+}
+
+function* getMorePublicServers() {
+  try {
+    const { data } = yield select(getExploreServersList);
+    const lastServer = data[data.length - 1];
+    const encodedCreatedAt = encodeURIComponent(lastServer.createdAt);
+    const url = `${ServerApi.GET_SERVER}?cursor=${encodedCreatedAt}&limit=${FETCH_PUBLIC_SERVERS_LIMIT}`;
+    const response = yield call(axiosInstance.get, url);
+    yield put(exploreMoreServersSuccess(
+      response.data,
+      response.data.length >= FETCH_PUBLIC_SERVERS_LIMIT,
+    ));
+  } catch (err) {
+    yield put(handleError(err, (error) => {
+      toast.error(`Error fetching more servers: ${error.message}`);
+      return exploreMoreServersFailed();
+    }));
   }
 }
 
@@ -300,6 +326,7 @@ export default function* serverSaga() {
     takeEvery(SERVER_DETAILS_REQUESTED, getServerDetails),
     takeEvery(JOIN_SERVER_REQUESTED, joinServer),
     takeLatest(EXPLORE_SERVERS_REQUESTED, getPublicServers),
+    takeEvery(EXPLORE_MORE_SERVERS_REQUESTED, getMorePublicServers),
     takeEvery(CREATE_SERVER_REQUESTED, createServer),
     takeEvery(UPDATE_SERVER_REQUESTED, updateServer),
     takeEvery(UPDATE_SERVER_ROLE_REQUESTED, updateUserRoleInServer),

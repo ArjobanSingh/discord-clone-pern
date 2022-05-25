@@ -66,9 +66,25 @@ export const exploreServersFailed = (error) => ({
   payload: { error },
 });
 
-export const exploreServersSuccess = (data) => ({
+export const exploreServersSuccess = (data, hasMore) => ({
   type: C.EXPLORE_SERVERS_SUCCESS,
-  payload: { data },
+  payload: { data, hasMore },
+});
+
+export const exploreMoreServersRequested = () => ({
+  type: C.EXPLORE_MORE_SERVERS_REQUESTED,
+});
+
+export const exploreMoreServersSuccess = (data, hasMore) => ({
+  type: C.EXPLORE_MORE_SERVERS_SUCCESS,
+  payload: {
+    data,
+    hasMore,
+  },
+});
+
+export const exploreMoreServersFailed = () => ({
+  type: C.EXPLORE_MORE_SERVERS_FAILED,
 });
 
 export const addExploreServerData = (data) => ({
