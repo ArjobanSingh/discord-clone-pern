@@ -2,8 +2,9 @@ import PropTypes from 'prop-types';
 import Modal from '@mui/material/Modal';
 import Zoom from '@mui/material/Zoom';
 import styled from 'styled-components';
+import { stopPropagation } from '../../utils/helperFunctions';
 
-const Container = styled.div`
+const StyledModal = styled(Modal)`
   width: 100%;
   height: 100%;
   overflow: hidden auto;
@@ -11,7 +12,7 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-const InnerContainer = styled.div`
+const Container = styled.div`
   flex: 1;
   width: 100%;
   display: flex;
@@ -20,26 +21,36 @@ const InnerContainer = styled.div`
   padding: ${({ theme }) => theme.spacing(2)};
 `;
 
+const InnerContainer = styled.div``;
+
 const TransitionModal = (props) => {
-  const { children, open, ...rest } = props;
+  const {
+    children, open, innerContainerClassName, onClose, ...rest
+  } = props;
   return (
-    <Modal
+    <StyledModal
       open={open}
       closeAfterTransition
       {...rest}
     >
-      <Container>
-        <InnerContainer>
-          <Zoom in={open}>{children}</Zoom>
-        </InnerContainer>
-      </Container>
-    </Modal>
+      <Zoom in={open}>
+        <Container onClick={onClose}>
+          <InnerContainer className={innerContainerClassName} onClick={stopPropagation}>{children}</InnerContainer>
+        </Container>
+      </Zoom>
+    </StyledModal>
   );
 };
 
 TransitionModal.propTypes = {
   children: PropTypes.node.isRequired,
   open: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  innerContainerClassName: PropTypes.string,
+};
+
+TransitionModal.defaultProps = {
+  innerContainerClassName: null,
 };
 
 export default TransitionModal;

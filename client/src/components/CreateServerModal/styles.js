@@ -66,12 +66,13 @@ export const SwitchLabel = styled(FormControlLabel)`
   justify-content: space-between;
 `;
 
-export const ModalFooter = styled.footer(({ theme }) => `
+export const ModalFooter = styled.footer(({ theme, justifyContent }) => `
   width: 100%;
   padding: ${theme.spacing(2)};
   background-color: ${theme.palette.background.paper};
+  color: ${theme.palette.text.primary};
   display: flex;
-  justify-content: flex-end;
+  justify-content: ${justifyContent || 'flex-end'};
   border-bottom-left-radius: ${theme.shape.borderRadius}px;
   border-bottom-right-radius: ${theme.shape.borderRadius}px;
 `);

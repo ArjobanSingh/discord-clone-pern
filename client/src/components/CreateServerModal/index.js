@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 import { toast } from 'react-toastify';
 import Switch from '@mui/material/Switch';
+import Button from '@mui/material/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import { useDispatch, useSelector } from 'react-redux';
 import { useState } from 'react';
@@ -30,7 +31,7 @@ import { MAX_FILE_SIZE } from '../../constants/Message';
 import StyledImage from '../../common/StyledImage';
 
 const CreateServerModal = (props) => {
-  const { closeModal } = props;
+  const { closeModal, openServerModalOptionsScreen } = props;
   const dispatch = useDispatch();
   const { error: apiErrors, isLoading: isCreatingServer } = useSelector(getServerCreationData);
 
@@ -208,7 +209,15 @@ const CreateServerModal = (props) => {
         </Form>
         {!!errors.message && <Error>{errors.message}</Error>}
       </ContentWrapper>
-      <ModalFooter>
+      <ModalFooter justifyContent="space-between">
+        <Button
+          variant="text"
+          color="inherit"
+          onClick={openServerModalOptionsScreen}
+        >
+          Back
+        </Button>
+
         <CreateServerButton
           form="create-server-form"
           type="submit"
@@ -225,6 +234,7 @@ const CreateServerModal = (props) => {
 
 CreateServerModal.propTypes = {
   closeModal: PropTypes.func.isRequired,
+  openServerModalOptionsScreen: PropTypes.func.isRequired,
 };
 
 export default CreateServerModal;

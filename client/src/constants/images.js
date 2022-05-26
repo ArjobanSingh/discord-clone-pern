@@ -9,3 +9,4 @@ export const FILE_ICON = 'https://res.cloudinary.com/arjoban-main-cloud/image/up
 export const PDF_ICON = 'https://res.cloudinary.com/arjoban-main-cloud/image/upload/v1650125631/discord_clone/pdf-icon_tianlc.svg';
 export const AUDIO_ICON = 'https://res.cloudinary.com/arjoban-main-cloud/image/upload/v1650125621/discord_clone/audio-icon_bykdwq.svg';
 export const NO_CHANNELS = 'https://res.cloudinary.com/arjoban-main-cloud/image/upload/v1653229095/discord_clone/no-chanels_jt0rtm.svg';
+export const CREATE_SERVER_MODAL_ICON = 'https://res.cloudinary.com/arjoban-main-cloud/image/upload/v1653594267/discord_clone/create-server_ioobw7.svg';

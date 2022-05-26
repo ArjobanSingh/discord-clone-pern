@@ -37,6 +37,7 @@ const Footer = styled.footer(({ theme }) => `
   justify-content: flex-end;
   gap: 10px;
   background-color: ${theme.palette.background.paper};
+  color: ${theme.palette.text.primary};
 `);
 
 const ConfirmationModal = (props) => {
@@ -72,7 +73,11 @@ const ConfirmationModal = (props) => {
           </Typography>
         </MainContent>
         <Footer>
-          <Button variant="info" color="text.primary" onClick={onClose}>
+          <Button
+            variant="text"
+            color="inherit"
+            onClick={onClose}
+          >
             Cancel
           </Button>
           {confirmButton || (

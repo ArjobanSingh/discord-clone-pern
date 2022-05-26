@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types';
+import { useCallback, useMemo, useState } from 'react';
+// import PropTypes from 'prop-types';
 import { Outlet, useLocation } from 'react-router-dom';
 import Box from '@mui/material/Box';
-import { useCallback, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import ResponsiveDrawer from '../../common/ResponsiveDrawer';
 import useUser from '../../customHooks/useUser';
@@ -15,7 +15,10 @@ import TransitionModal from '../../common/TransitionModal';
 import CreateServerModal from '../../components/CreateServerModal';
 import useDidUpdate from '../../customHooks/useDidUpdate';
 import { createServerReset } from '../../redux/actions/servers';
+import CreateServerOptionsScreen from '../../components/CreateServerOptionsScreen';
 
+const CREATE_SERVER_OPTIONS_SCREEN = 'CREATE_SERVER_OPTIONS_SCREEN';
+const CREATE_SERVER_MAIN_SCREEN = 'CREATE_SERVER_MAIN_SCREEN';
 // This wrapper will be used for two global routes /channels/ and /guild-discovery
 const Servers = () => {
   const { user, isLoading } = useUser();
@@ -30,26 +33,33 @@ const Servers = () => {
     closeDrawer,
   } = useMobileDrawerState();
 
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [createServerModalData, setCreateServerModalData] = useState(null);
 
   const openCreateModal = useCallback(() => {
-    setIsCreateModalOpen(true);
+    setCreateServerModalData(CREATE_SERVER_OPTIONS_SCREEN);
   }, []);
 
+  const openServerModalMainScreen = () => {
+    setCreateServerModalData(CREATE_SERVER_MAIN_SCREEN);
+  };
+
+  const openServerModalOptionsScreen = () => {
+    setCreateServerModalData(CREATE_SERVER_OPTIONS_SCREEN);
+  };
+
   const closeCreateModal = useCallback(() => {
-    setIsCreateModalOpen(false);
+    setCreateServerModalData(null);
   }, []);
 
   const outletContextValue = useMemo(() => ({
-    isCreateModalOpen,
     openCreateModal,
     closeCreateModal,
     openDrawer,
-  }), [isCreateModalOpen, openCreateModal, closeCreateModal, openDrawer]);
+  }), [openCreateModal, closeCreateModal, openDrawer]);
 
   useDidUpdate(() => {
-    if (!isCreateModalOpen) dispatch(createServerReset());
-  }, [isCreateModalOpen]);
+    if (!createServerModalData) dispatch(createServerReset());
+  }, [createServerModalData]);
 
   const renderDrawerLoader = () => (isDiscoveryPage
     ? <ServersAvatarLoader /> : <ServersListLoading />);
@@ -85,16 +95,27 @@ const Servers = () => {
           : <ServerContainer><Outlet context={outletContextValue} /></ServerContainer>}
       </Box>
       <TransitionModal
-        open={isCreateModalOpen}
+        open={!!createServerModalData}
         onClose={closeCreateModal}
         aria-labelledby="create-server-title"
         aria-describedby="create-server-description"
         disableAutoFocus={false}
       >
         <div>
-          <CreateServerModal
-            closeModal={closeCreateModal}
-          />
+          {createServerModalData === CREATE_SERVER_MAIN_SCREEN
+            ? (
+              <CreateServerModal
+                closeModal={closeCreateModal}
+                openServerModalOptionsScreen={openServerModalOptionsScreen}
+              />
+            )
+            : (
+              <CreateServerOptionsScreen
+                closeModal={closeCreateModal}
+                openServerModalMainScreen={openServerModalMainScreen}
+              />
+            )}
+          ?
         </div>
       </TransitionModal>
     </>

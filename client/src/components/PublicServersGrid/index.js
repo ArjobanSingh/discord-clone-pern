@@ -15,7 +15,6 @@ const PublicServersGrid = (props) => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const parentDiv = useRef(document.getElementById('server-discovery-container'));
 
   const intersectionObserver = useRef();
 
