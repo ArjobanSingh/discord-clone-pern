@@ -17,6 +17,7 @@ import { getServerForJoinLink, updateServerFile } from '../utils/helperFunctions
 import Channel from '../entity/Channel';
 import cloudinary from '../cloudinary';
 import * as C from '../../../common/socket-io-constants';
+import { getServerData, ServerData } from '../utils/typeormHelpers';
 
 export const createServer = async (
   req: CustomRequest,
@@ -106,7 +107,7 @@ export const joinServer = async (
   try {
     const { userId, query } = req;
 
-    let server: Server | undefined;
+    let server: ServerData | undefined;
 
     if (query.inviteLink) {
       // user trying to join with invite link
@@ -118,7 +119,11 @@ export const joinServer = async (
       return;
     } else {
       // valid serverId, so find the corresponding server
-      server = await Server.findOne(`${query.serverId}`);
+      // server = await Server.findOne(`${query.serverId}`, {
+      //   relations: ['serverMembers', 'serverMembers.user', 'channels'],
+      // });
+
+      server = await getServerData(`${query.serverId}`);
       if (!server) {
         next(new CustomError('No server found', 404));
         return;
@@ -133,10 +138,11 @@ export const joinServer = async (
       }
     }
 
-    let serverMember = await ServerMember.findOne({
-      where: { userId, serverId: server.id },
-    });
-    if (serverMember) {
+    const isServerMemberAlreadyPresent = server.members.find((mem) => mem.userId === userId);
+    // let serverMember = await ServerMember.findOne({
+    //   where: { userId, serverId: server.id },
+    // });
+    if (isServerMemberAlreadyPresent) {
       // user already in this group
       next(new CustomError('You are already part of this server', 400));
       return;
@@ -144,7 +150,7 @@ export const joinServer = async (
 
     const user = await User.findOne(userId);
 
-    serverMember = new ServerMember();
+    const serverMember = new ServerMember();
     serverMember.user = user;
     serverMember.server = server;
 
@@ -158,7 +164,14 @@ export const joinServer = async (
       await updateServerPromise;
     });
 
-    res.status(204).json();
+    server.members.push({
+      userName: user.name,
+      userId: user.id,
+      profilePicture: user.profilePicture,
+      role: MemberRole.USER,
+    });
+
+    res.status(201).json(server);
   } catch (err) {
     next(err);
   }
@@ -652,3 +665,35 @@ export const kickUser = async (req: CustomRequest, res: Response, next: NextFunc
     next(err);
   }
 };
+
+const s = `
+SELECT "Server"."id" AS "Server_id", "Server"."name" AS "Server_name",
+"Server"."description" AS "Server_description", "Server"."ownerId" AS "Server_ownerId",
+"Server"."avatar" AS "Server_avatar", "Server"."avatarPublicId" AS "Server_avatarPublicId",
+"Server"."banner" AS "Server_banner", "Server"."bannerPublicId" AS "Server_bannerPublicId",
+"Server"."channelCount" AS "Server_channelCount","Server"."memberCount" AS "Server_memberCount",
+"Server"."type" AS "Server_type", "Server"."createdAt" AS "Server_createdAt",
+"Server"."updatedAt" AS "Server_updatedAt",
+"Server__serverMembers"."userId" AS "Server__serverMembers_userId",
+"Server__serverMembers"."serverId" AS "Server__serverMembers_serverId",
+"Server__serverMembers"."role" AS "Server__serverMembers_role",
+"Server__serverMembers__user"."id" AS "Server__serverMembers__user_id",
+"Server__serverMembers__user"."name" AS "Server__serverMembers__user_name",
+"Server__serverMembers__user"."email" AS "Server__serverMembers__user_email",
+"Server__serverMembers__user"."password" AS "Server__serverMembers__user_password",
+"Server__serverMembers__user"."status" AS "Server__serverMembers__user_status",
+"Server__serverMembers__user"."profilePicture" AS "Server__serverMembers__user_profilePicture",
+"Server__serverMembers__user"."createdAt" AS "Server__serverMembers__user_createdAt",
+"Server__serverMembers__user"."updatedAt" AS "Server__serverMembers__user_updatedAt",
+"Server__channels"."id" AS "Server__channels_id", "Server__channels"."name" AS "Server__channels_name",
+"Server__channels"."type" AS "Server__channels_type",
+"Server__channels"."serverId" AS "Server__channels_serverId",
+"Server__channels"."createdAt" AS "Server__channels_createdAt",
+"Server__channels"."updatedAt" AS "Server__channels_updatedAt"
+FROM "server" "Server"
+INNER JOIN "server_member" "Server__serverMembers" ON "Server__serverMembers"."serverId"="Server"."id"
+INNER JOIN "users" "Server__serverMembers__user" ON "Server__serverMembers__user"."id"="Server__serverMembers"."userId"
+LEFT JOIN "channel" "Server__channels" ON "Server__channels"."serverId"="Server"."id"
+WHERE "Server"."id" IN ($1) -- PARAMETERS: ["249e404d-9fe2-4361-ac1b-536765180b39"] 
+
+`;

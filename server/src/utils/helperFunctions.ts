@@ -8,6 +8,7 @@ import Server from '../entity/Server';
 import LoginDataType from '../interfaces/LoginData';
 import redisClient from '../redisConfig';
 import { CustomError } from './errors';
+import { getServerData, ServerData } from './typeormHelpers';
 
 const jwt = require('jsonwebtoken');
 
@@ -56,7 +57,7 @@ const createLoginData = async (userId: string): Promise<LoginDataType> => {
   return { accessToken, refreshToken };
 };
 
-const getServerForJoinLink = async (inviteLink: string): Promise<Server> => {
+const getServerForJoinLink = async (inviteLink: string): Promise<ServerData> => {
   if (inviteLink.length !== 21) {
     throw new CustomError('Invalid Join Link', 400);
   }
@@ -69,7 +70,8 @@ const getServerForJoinLink = async (inviteLink: string): Promise<Server> => {
     throw new CustomError('Link expired', 403);
   }
 
-  const server = await Server.findOne(link.serverId);
+  // const server = await Server.findOne(link.serverId);
+  const server = await getServerData(`${link.serverId}`);
   if (!server) {
     throw new CustomError('No server found', 404);
   }

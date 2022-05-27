@@ -203,3 +203,15 @@ export function bytesToSize(bytes) {
   const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
   return `${Math.round(bytes / 1024 ** i, 2)} ${sizes[i]}`;
 }
+
+export function getInviteId(string) {
+  let url;
+
+  try {
+    url = new URL(string);
+    const splitArr = url.pathname.split('/');
+    return splitArr[splitArr.length - 1];
+  } catch (_) {
+    return string;
+  }
+}

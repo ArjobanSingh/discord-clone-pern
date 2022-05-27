@@ -82,32 +82,33 @@ function* joinServer(actionData) {
     let url = `${ServerApi.JOIN_SERVER}?serverId=${serverId}`;
     if (inviteLink) url = `${url}&inviteLink=${inviteLink}`;
 
-    yield call(axiosInstance.post, url);
-    let latestServerDetails = yield call(fetchServerDetails, serverId, false);
-
-    if (latestServerDetails) {
-      // update channels with latest server channels we got from api
-      yield put(saveAllChannels(serverId, latestServerDetails.channels ?? []));
-    } else {
-      // for some reason fetch server details api failed, just append
-      // our newly added member to old server details we have, which
-      // we got while exploring this public server
-      const { name, id, profilePicture } = yield select((state) => getUser(state).user);
-      const ourMemberDetails = {
-        userName: name,
-        userId: id,
-        profilePicture,
-        role: ServerMemberRoles.USER,
-      };
-      latestServerDetails = {
-        ...server,
-        members: [...server.members, ourMemberDetails],
-      };
-    }
-
+    const response = yield call(axiosInstance.post, url);
+    const latestServerDetails = response.data;
+    yield put(saveAllChannels(serverId, latestServerDetails.channels ?? []));
     yield put(joinServerSucess(serverId, latestServerDetails));
     yield put(setNavigateState([`/channels/${serverId}`, { replace: !!inviteLink }]));
     socketClient.connectSingleServer(serverId);
+
+    // let latestServerDetails = yield call(fetchServerDetails, serverId, false);
+    // if (latestServerDetails) {
+    //   // update channels with latest server channels we got from api
+    //   yield put(saveAllChannels(serverId, latestServerDetails.channels ?? []));
+    // } else {
+    //   // for some reason fetch server details api failed, just append
+    //   // our newly added member to old server details we have, which
+    //   // we got while exploring this public server
+    //   const { name, id, profilePicture } = yield select((state) => getUser(state).user);
+    //   const ourMemberDetails = {
+    //     userName: name,
+    //     userId: id,
+    //     profilePicture,
+    //     role: ServerMemberRoles.USER,
+    //   };
+    //   latestServerDetails = {
+    //     ...server,
+    //     members: [...server.members, ourMemberDetails],
+    //   };
+    // }
   } catch (err) {
     yield put(
       handleError(err, (error) => {

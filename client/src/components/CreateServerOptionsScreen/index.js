@@ -12,7 +12,7 @@ import StyledTextfield from '../../common/StyledTextfield';
 import { APP_URL } from '../../utils/axiosConfig';
 import StyledImage from '../../common/StyledImage';
 import { CREATE_SERVER_MODAL_ICON } from '../../constants/images';
-import { handleEnter } from '../../utils/helperFunctions';
+import { getInviteId, handleEnter } from '../../utils/helperFunctions';
 
 const Content = styled.div`
   width: 100%;
@@ -57,6 +57,19 @@ const CreateServerWrapper = styled.div(({ theme }) => `
 
 const CreateServerOptionsScreen = (props) => {
   const { closeModal, openServerModalMainScreen } = props;
+
+  const handleInviteSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const inviteUrl = formData.get('join-server-invite-input');
+    if (!inviteUrl?.trim()) return;
+
+    const inviteId = getInviteId(inviteUrl);
+    console.log('inviteId', inviteId);
+
+    // dispatch(joinServerRequested(server, inviteId));
+  };
+
   return (
     <ModalContainer>
       <ContentWrapper>
@@ -113,16 +126,17 @@ const CreateServerOptionsScreen = (props) => {
             </Typography>
           </TitleContainer>
 
-          <Form id="create-modal-join-server-form">
+          <Form id="create-modal-join-server-form" onSubmit={handleInviteSubmit}>
             <div>
               <StyledTextfield
                 id="create-server-modal-invite-input"
                 placeholder="Enter an invite"
+                name="join-server-invite-input"
                 label={(
                   <Typography marginBottom="5px" variant="body2" color="text.secondary">
                     INVITE LINK
                   </Typography>
-              )}
+                )}
               />
             </div>
           </Form>

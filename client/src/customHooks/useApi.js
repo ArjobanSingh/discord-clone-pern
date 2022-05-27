@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useReducer } from 'react';
+import {
+  useCallback, useEffect, useReducer, useRef,
+} from 'react';
 import axiosInstance from '../utils/axiosConfig';
 import { handleError } from '../utils/helperFunctions';
 
@@ -23,15 +25,22 @@ const reducer = (state, action) => {
 
 const useApi = (
   apiHandler,
-  { isConditionMet = true, callbackParams = {} },
+  { isConditionMet = true, callbackParams = {} } = {},
 ) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const callbackParamsRef = useRef(callbackParams);
+  const apiHandlerRef = useRef(apiHandler);
+
+  useEffect(() => {
+    apiHandlerRef.current = apiHandler;
+    callbackParamsRef.current = callbackParams;
+  }, [apiHandler, callbackParams]);
 
   // whenever apiHandler function will change, new api request will be made
   const hitApi = useCallback(async () => {
     try {
       dispatch({ type: API_REQUESTED });
-      const reponse = await apiHandler(axiosInstance, callbackParams);
+      const reponse = await apiHandlerRef.current(axiosInstance, callbackParamsRef.current);
       dispatch({ type: API_SUCCESS, payload: { data: reponse } });
     } catch (err) {
       const sessionExpireError = handleError(err, (error) => {
@@ -39,7 +48,7 @@ const useApi = (
       });
       if (sessionExpireError) dispatch(sessionExpireError);
     }
-  }, [apiHandler, ...Object.values(callbackParams)]);
+  }, []);
 
   useEffect(() => {
     if (!isConditionMet) return;

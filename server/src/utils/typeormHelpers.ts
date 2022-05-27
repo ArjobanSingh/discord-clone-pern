@@ -1,5 +1,7 @@
 /* eslint-disable no-throw-literal */
 import { getConnection } from 'typeorm';
+import Channel from '../entity/Channel';
+import Server from '../entity/Server';
 import { UserType } from '../types/UserTypes';
 
 export const getUserData = async (
@@ -35,7 +37,56 @@ export const getUserData = async (
   return [user];
 };
 
-export const test = 'test';
+export interface ServerData extends Server {
+  channels: Channel[],
+  members: {
+    userName: string,
+    userId: string,
+    profilePicture?: string,
+    role: string,
+  }[],
+}
+
+const removeDuplicatesAndEmpty = (objectArr: Array<unknown>, uniqueKey: string) => {
+  const set = new Set();
+  const newArr = [];
+  objectArr.forEach((element) => {
+    if (!element[uniqueKey]) return;
+    if (set.has(element[uniqueKey])) return;
+    set.add(element[uniqueKey]);
+    newArr.push(element);
+  });
+  return newArr;
+};
+
+export const getServerData = async (serverId: String): Promise<ServerData | undefined> => {
+  const [server] = await getConnection().query(`
+  SELECT "Server".*,
+    json_agg(json_build_object(
+      'userName', u.name, 'userId', u.id, 'profilePicture', u."profilePicture", 'role', sm.role
+    )) as members,
+    json_agg(json_build_object(
+    'name', c.name, 'id', c.id, 'serverId', c."id", 'createdAt', c."createdAt",
+    'updatedAt', c."updatedAt"
+    )) as channels
+  FROM "server" "Server"
+  INNER JOIN "server_member" sm ON sm."serverId"="Server"."id"
+  INNER JOIN "users" u ON u."id"= sm."userId"
+  LEFT JOIN "channel" c ON c."serverId"="Server"."id"
+  WHERE "Server"."id" = $1
+  Group by "Server".id
+  limit 1;
+`, [serverId]);
+
+  if (!server) return server;
+
+  // in case this server does not have any channel,
+  // this query will return array(length equal to other members array)
+  // of objects with undefined entries
+  server.channels = removeDuplicatesAndEmpty(server.channels, 'id');
+  server.members = removeDuplicatesAndEmpty(server.members, 'userId');
+  return server;
+};
 
 // SELECT u.*, s.id as server_id, s.name as server_name
 // FROM users "u"
