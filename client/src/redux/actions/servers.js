@@ -42,19 +42,19 @@ export const saveUrl = (payload) => ({
   payload,
 });
 
-export const joinServerRequested = (server, inviteLink) => ({
+export const joinServerRequested = (server, inviteId) => ({
   type: C.JOIN_SERVER_REQUESTED,
-  payload: { server, inviteLink },
+  payload: { server, inviteId },
 });
 
-export const joinServerFailed = (serverId, error) => ({
+export const joinServerFailed = (serverId, inviteId, error) => ({
   type: C.JOIN_SERVER_FAILED,
-  payload: { serverId, error },
+  payload: { serverId, inviteId, error },
 });
 
-export const joinServerSucess = (serverId, data) => ({
+export const joinServerSucess = (serverId, inviteId, data) => ({
   type: C.JOIN_SERVER_SUCCESS,
-  payload: { serverId, data },
+  payload: { serverId, inviteId, data },
 });
 
 export const exploreServersRequested = () => ({

@@ -2,6 +2,7 @@ import React from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -13,6 +14,7 @@ import { APP_URL } from '../../utils/axiosConfig';
 import StyledImage from '../../common/StyledImage';
 import { CREATE_SERVER_MODAL_ICON } from '../../constants/images';
 import { getInviteId, handleEnter } from '../../utils/helperFunctions';
+import { joinServerRequested } from '../../redux/actions/servers';
 
 const Content = styled.div`
   width: 100%;
@@ -57,6 +59,7 @@ const CreateServerWrapper = styled.div(({ theme }) => `
 
 const CreateServerOptionsScreen = (props) => {
   const { closeModal, openServerModalMainScreen } = props;
+  const dispatch = useDispatch();
 
   const handleInviteSubmit = (e) => {
     e.preventDefault();
@@ -67,7 +70,7 @@ const CreateServerOptionsScreen = (props) => {
     const inviteId = getInviteId(inviteUrl);
     console.log('inviteId', inviteId);
 
-    // dispatch(joinServerRequested(server, inviteId));
+    dispatch(joinServerRequested({}, inviteId));
   };
 
   return (

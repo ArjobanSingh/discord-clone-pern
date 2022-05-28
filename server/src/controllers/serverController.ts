@@ -276,33 +276,8 @@ export const getServerDetails = async (
       return;
     }
 
-    // get server details and with all users which are part of this as members
-    const serverDetailsPromise = getConnection().query(
-      `
-      SELECT s.*,
-      json_agg(json_build_object(
-        'userName', u.name, 'userId', u.id, 'profilePicture', u."profilePicture", 'role', sm.role
-      )) as members
-      FROM server "s"
-      INNER JOIN server_member "sm" ON  s.id = sm."serverId"
-      INNER JOIN users "u" ON u.id = sm."userId"
-      WHERE s.id = $1
-      group by s.id
-      limit 1;
-    `,
-      [serverId],
-    );
-
-    const getChannelsPromise = Channel.find({
-      where: { serverId },
-    });
-
-    const [serverData, serverChannels] = await Promise.all([
-      serverDetailsPromise,
-      getChannelsPromise,
-    ]);
-
-    const [server] = serverData;
+    // get server details it's channles and members
+    const server = await getServerData(serverId);
 
     if (!server) {
       next(new CustomError('No server found', 404));
@@ -313,14 +288,16 @@ export const getServerDetails = async (
       // if current server is private, and user in not part of server
       // throw error
       const thisMember = server.members.find(
-        (member: ServerMember) => member.userId === req.userId,
+        (member) => member.userId === req.userId,
       );
       if (!thisMember) {
         next(new CustomError('Forbidden', 403));
         return;
       }
     }
-    res.json({ ...server, channels: serverChannels });
+
+    // res.json({ ...server, channels: serverChannels });
+    res.json(server);
   } catch (err) {
     next(err);
   }
@@ -665,35 +642,3 @@ export const kickUser = async (req: CustomRequest, res: Response, next: NextFunc
     next(err);
   }
 };
-
-const s = `
-SELECT "Server"."id" AS "Server_id", "Server"."name" AS "Server_name",
-"Server"."description" AS "Server_description", "Server"."ownerId" AS "Server_ownerId",
-"Server"."avatar" AS "Server_avatar", "Server"."avatarPublicId" AS "Server_avatarPublicId",
-"Server"."banner" AS "Server_banner", "Server"."bannerPublicId" AS "Server_bannerPublicId",
-"Server"."channelCount" AS "Server_channelCount","Server"."memberCount" AS "Server_memberCount",
-"Server"."type" AS "Server_type", "Server"."createdAt" AS "Server_createdAt",
-"Server"."updatedAt" AS "Server_updatedAt",
-"Server__serverMembers"."userId" AS "Server__serverMembers_userId",
-"Server__serverMembers"."serverId" AS "Server__serverMembers_serverId",
-"Server__serverMembers"."role" AS "Server__serverMembers_role",
-"Server__serverMembers__user"."id" AS "Server__serverMembers__user_id",
-"Server__serverMembers__user"."name" AS "Server__serverMembers__user_name",
-"Server__serverMembers__user"."email" AS "Server__serverMembers__user_email",
-"Server__serverMembers__user"."password" AS "Server__serverMembers__user_password",
-"Server__serverMembers__user"."status" AS "Server__serverMembers__user_status",
-"Server__serverMembers__user"."profilePicture" AS "Server__serverMembers__user_profilePicture",
-"Server__serverMembers__user"."createdAt" AS "Server__serverMembers__user_createdAt",
-"Server__serverMembers__user"."updatedAt" AS "Server__serverMembers__user_updatedAt",
-"Server__channels"."id" AS "Server__channels_id", "Server__channels"."name" AS "Server__channels_name",
-"Server__channels"."type" AS "Server__channels_type",
-"Server__channels"."serverId" AS "Server__channels_serverId",
-"Server__channels"."createdAt" AS "Server__channels_createdAt",
-"Server__channels"."updatedAt" AS "Server__channels_updatedAt"
-FROM "server" "Server"
-INNER JOIN "server_member" "Server__serverMembers" ON "Server__serverMembers"."serverId"="Server"."id"
-INNER JOIN "users" "Server__serverMembers__user" ON "Server__serverMembers__user"."id"="Server__serverMembers"."userId"
-LEFT JOIN "channel" "Server__channels" ON "Server__channels"."serverId"="Server"."id"
-WHERE "Server"."id" IN ($1) -- PARAMETERS: ["249e404d-9fe2-4361-ac1b-536765180b39"] 
-
-`;

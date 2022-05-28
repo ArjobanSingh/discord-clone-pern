@@ -2,23 +2,28 @@ import * as C from '../../constants/servers';
 
 export default (state = {}, action) => {
   switch (action.type) {
-    case C.JOIN_SERVER_REQUESTED:
+    case C.JOIN_SERVER_REQUESTED: {
+      const { server, inviteId } = action.payload;
       return {
         ...state,
-        [action.payload.server.id]: {
+        [inviteId || server.id]: {
           isLoading: true, error: null,
         },
       };
-    case C.JOIN_SERVER_FAILED:
+    }
+    case C.JOIN_SERVER_FAILED: {
+      const { serverId, inviteId } = action.payload;
       return {
         ...state,
-        [action.payload.serverId]: {
+        [inviteId || serverId]: {
           isLoading: false, error: action.payload.error,
         },
       };
+    }
     case C.JOIN_SERVER_SUCCESS: {
+      const { serverId, inviteId } = action.payload;
       const newState = { ...state };
-      delete newState[action.payload.serverId];
+      delete newState[inviteId || serverId];
       return newState;
     }
     default:

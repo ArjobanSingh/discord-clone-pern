@@ -75,18 +75,20 @@ function* getServerDetails(actionData) {
 }
 
 function* joinServer(actionData) {
-  const { server, inviteLink } = actionData.payload;
-  const { id: serverId } = server;
+  const { server, inviteId } = actionData.payload;
+  let { id: serverId } = server;
 
   try {
     let url = `${ServerApi.JOIN_SERVER}?serverId=${serverId}`;
-    if (inviteLink) url = `${url}&inviteLink=${inviteLink}`;
+    if (inviteId) url = `${url}&inviteLink=${inviteId}`;
 
     const response = yield call(axiosInstance.post, url);
     const latestServerDetails = response.data;
+    serverId = latestServerDetails.id;
+
     yield put(saveAllChannels(serverId, latestServerDetails.channels ?? []));
-    yield put(joinServerSucess(serverId, latestServerDetails));
-    yield put(setNavigateState([`/channels/${serverId}`, { replace: !!inviteLink }]));
+    yield put(joinServerSucess(serverId, inviteId, latestServerDetails));
+    yield put(setNavigateState([`/channels/${serverId}`, { replace: !!inviteId }]));
     socketClient.connectSingleServer(serverId);
 
     // let latestServerDetails = yield call(fetchServerDetails, serverId, false);
@@ -112,11 +114,11 @@ function* joinServer(actionData) {
   } catch (err) {
     yield put(
       handleError(err, (error) => {
-        if (!inviteLink) {
+        if (!inviteId) {
           // joining server while exploring public server, so also show notification error
           toast.error(`Error joining server ${error.message}`);
         }
-        return joinServerFailed(serverId, error);
+        return joinServerFailed(serverId, inviteId, error);
       }),
     );
   }

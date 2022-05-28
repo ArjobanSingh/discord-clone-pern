@@ -17,7 +17,7 @@ const MainContent = (props) => {
   const { server, inviteId } = props;
 
   const savedServer = useSelector((state) => getServerDetails(state, server.id));
-  const joinServerApi = useSelector((state) => getJoinServerApi(state, server.id)) || {};
+  const joinServerApi = useSelector((state) => getJoinServerApi(state, inviteId)) || {};
   const dispatch = useDispatch();
   const navigate = useNavigate();
 

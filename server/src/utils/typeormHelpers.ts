@@ -61,7 +61,7 @@ const removeDuplicatesAndEmpty = (objectArr: Array<unknown>, uniqueKey: string) 
 
 export const getServerData = async (serverId: String): Promise<ServerData | undefined> => {
   const [server] = await getConnection().query(`
-  SELECT "Server".*,
+  SELECT s.*,
     json_agg(json_build_object(
       'userName', u.name, 'userId', u.id, 'profilePicture', u."profilePicture", 'role', sm.role
     )) as members,
@@ -69,12 +69,12 @@ export const getServerData = async (serverId: String): Promise<ServerData | unde
     'name', c.name, 'id', c.id, 'serverId', c."id", 'createdAt', c."createdAt",
     'updatedAt', c."updatedAt"
     )) as channels
-  FROM "server" "Server"
-  INNER JOIN "server_member" sm ON sm."serverId"="Server"."id"
+  FROM "server" s
+  INNER JOIN "server_member" sm ON sm."serverId"= s."id"
   INNER JOIN "users" u ON u."id"= sm."userId"
-  LEFT JOIN "channel" c ON c."serverId"="Server"."id"
-  WHERE "Server"."id" = $1
-  Group by "Server".id
+  LEFT JOIN "channel" c ON c."serverId" = s."id"
+  WHERE s."id" = $1
+  Group by s.id
   limit 1;
 `, [serverId]);
 
@@ -88,21 +88,30 @@ export const getServerData = async (serverId: String): Promise<ServerData | unde
   return server;
 };
 
-// SELECT u.*, s.id as server_id, s.name as server_name
-// FROM users "u"
-// LEFT JOIN server_member "sm" ON  u.id = sm."userId"
-// LEFT JOIN public.server "s" ON s.id = sm."serverId"
-// -- WHERE u.email = 'ask@mail.co'
-// -- limit 1;
-
-// const [user] = await getConnection().query(`
-// select u.*, sa.servers from users u
-// JOIN (Select sm."userId" as id,
-//   json_agg(
-//     json_build_object('serverName', s.name, 'serverId', s.id, 'ownerId', s."ownerId")
-//   ) as servers from server_member sm
-//   join server s on sm."serverId" = s.id
-//   Group by sm."userId") sa using (id)
-//   where u.id = '${userId}'
+// two apis for getting server and its channels approach
+// const serverDetailsPromise = getConnection().query(
+//   `
+//   SELECT s.*,
+//   json_agg(json_build_object(
+//     'userName', u.name, 'userId', u.id, 'profilePicture', u."profilePicture", 'role', sm.role
+//   )) as members
+//   FROM server "s"
+//   INNER JOIN server_member "sm" ON  s.id = sm."serverId"
+//   INNER JOIN users "u" ON u.id = sm."userId"
+//   WHERE s.id = $1
+//   group by s.id
 //   limit 1;
-// `);
+// `,
+//   [serverId],
+// );
+
+// const getChannelsPromise = Channel.find({
+//   where: { serverId },
+// });
+
+// const [serverData, serverChannels] = await Promise.all([
+//   serverDetailsPromise,
+//   getChannelsPromise,
+// ]);
+
+// const [server] = serverData;

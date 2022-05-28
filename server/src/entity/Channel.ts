@@ -50,6 +50,7 @@ export default class Channel extends BaseEntity {
   @ManyToOne((type) => Server, (server) => server.channels, { onDelete: 'CASCADE' })
   server: Server;
 
+  @Index()
   @Column('uuid')
   serverId: string;
 
