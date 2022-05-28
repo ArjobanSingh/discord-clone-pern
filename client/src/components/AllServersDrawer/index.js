@@ -31,9 +31,9 @@ const AllServersDrawer = ({
 
   const { serverId } = useParams();
 
-  useDidUpdate(() => {
-    closeCreateModal();
-  }, [serverId]);
+  // useDidUpdate(() => {
+  //   closeCreateModal();
+  // }, [serverId]);
 
   return (
     <>

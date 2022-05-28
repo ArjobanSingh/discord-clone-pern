@@ -13,11 +13,11 @@ const Input = styled('input')`
 `;
 
 const InputWrapper = styled.div(({
-  theme, width, error, injectCss,
+  theme, width, isError, injectCss,
 }) => `
   width: ${width || ''};
   display: flex;
-  border: 1px solid ${error ? theme.palette.error.light : theme.palette.input.borderColor};
+  border: 1px solid ${isError ? theme.palette.error.light : theme.palette.input.borderColor};
   background: ${theme.palette.input.background};
   border-radius: ${theme.shape.borderRadius}px;
   color: ${theme.palette.text.secondary};
@@ -27,7 +27,7 @@ const InputWrapper = styled.div(({
   align-items: center;
 
   &:focus-within {
-    border: 1px solid ${error ? theme.palette.error.light : theme.palette.primary.main};
+    border: 1px solid ${isError ? theme.palette.error.light : theme.palette.primary.main};
   }
 
   input:-webkit-autofill,
@@ -73,9 +73,9 @@ const StyledTextfield = ({
       </Typography>
       )}
     </StyledLabel>
-    <InputWrapper injectCss={injectCss}>
+    <InputWrapper injectCss={injectCss} isError={isError}>
       {startIcon}
-      <Input id={id} {...rest} error={isError ? 'error' : ''} />
+      <Input id={id} {...rest} />
       {endIcon}
     </InputWrapper>
   </>

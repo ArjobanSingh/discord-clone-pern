@@ -43,7 +43,7 @@ const TransitionModal = (props) => {
 };
 
 TransitionModal.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   innerContainerClassName: PropTypes.string,
@@ -51,6 +51,7 @@ TransitionModal.propTypes = {
 
 TransitionModal.defaultProps = {
   innerContainerClassName: null,
+  children: null,
 };
 
 export default TransitionModal;

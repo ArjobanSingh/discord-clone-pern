@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 // import PropTypes from 'prop-types';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import { useDispatch } from 'react-redux';
 import ResponsiveDrawer from '../../common/ResponsiveDrawer';
@@ -24,6 +24,7 @@ const Servers = () => {
   const { user, isLoading } = useUser();
   const location = useLocation();
   const dispatch = useDispatch();
+  const { serverId } = useParams();
 
   const isDiscoveryPage = location.pathname?.includes('guild-discovery');
 
@@ -61,11 +62,35 @@ const Servers = () => {
     if (!createServerModalData) dispatch(createServerReset());
   }, [createServerModalData]);
 
+  useDidUpdate(() => {
+    closeCreateModal();
+  }, [serverId]);
+
   const renderDrawerLoader = () => (isDiscoveryPage
     ? <ServersAvatarLoader /> : <ServersListLoading />);
 
   const renderContentLoader = () => (isDiscoveryPage
     ? <ServerDiscoveryLoader /> : <ServerLoader />);
+
+  const renderModalContent = () => {
+    switch (createServerModalData) {
+      case CREATE_SERVER_OPTIONS_SCREEN:
+        return (
+          <CreateServerOptionsScreen
+            closeModal={closeCreateModal}
+            openServerModalMainScreen={openServerModalMainScreen}
+          />
+        );
+      case CREATE_SERVER_MAIN_SCREEN:
+        return (
+          <CreateServerModal
+            closeModal={closeCreateModal}
+            openServerModalOptionsScreen={openServerModalOptionsScreen}
+          />
+        );
+      default: return null;
+    }
+  };
 
   return (
     <>
@@ -102,20 +127,7 @@ const Servers = () => {
         disableAutoFocus={false}
       >
         <div>
-          {createServerModalData === CREATE_SERVER_MAIN_SCREEN
-            ? (
-              <CreateServerModal
-                closeModal={closeCreateModal}
-                openServerModalOptionsScreen={openServerModalOptionsScreen}
-              />
-            )
-            : (
-              <CreateServerOptionsScreen
-                closeModal={closeCreateModal}
-                openServerModalMainScreen={openServerModalMainScreen}
-              />
-            )}
-          ?
+          {renderModalContent()}
         </div>
       </TransitionModal>
     </>

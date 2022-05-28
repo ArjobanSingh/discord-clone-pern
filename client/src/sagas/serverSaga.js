@@ -75,6 +75,9 @@ function* getServerDetails(actionData) {
 }
 
 function* joinServer(actionData) {
+  // in case of inviteId, server.id can be undefined
+  // but it does not matter than, cause in case of invite id
+  // server.id is not required at backend
   const { server, inviteId } = actionData.payload;
   let { id: serverId } = server;
 

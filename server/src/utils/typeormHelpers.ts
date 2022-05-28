@@ -67,7 +67,7 @@ export const getServerData = async (serverId: String): Promise<ServerData | unde
     )) as members,
     json_agg(json_build_object(
     'name', c.name, 'id', c.id, 'serverId', c."id", 'createdAt', c."createdAt",
-    'updatedAt', c."updatedAt"
+    'updatedAt', c."updatedAt", 'type', c.type
     )) as channels
   FROM "server" s
   INNER JOIN "server_member" sm ON sm."serverId"= s."id"

@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import PropTypes from 'prop-types';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -15,6 +15,10 @@ import StyledImage from '../../common/StyledImage';
 import { CREATE_SERVER_MODAL_ICON } from '../../constants/images';
 import { getInviteId, handleEnter } from '../../utils/helperFunctions';
 import { joinServerRequested } from '../../redux/actions/servers';
+import { getJoinServerApi } from '../../redux/reducers';
+import { AbsoluteProgress, ConfirmationButton } from '../ServerSettings/Options/styles';
+import Error from '../../common/Error';
+import useDidUpdate from '../../customHooks/useDidUpdate';
 
 const Content = styled.div`
   width: 100%;
@@ -59,19 +63,32 @@ const CreateServerWrapper = styled.div(({ theme }) => `
 
 const CreateServerOptionsScreen = (props) => {
   const { closeModal, openServerModalMainScreen } = props;
+
   const dispatch = useDispatch();
+  const [addedInviteId, setAddedInviteId] = useState('');
+  const [serverJoinError, setServerJoinError] = useState();
+
+  const joinServerApi = useSelector(
+    (state) => getJoinServerApi(state, addedInviteId),
+  ) || { isLoading: false, error: null };
+
+  const { isLoading: isJoiningServer, error } = joinServerApi;
 
   const handleInviteSubmit = (e) => {
     e.preventDefault();
+    if (isJoiningServer) return;
     const formData = new FormData(e.currentTarget);
     const inviteUrl = formData.get('join-server-invite-input');
     if (!inviteUrl?.trim()) return;
 
     const inviteId = getInviteId(inviteUrl);
-    console.log('inviteId', inviteId);
-
+    setAddedInviteId(inviteId);
     dispatch(joinServerRequested({}, inviteId));
   };
+
+  useDidUpdate(() => {
+    setServerJoinError(error?.message || null);
+  }, [error]);
 
   return (
     <ModalContainer>
@@ -135,6 +152,7 @@ const CreateServerOptionsScreen = (props) => {
                 id="create-server-modal-invite-input"
                 placeholder="Enter an invite"
                 name="join-server-invite-input"
+                isError={!!serverJoinError}
                 label={(
                   <Typography marginBottom="5px" variant="body2" color="text.secondary">
                     INVITE LINK
@@ -156,15 +174,20 @@ const CreateServerOptionsScreen = (props) => {
             ))}
           </div>
         </Content>
+        {!!serverJoinError && <Error>{serverJoinError}</Error>}
       </ContentWrapper>
       <ModalFooter>
-        <Button
+        <ConfirmationButton
           form="create-modal-join-server-form"
           type="submit"
           variant="contained"
+          isLoading={isJoiningServer}
         >
-          Join Server
-        </Button>
+          <span className="button-text">
+            Join Server
+          </span>
+          {isJoiningServer && <AbsoluteProgress color="inherit" size={20} />}
+        </ConfirmationButton>
       </ModalFooter>
     </ModalContainer>
   );
