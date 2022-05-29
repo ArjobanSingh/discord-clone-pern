@@ -1,5 +1,5 @@
 import {
-  take, call, fork, select, put,
+  take, call, fork, select, put, all, takeEvery,
 } from 'redux-saga/effects';
 import { eventChannel } from 'redux-saga';
 import { toast } from 'react-toastify';
@@ -13,7 +13,8 @@ import {
   updateOwnershipSuccess,
 } from '../redux/actions/servers';
 import { setNavigateState } from '../redux/actions/navigate';
-import { getServerDetails } from '../redux/reducers';
+import { getAllServers, getServerDetails } from '../redux/reducers';
+import { INTERNET_RECONNECTED } from '../constants';
 
 function createSocketChannel(socket) {
   return eventChannel((emit) => {
@@ -110,7 +111,7 @@ function* handleSocketEvents(socketEvent) {
   }
 }
 
-function* socketSaga() {
+function* socketEventSaga() {
   const socket = socketHandler.getSocket();
   const socketChannel = yield call(createSocketChannel, socket);
 
@@ -128,4 +129,14 @@ function* socketSaga() {
   }
 }
 
-export default socketSaga;
+function* socketDispatchSaga() {
+  const allServers = yield select((state) => getAllServers(state));
+  socketHandler.connectAllServers(Object.keys(allServers));
+}
+
+export default function* socketSaga() {
+  yield all([
+    fork(socketEventSaga),
+    takeEvery(INTERNET_RECONNECTED, socketDispatchSaga),
+  ]);
+}

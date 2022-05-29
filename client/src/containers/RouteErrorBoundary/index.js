@@ -19,7 +19,28 @@ class RouteErrorBoundary extends Component {
 
     const isLoadingChunkError = ['loading', 'chunk', 'failed']
       .every((it) => lowercaseError.includes(it));
-    return { hasError: true, loadingChunkError: isLoadingChunkError };
+
+    return {
+      hasError: true,
+      loadingChunkError: isLoadingChunkError,
+      isReloadingChunk: false,
+    };
+  }
+
+  componentDidUpdate(prevProps) {
+    const { children } = this.props;
+    if (prevProps.children !== children) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState((prevState) => {
+        if (prevState.loadingChunkError) {
+          // children changed means, refetched again
+          return {
+            hasError: false, loadingChunkError: false, isReloadingChunk: false,
+          };
+        }
+        return prevState;
+      });
+    }
   }
 
   componentDidCatch(error, errorInfo) {}
@@ -35,14 +56,8 @@ class RouteErrorBoundary extends Component {
     }
 
     if (loadingChunkError) {
-      try {
-        this.setState({ isReloadingChunk: true });
-        await reloadChunk();
-        this.setState({ hasError: false, loadingChunkError: false, isReloadingChunk: false });
-      } catch (err) {
-        this.setState({ isReloadingChunk: false });
-        console.log('reloading error', err);
-      }
+      this.setState({ isReloadingChunk: true });
+      reloadChunk();
       return;
     }
 
