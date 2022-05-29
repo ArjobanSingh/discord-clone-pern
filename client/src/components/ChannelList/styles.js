@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import Menu, { menuClasses } from '@mui/material/Menu';
 import AddIcon from '@mui/icons-material/Add';
+import Avatar from '@mui/material/Avatar';
 import ListItemButton from '@mui/material/ListItemButton';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ListItemText from '@mui/material/ListItemText';
@@ -32,7 +33,10 @@ export const ChannelListContainer = styled.div`
   height: 100%;
   width: 100%;
   max-width: 245px;
-  overflow-x: hidden;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 `;
 
 export const InviteSectionWrapper = styled.section`
@@ -89,8 +93,34 @@ export const StyledMenu = styled(Menu)(({ theme }) => `
 `);
 
 export const ListContainer = styled.div(({ isInviteBoxVisible }) => `
-  height: ${isInviteBoxVisible ? 'calc(100% - 245px)' : 'calc(100% - 190px)'};
+  /* height: ${isInviteBoxVisible ? 'calc(100% - 245px)' : 'calc(100% - 190px)'}; */
   width: 100%;
+  flex: 1;
+  position: relative;
+`);
+
+export const ScrollableListContainer = styled.div`
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden auto;
+`;
+
+export const ListFooter = styled.footer(({ theme }) => `
+  width: 100%;
+  background-color: ${theme.palette.background.darker};
+  padding: ${theme.spacing(1)};
+  display: flex;
+  align-items: center;
+  gap: ${theme.spacing(1)};
+`);
+
+export const UserAvatar = styled(Avatar)(({ theme }) => `
+  color: ${theme.palette.text.primary};
+  width: 32px;
+  height: 32px;
 `);
 
 export const ExpandableIcon = styled(({ isExpanded, ...rest }) => <ArrowForwardIosIcon {...rest} />)`

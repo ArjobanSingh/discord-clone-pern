@@ -5,6 +5,7 @@ import {
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+import SettingsIcon from '@mui/icons-material/Settings';
 import Collapse from '@mui/material/Collapse';
 import Box from '@mui/material/Box';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -22,10 +23,13 @@ import {
   InviteSection,
   InviteSectionWrapper,
   ListContainer,
+  ListFooter,
+  ScrollableListContainer,
   StyledAddIcon,
   StyledListButton,
   StyledListText,
   StyledMenu,
+  UserAvatar,
 } from './styles';
 import TransitionModal from '../../common/TransitionModal';
 import InviteModal from '../InviteModal';
@@ -37,13 +41,14 @@ import Tag from '../../common/Tag';
 import { ChannelType } from '../../constants/channels';
 import CreateChannelModal from '../CreateChannelModal';
 import StyledTooltip from '../../common/StyledToolTip';
-import useDidUpdate from '../../customHooks/useDidUpdate';
+// import useDidUpdate from '../../customHooks/useDidUpdate';
 import ConfirmationModal from '../../common/ConfirmationModal';
 import { handleError } from '../../utils/helperFunctions';
 import { ChannelApi } from '../../utils/apiEndpoints';
 import { deleteChannelSuccess } from '../../redux/actions/channels';
 import { AbsoluteProgress, ConfirmationButton } from '../ServerSettings/Options/styles';
 import ChannelListLoader from './ChannelListLoader';
+import Logo from '../../common/Logo';
 
 const anchorOrigin = {
   vertical: 'bottom',
@@ -271,36 +276,37 @@ const ChannelList = (props) => {
           </InviteSectionWrapper>
         )}
         <ListContainer isInviteBoxVisible={!hideOptions}>
-          {Object.entries(channelListData).map(([key, data]) => (
-            <ChannelTypeContainer key={key}>
-              <StyledListButton onClick={channelsState[key].onChange}>
-                <ExpandableIcon isExpanded={channelsState[key].isExpanded} />
-                <StyledListText primary={data.title} />
-                {canCreateChannel && (
-                <StyledTooltip
-                  placement="top"
-                  title="Create Channel"
-                >
-                  <StyledAddIcon onClick={openChannelModal} />
-                </StyledTooltip>
-                )}
-              </StyledListButton>
+          <ScrollableListContainer>
+            {Object.entries(channelListData).map(([key, data]) => (
+              <ChannelTypeContainer key={key}>
+                <StyledListButton onClick={channelsState[key].onChange}>
+                  <ExpandableIcon isExpanded={channelsState[key].isExpanded} />
+                  <StyledListText primary={data.title} />
+                  {canCreateChannel && (
+                  <StyledTooltip
+                    placement="top"
+                    title="Create Channel"
+                  >
+                    <StyledAddIcon onClick={openChannelModal} />
+                  </StyledTooltip>
+                  )}
+                </StyledListButton>
 
-              <Collapse in={channelsState[key].isExpanded} timeout="auto" unmountOnExit>
-                {data.channels.map((channel) => (
-                  <Link to={`${params.serverId}/${channel.id}`} key={channel.id}>
-                    <ChannelItem isChannelOpened={channel.id === params.channelId}>
-                      <Tag />
-                      <Typography
-                        flex="1"
-                        component="div"
-                        maxWidth={canDeleteChannel ? 'calc(100% - 48px)' : 'calc(100% - 24px)'}
-                      >
-                        <SimpleEllipsis>
-                          {channel.name}
-                        </SimpleEllipsis>
-                      </Typography>
-                      {canDeleteChannel
+                <Collapse in={channelsState[key].isExpanded} timeout="auto" unmountOnExit>
+                  {data.channels.map((channel) => (
+                    <Link to={`${params.serverId}/${channel.id}`} key={channel.id}>
+                      <ChannelItem isChannelOpened={channel.id === params.channelId}>
+                        <Tag />
+                        <Typography
+                          flex="1"
+                          component="div"
+                          maxWidth={canDeleteChannel ? 'calc(100% - 48px)' : 'calc(100% - 24px)'}
+                        >
+                          <SimpleEllipsis>
+                            {channel.name}
+                          </SimpleEllipsis>
+                        </Typography>
+                        {canDeleteChannel
                       && (
                       <StyledTooltip
                         placement="top"
@@ -316,15 +322,33 @@ const ChannelList = (props) => {
                         </IconButton>
                       </StyledTooltip>
                       )}
-                    </ChannelItem>
-                  </Link>
-                ))}
-              </Collapse>
-            </ChannelTypeContainer>
-          ))}
-
+                      </ChannelItem>
+                    </Link>
+                  ))}
+                </Collapse>
+              </ChannelTypeContainer>
+            ))}
+          </ScrollableListContainer>
         </ListContainer>
 
+        <ListFooter>
+          <UserAvatar src={user.profilePicture}>
+            <Logo />
+          </UserAvatar>
+          <Typography
+            width="calc(100% - 82px)"
+            variant="body2"
+            component="div"
+          >
+            <SimpleEllipsis>
+              {user.name}
+            </SimpleEllipsis>
+          </Typography>
+
+          <IconButton size="small">
+            <SettingsIcon />
+          </IconButton>
+        </ListFooter>
       </ChannelListContainer>
       {!hideOptions && (
         <TransitionModal
