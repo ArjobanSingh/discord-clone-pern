@@ -1,7 +1,7 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy } from 'react';
 // import PropTypes from 'prop-types';
 import {
-  Navigate, Route, Routes, useLocation, useNavigate,
+  Navigate, Route, Routes,
 } from 'react-router-dom';
 import RequireAuth from '../RequireAuth';
 // import MeServer from '../../components/MeServer';
@@ -14,52 +14,32 @@ import ServerDiscoveryLoader from '../../components/ServerDiscovery/ServerDiscov
 import ServersFallback from './ServersFallback';
 import ServerDiscoveryFallback from './ServerDiscoveryFallback';
 import ChatLoader from '../../components/Chat/ChatLoader';
-import RouteErrorBoundary from '../RouteErrorBoundary';
+import withSuspense from '../../hocs/withSuspense';
 
-// reloadChunk={reloadChunk}
-// navigate={navigate}
-// fallback={Fallback}
-// location={location}
-// hoc to wrap every lazy loading component with Suspense and fallback
-const withSuspense = (c, Fallback, reloadChunk) => (props) => {
-  const [Component, setComponent] = useState(c);
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const reload = async () => {
-    try {
-      const res = await reloadChunk();
-      setComponent(res);
-    } catch (err) {
-      // reloading error:
-      console.log('reloading error', err);
-    }
-  };
-  return (
-    <RouteErrorBoundary>
-      <Suspense fallback={Fallback}>
-        <Component {...props} />
-      </Suspense>
-    </RouteErrorBoundary>
-  );
-};
-
-function lazyWithPreload(factory) {
+function lazyWithReload(factory) {
   const Component = lazy(factory);
-  Component.preload = factory;
+  Component.reload = factory;
   return Component;
 }
 
 // lazy loading Inner code extensive components
-const Servers = lazyWithPreload(() => import('../Servers'));
-const LazyLoadingServer = lazyWithPreload(() => import('../../components/Server'));
-const LazyLoadingChannel = lazyWithPreload(() => import('../../components/Channel'));
-const LazyLoadingServerDiscovery = lazyWithPreload(() => import('../../components/ServerDiscovery'));
+const LazyLoadingServers = lazyWithReload(() => import('../Servers'));
+const LazyLoadingServer = lazyWithReload(() => import('../../components/Server'));
+const LazyLoadingChannel = lazyWithReload(() => import('../../components/Channel'));
+const LazyLoadingServerDiscovery = lazyWithReload(() => import('../../components/ServerDiscovery'));
 
-const Server = withSuspense(LazyLoadingServer, <ServerLoader />, LazyLoadingServer.preload);
-const Channel = withSuspense(LazyLoadingChannel, <ChatLoader />, LazyLoadingChannel.preload);
+const Server = withSuspense(LazyLoadingServer, <ServerLoader />, LazyLoadingServer.reload);
+const Channel = withSuspense(LazyLoadingChannel, <ChatLoader />, LazyLoadingChannel.reload);
 const ServerDiscovery = withSuspense(
-  LazyLoadingServerDiscovery, <ServerDiscoveryLoader />, LazyLoadingServerDiscovery.preload,
+  LazyLoadingServerDiscovery, <ServerDiscoveryLoader />, LazyLoadingServerDiscovery.reload,
+);
+
+const DiscoveryServersContainer = withSuspense(
+  LazyLoadingServers, <ServerDiscoveryFallback />, LazyLoadingServers.reload,
+);
+
+const ChannelsServersContainer = withSuspense(
+  LazyLoadingServers, <ServersFallback />, LazyLoadingServers.reload,
 );
 
 const AppRoutes = () => (
@@ -73,9 +53,7 @@ const AppRoutes = () => (
       path="/guild-discovery"
       element={(
         <RequireAuth>
-          <Suspense fallback={<ServerDiscoveryFallback />}>
-            <Servers />
-          </Suspense>
+          <DiscoveryServersContainer />
         </RequireAuth>
       )}
     >
@@ -87,9 +65,7 @@ const AppRoutes = () => (
       path="channels"
       element={(
         <RequireAuth>
-          <Suspense fallback={<ServersFallback />}>
-            <Servers />
-          </Suspense>
+          <ChannelsServersContainer />
         </RequireAuth>
         )}
     >

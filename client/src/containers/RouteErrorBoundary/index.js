@@ -9,13 +9,12 @@ class RouteErrorBoundary extends Component {
     this.state = {
       hasError: false,
       loadingChunkError: false,
-    //   isReloadingChunk: false,
+      isReloadingChunk: false,
     };
     this.retry = this.retry.bind(this);
   }
 
   static getDerivedStateFromError(error) {
-    console.log('Route Error', error.message);
     const lowercaseError = error.message?.toLowerCase() || '';
 
     const isLoadingChunkError = ['loading', 'chunk', 'failed']
@@ -25,9 +24,9 @@ class RouteErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {}
 
-  retry() {
+  async retry() {
     const { loadingChunkError } = this.state;
-    // const { reloadChunk, navigate, location } = this.props;
+    const { reloadChunk } = this.props;
     const isOnline = window.navigator.onLine;
 
     if (!isOnline) {
@@ -35,30 +34,24 @@ class RouteErrorBoundary extends Component {
       return;
     }
 
-    window.location.reload();
+    if (loadingChunkError) {
+      try {
+        this.setState({ isReloadingChunk: true });
+        await reloadChunk();
+        this.setState({ hasError: false, loadingChunkError: false, isReloadingChunk: false });
+      } catch (err) {
+        this.setState({ isReloadingChunk: false });
+        console.log('reloading error', err);
+      }
+      return;
+    }
 
-    // TODO: logic to load only current chunk
-    // if (loadingChunkError) {
-    //   try {
-    //     this.setState({ isReloadingChunk: true });
-    //     const res = await reloadChunk();
-    //     this.setState({ isReloadingChunk: false });
-    //     navigate(location.pathname, { replace: true });
-    //     console.log('location', location, res);
-    //   } catch (err) {
-    //     console.log('err failed again', err);
-    //     this.setState({ hasError: true, isReloadingChunk: false });
-    //   }
-    // } else {
-    //   console.log('why here');
-    //   // some unexpected error occured, refresh app
-    // //   window.location.reload();
-    // }
+    window.location.reloadChunk();
   }
 
   render() {
-    const { hasError } = this.state; // isReloadingChunk
-    const { children } = this.props; // fallback
+    const { hasError, isReloadingChunk } = this.state;
+    const { children, fallback } = this.props;
     const isOnline = window.navigator.onLine;
 
     const error = !isOnline
@@ -66,7 +59,7 @@ class RouteErrorBoundary extends Component {
       : undefined;
 
     if (hasError) {
-    //   if (isReloadingChunk) return fallback;
+      if (isReloadingChunk) return fallback;
 
       return (
         <>
@@ -84,12 +77,8 @@ class RouteErrorBoundary extends Component {
 
 RouteErrorBoundary.propTypes = {
   children: PropTypes.node.isRequired,
-//   reloadChunk: PropTypes.func.isRequired,
-//   navigate: PropTypes.func.isRequired,
-//   fallback: PropTypes.node.isRequired,
-//   location: PropTypes.shape({
-//     pathname: PropTypes.string.isRequired,
-//   }).isRequired,
+  reloadChunk: PropTypes.func.isRequired,
+  fallback: PropTypes.node.isRequired,
 };
 
 export default RouteErrorBoundary;
