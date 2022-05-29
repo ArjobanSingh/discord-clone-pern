@@ -115,12 +115,15 @@ const ChannelList = (props) => {
     setModalState(ModalTypes.INVITE);
   };
 
-  const closeModal = () => {
-    setModalState(null);
-  };
-
   const closeSettingsMenu = () => {
     setMenuAnchorEl(null);
+  };
+
+  const closeModal = () => {
+    setModalState(null);
+    closeSettingsMenu();
+    // on invite or channel modal close,
+    // close settings menu as well
   };
 
   const openDeleteChannelModal = (e) => {
@@ -375,7 +378,11 @@ const ChannelList = (props) => {
         transformOrigin={transformOrigin}
       >
         {!hideOptions && (
-          <ServerSettingsMenu currentRole={serverMember.role} />
+          <ServerSettingsMenu
+            currentRole={serverMember.role}
+            closeSettingsMenu={closeSettingsMenu}
+            openCreateChannelModal={openChannelModal}
+          />
         )}
       </StyledMenu>
     </>

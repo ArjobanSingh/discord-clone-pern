@@ -44,7 +44,7 @@ const settings = [{
 }];
 
 const ServerSettingsMenu = (props) => {
-  const { currentRole } = props;
+  const { currentRole, closeSettingsMenu, openCreateChannelModal } = props;
   const { serverId } = useParams();
   const dispatch = useDispatch();
 
@@ -53,19 +53,21 @@ const ServerSettingsMenu = (props) => {
   const openServerSettings = () => {
     setIsServerDetailsOpen(true);
   };
-  const createChannel = () => {};
   const leaveServer = () => {
     dispatch(leaveServerMemberRequested(serverId));
   };
 
   const clickHanlders = {
     [SERVER_SETTINGS]: openServerSettings,
-    [CREATE_CHANNEL]: createChannel,
+    [CREATE_CHANNEL]: openCreateChannelModal,
     [LEAVE_SERVER]: leaveServer,
   };
 
   const closeServerSettings = () => {
+    // whenever server settings dialog closes
+    // close the settings menu as well
     setIsServerDetailsOpen(false);
+    closeSettingsMenu();
   };
 
   const [serverSettings] = settings;
@@ -112,6 +114,8 @@ const ServerSettingsMenu = (props) => {
 };
 
 ServerSettingsMenu.propTypes = {
+  closeSettingsMenu: PropTypes.func.isRequired,
+  openCreateChannelModal: PropTypes.func.isRequired,
   currentRole: PropTypes.oneOf(Object.keys(ServerMemberRoles)).isRequired,
 };
 

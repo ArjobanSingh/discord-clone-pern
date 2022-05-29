@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Drawer, { drawerClasses } from '@mui/material/Drawer';
+import IconButton from '@mui/material/IconButton';
 
 export const SettingsContainer = styled.div(({ theme }) => `
   width: 100%;
@@ -40,6 +41,7 @@ export const SettingsNav = styled.nav(({ theme }) => `
   width: 14rem;
   height: 100%;
   padding: ${`${theme.spacing(7)} ${theme.spacing(2)}`};
+  background-color: inherit;
   overflow: auto;
 `);
 
@@ -101,4 +103,28 @@ export const UnsavedWrapper = styled.div(({ theme }) => `
   display: flex;
   align-items: center;
   justify-content: space-between;
+`);
+
+export const AbsoluteIconsContainer = styled.div(({ theme }) => `
+  position: absolute;
+  padding: ${theme.spacing(2)};
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: flex-end;
+  color: ${theme.palette.text.secondary};
+
+  & button {
+    border: 1px solid currentColor;
+  }
+`);
+
+export const SettingsDrawerMenuIcon = styled(IconButton)(({ theme }) => `
+  display: inline-flex;
+  margin-right: auto;
+
+  ${theme.breakpoints.up('md')} {
+    display: none;
+  }
 `);

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
@@ -6,8 +6,14 @@ import IconButton from '@mui/material/IconButton';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import {
+  AbsoluteIconsContainer,
   FullHeightContainer,
-  ListContainer, MainContent, ServerOptionsDrawer, SettingsContainer, SettingsNav,
+  ListContainer,
+  MainContent,
+  ServerOptionsDrawer,
+  SettingsContainer,
+  SettingsDrawerMenuIcon,
+  SettingsNav,
 } from './styles';
 import useMobileDrawerState from '../../customHooks/useMobileDrawerState';
 import ServerOptions from './ServerOptions';
@@ -97,36 +103,25 @@ const ServerSettings = (props) => {
             />
           </MainContent>
 
-          <IconButton
-            color="inherit"
-            aria-label="open/close server options"
-            size="small"
-            onClick={openDrawer}
-            sx={{
-              display: { xs: 'bock', md: 'none' },
-              position: 'absolute',
-              left: '0',
-              color: 'text.secondaryDark',
-              border: '1px solid currentColor',
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
+          <AbsoluteIconsContainer>
+            <SettingsDrawerMenuIcon
+              aria-label="open/close server options"
+              size="small"
+              onClick={openDrawer}
+              color="inherit"
+            >
+              <MenuIcon />
+            </SettingsDrawerMenuIcon>
 
-          <IconButton
-            color="inherit"
-            aria-label="close server settings"
-            size="small"
-            onClick={closeServerSettings}
-            sx={{
-              position: 'absolute',
-              right: '0',
-              color: 'text.secondaryDark',
-              border: '1px solid currentColor',
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
+            <IconButton
+              color="inherit"
+              aria-label="close server settings"
+              size="small"
+              onClick={closeServerSettings}
+            >
+              <CloseIcon />
+            </IconButton>
+          </AbsoluteIconsContainer>
         </SettingsContainer>
       </FullHeightContainer>
 
