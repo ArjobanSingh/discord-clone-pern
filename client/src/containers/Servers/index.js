@@ -16,6 +16,7 @@ import CreateServerModal from '../../components/CreateServerModal';
 import useDidUpdate from '../../customHooks/useDidUpdate';
 import { createServerReset } from '../../redux/actions/servers';
 import CreateServerOptionsScreen from '../../components/CreateServerOptionsScreen';
+import UserSettingsProvider from '../../providers/UserSettingsProvider';
 
 const CREATE_SERVER_OPTIONS_SCREEN = 'CREATE_SERVER_OPTIONS_SCREEN';
 const CREATE_SERVER_MAIN_SCREEN = 'CREATE_SERVER_MAIN_SCREEN';
@@ -93,7 +94,7 @@ const Servers = () => {
   };
 
   return (
-    <>
+    <UserSettingsProvider>
       <Box
         display="flex"
         width="100%"
@@ -130,7 +131,7 @@ const Servers = () => {
           {renderModalContent()}
         </div>
       </TransitionModal>
-    </>
+    </UserSettingsProvider>
   );
 };
 

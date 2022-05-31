@@ -155,3 +155,11 @@ export const ChannelTypeContainer = styled.div`
   width: 100%;
   margin-bottom: ${({ theme }) => theme.spacing(1)};
 `;
+
+export const AbsoluteUserName = styled.div`
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+`;

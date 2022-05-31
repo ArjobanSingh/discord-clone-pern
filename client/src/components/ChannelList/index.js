@@ -16,6 +16,7 @@ import { toast } from 'react-toastify';
 import { Header, SimpleEllipsis } from '../../common/StyledComponents';
 import axiosInstance from '../../utils/axiosConfig';
 import {
+  AbsoluteUserName,
   ChannelItem,
   ChannelListContainer,
   ChannelTypeContainer,
@@ -49,6 +50,8 @@ import { deleteChannelSuccess } from '../../redux/actions/channels';
 import { AbsoluteProgress, ConfirmationButton } from '../ServerSettings/Options/styles';
 import ChannelListLoader from './ChannelListLoader';
 import Logo from '../../common/Logo';
+import ThemeToggler from '../../common/ThemeToggler';
+import { useUserSettings } from '../../providers/UserSettingsProvider';
 
 const anchorOrigin = {
   vertical: 'bottom',
@@ -71,6 +74,7 @@ const ChannelList = (props) => {
   const { user } = useUser();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { openUserSettingsDialog } = useUserSettings();
 
   const [modalState, setModalState] = useState(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
@@ -336,31 +340,32 @@ const ChannelList = (props) => {
             <Logo />
           </UserAvatar>
           <Typography
-            width="calc(100% - 82px)"
             variant="body2"
             component="div"
+            flex="1"
+            position="relative"
           >
-            <SimpleEllipsis>
-              {user.name}
-            </SimpleEllipsis>
+            <AbsoluteUserName>
+              <SimpleEllipsis>
+                {user.name}
+              </SimpleEllipsis>
+            </AbsoluteUserName>
           </Typography>
 
-          <IconButton size="small">
+          <ThemeToggler />
+          <IconButton size="small" onClick={openUserSettingsDialog}>
             <SettingsIcon />
           </IconButton>
         </ListFooter>
       </ChannelListContainer>
-      {!hideOptions && (
-        <TransitionModal
-          open={!!modalState}
-          onClose={closeModal}
-          // aria-labelledby="invite-modal-title"
-        >
-          <div>
-            {getModalBody()}
-          </div>
-        </TransitionModal>
-      )}
+      <TransitionModal
+        open={!!modalState}
+        onClose={closeModal}
+      >
+        <div>
+          {getModalBody()}
+        </div>
+      </TransitionModal>
 
       {canDeleteChannel && (
         <ConfirmationModal

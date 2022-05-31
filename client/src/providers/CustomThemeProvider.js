@@ -14,10 +14,11 @@ const CustomThemeProvider = ({ children }) => {
   const [mode, setMode] = useState(DARK_THEME);
 
   const colorMode = useMemo(() => ({
+    mode,
     toggleColorMode: () => {
       setMode((prev) => (prev === DARK_THEME ? LIGHT_THEME : DARK_THEME));
     },
-  }), []);
+  }), [mode]);
 
   const theme = useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
 
