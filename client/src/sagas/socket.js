@@ -15,6 +15,7 @@ import {
 import { setNavigateState } from '../redux/actions/navigate';
 import { getAllServers, getServerDetails } from '../redux/reducers';
 import { INTERNET_RECONNECTED } from '../constants';
+import { updateUserDetails } from '../redux/actions/user';
 
 function createSocketChannel(socket) {
   return eventChannel((emit) => {
@@ -104,6 +105,13 @@ function* handleSocketEvents(socketEvent) {
         yield put(setNavigateState([`/channels/${serverId}`, { replace: true }]));
       }
       yield put(deleteChannelSuccess(serverId, channelId));
+      break;
+    }
+    case C.USER_DETAILS_UPDATED: {
+      const { userId } = payload;
+      if (userId === loggedInUser.id) {
+        yield put(updateUserDetails(payload));
+      }
       break;
     }
     default:

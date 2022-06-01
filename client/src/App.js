@@ -2,11 +2,7 @@ import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
 import { styled } from '@mui/material/styles';
 import { ToastContainer } from 'react-toastify';
-import Button from '@mui/material/Button';
-import { useDispatch } from 'react-redux';
 import CustomThemeProvider from './providers/CustomThemeProvider';
-import { logoutRequested } from './redux/actions/auth';
-import useIsAuthenticated from './customHooks/useIsAuthenticated';
 import AppRoutes from './containers/Routes';
 import BaseStyles from './BaseStyles';
 import GlobalNavigation from './components/GlobalNavigation';
@@ -24,28 +20,6 @@ const InnerWrapper = styled('div')`
   overflow: auto;
 `;
 
-const Child = () => {
-  const isAuthenticated = useIsAuthenticated();
-  const dispatch = useDispatch();
-
-  return (
-    <>
-      {isAuthenticated && (
-        <Button
-          sx={{
-            position: 'fixed', bottom: '100px', left: '210px', zIndex: '2000',
-          }}
-          color="primary"
-          variant="contained"
-          onClick={() => { dispatch(logoutRequested()); }}
-        >
-          Logout
-        </Button>
-      )}
-    </>
-  );
-};
-
 function App() {
   return (
     <CustomThemeProvider>
@@ -55,7 +29,6 @@ function App() {
       <ToastContainer theme="dark" />
 
       <Container>
-        <Child />
         <InnerWrapper>
           <AppRoutes />
         </InnerWrapper>

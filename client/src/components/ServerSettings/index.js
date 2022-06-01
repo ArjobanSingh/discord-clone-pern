@@ -127,7 +127,7 @@ const ServerSettings = (props) => {
 
       {currentRole === ServerMemberRoles.OWNER && (
         <ConfirmationModal
-          open={!!isDeleteModalVisible}
+          open={isDeleteModalVisible}
           onClose={closeDeleteModal}
           title={`Delete '${serverDetails.name}'`}
           description={(

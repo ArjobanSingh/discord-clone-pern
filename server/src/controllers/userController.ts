@@ -1,11 +1,13 @@
 import { validate } from 'class-validator';
 import { NextFunction, Response } from 'express';
+import { Server as SocketServer } from 'socket.io';
 import sharp from 'sharp';
 import cloudinary from '../cloudinary';
 import User from '../entity/User';
 import CustomRequest from '../interfaces/CustomRequest';
 import { createValidationError, CustomError } from '../utils/errors';
 import { getUserData } from '../utils/typeormHelpers';
+import { USER_DETAILS_UPDATED } from '../../../common/socket-io-constants';
 
 export const getCurrentUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
@@ -71,14 +73,18 @@ export const updateUserDetails = async (req: CustomRequest, res: Response, next:
     await user.save();
 
     const responseObj = {
+      id: user.id,
       name: user.name,
       email: user.email,
       profilePicture: user.profilePicture,
     };
     res.json(responseObj);
 
+    const io: SocketServer = req.app.get('io');
+
     // after response has been sent, delete previous avatar/banner if present
     if (prevProfilePublicId) cloudinary.uploader.destroy(prevProfilePublicId);
+    io.emit(USER_DETAILS_UPDATED, responseObj);
   } catch (err) {
     next(err);
   }
