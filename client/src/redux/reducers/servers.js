@@ -2,6 +2,7 @@ import { combineReducers } from 'redux';
 import { ADD_CHANNEL_SUCCESS, DELETE_CHANNEL_SUCCESS } from '../../constants/channels';
 import * as C from '../../constants/servers';
 import { APP_URL } from '../../utils/axiosConfig';
+import { isEmpty } from '../../utils/validators';
 
 const allServers = (state = {}, action) => {
   switch (action.type) {
@@ -19,7 +20,9 @@ const allServers = (state = {}, action) => {
         return acc;
       }, {});
     case C.JOIN_SERVER_SUCCESS:
-    case C.CREATE_SERVER_SUCCESS:
+    case C.CREATE_SERVER_SUCCESS: {
+      if (state[action.payload.serverId]) return state;
+
       return {
         [action.payload.serverId]: {
           ...action.payload.data,
@@ -29,6 +32,7 @@ const allServers = (state = {}, action) => {
         },
         ...state,
       };
+    }
     case C.REMOVE_SERVER: {
       const newState = { ...state };
       delete newState[action.payload.serverId];
@@ -129,6 +133,34 @@ const allServers = (state = {}, action) => {
             }
             return member;
           }),
+        },
+      };
+    }
+    case C.NEW_SERVER_MEMBER_JOINED_SUCCESS: {
+      const { serverId, newMember } = action.payload;
+
+      // although possibilty of this case is none
+      if (!state[serverId]) return state;
+
+      // server details not fetched already, skip this
+      if (isEmpty(state[serverId].members)) return state;
+
+      let isMemberAddedAlready = false;
+      const newMembers = state[serverId].members.map((member) => {
+        if (member.userId === newMember.userId) {
+          isMemberAddedAlready = true;
+          return newMember;
+        }
+        return member;
+      });
+
+      if (!isMemberAddedAlready) newMembers.push(newMember);
+
+      return {
+        ...state,
+        [serverId]: {
+          ...state[serverId],
+          members: newMembers,
         },
       };
     }

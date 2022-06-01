@@ -5,12 +5,17 @@ import { eventChannel } from 'redux-saga';
 import { toast } from 'react-toastify';
 import socketHandler from '../services/socket-client';
 import * as C from '../constants/socket-io';
-import { addChannelSuccess, deleteChannelSuccess, sendChannelMessageSent } from '../redux/actions/channels';
+import {
+  addChannelSuccess, deleteChannelSuccess, saveAllChannels, sendChannelMessageSent,
+} from '../redux/actions/channels';
 import {
   deleteServerSuccess,
+  joinServerSucess,
   kickServerMemberSuccess,
   leaveServerMemberSuccess,
+  newServerMemberJoined,
   updateOwnershipSuccess,
+  updateServerRoleSuccess,
 } from '../redux/actions/servers';
 import { setNavigateState } from '../redux/actions/navigate';
 import { getAllServers, getServerDetails } from '../redux/reducers';
@@ -112,6 +117,23 @@ function* handleSocketEvents(socketEvent) {
       if (userId === loggedInUser.id) {
         yield put(updateUserDetails(payload));
       }
+      break;
+    }
+    case C.SERVER_MEMBER_ROLE_UPDATED: {
+      const { serverId, userId, role } = payload;
+      yield put(updateServerRoleSuccess(serverId, { userId, role }));
+      break;
+    }
+    case C.NEW_SERVER_MEMBER_JOINED: {
+      const { server, newMember } = payload;
+      if (newMember.userId === loggedInUser.id) {
+        // we joined some new server, might be from some other device
+        // so add server in redux state
+        yield put(saveAllChannels(server.id, server.channels ?? []));
+        yield put(joinServerSucess(server.id, undefined, server));
+        break;
+      }
+      yield put(newServerMemberJoined(server.id, newMember));
       break;
     }
     default:

@@ -165,14 +165,25 @@ export const joinServer = async (
       await updateServerPromise;
     });
 
-    server.members.push({
+    const newMemberObj = {
       userName: user.name,
       userId: user.id,
       profilePicture: user.profilePicture,
       role: MemberRole.USER,
-    });
+    };
+
+    server.members.push(newMemberObj);
 
     res.status(201).json(server);
+
+    // extracting out heavy json items like channels and members for socket payload
+    const { channels: _c, members: _m, ...restServerDetails } = server;
+
+    const io: SocketServer = req.app.get('io');
+    io.to(server.id).emit(C.NEW_SERVER_MEMBER_JOINED, {
+      server: restServerDetails,
+      newMember: newMemberObj,
+    });
   } catch (err) {
     next(err);
   }
@@ -501,7 +512,16 @@ export const updateServerMemberRoles = async (
       );
     }
 
-    res.status(204).json();
+    const responseObj = {
+      serverId,
+      userId: requestedUser.userId,
+      role,
+    };
+
+    res.status(200).json(responseObj);
+
+    const io: SocketServer = req.app.get('io');
+    io.to(serverId).emit(C.SERVER_MEMBER_ROLE_UPDATED, responseObj);
   } catch (err) {
     next(err);
   }

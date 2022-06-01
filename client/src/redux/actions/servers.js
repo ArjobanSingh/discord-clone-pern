@@ -242,6 +242,14 @@ export const deleteServerSuccess = (serverId) => ({
   },
 });
 
+export const newServerMemberJoined = (serverId, newMember) => ({
+  type: C.NEW_SERVER_MEMBER_JOINED_SUCCESS,
+  payload: {
+    serverId,
+    newMember,
+  },
+});
+
 // export const updateServerRoleFailed = (serverId, error) => ({
 //   type: C.UPDATE_SERVER_ROLE_FAILED,
 //   payload: {

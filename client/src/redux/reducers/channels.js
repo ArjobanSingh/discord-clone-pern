@@ -16,6 +16,9 @@ import * as S from '../../constants/servers';
 export default (state = {}, action) => {
   switch (action.type) {
     case C.SAVE_ALL_CHANNELS_LIST:
+      // if channels are already added, this might be socket notification
+      // for change done from this device, so ignore
+      if (state[action.payload.serverId]) return state;
       return {
         ...state,
         [action.payload.serverId]: action.payload.channels.reduce((acc, channel) => {
