@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
@@ -15,6 +15,9 @@ import {
   SettingsNav,
 } from '../ServerSettings/styles';
 import useMobileDrawerState from '../../customHooks/useMobileDrawerState';
+import UserSettingsOptions from './UserSettingsOptions';
+import { USER_SETTINGS } from '../../constants/user';
+import OptionContent from './OptionContent';
 
 const UserSettings = (props) => {
   const { closeUserSettingsDialog } = props;
@@ -25,6 +28,21 @@ const UserSettings = (props) => {
     closeDrawer,
   } = useMobileDrawerState();
 
+  const [openedTab, setOpenedTab] = useState(USER_SETTINGS.MY_ACCOUNT);
+
+  const openLogoutModal = () => {};
+
+  const openNewOption = (newTabOption) => {
+    if (newTabOption) {
+      setOpenedTab(newTabOption);
+    } else {
+      // if newTabOption not available means action type button
+      // for now only logout modal action
+      openLogoutModal();
+    }
+    closeDrawer();
+  };
+
   return (
     <Container>
       <UserOptionsDrawer
@@ -32,7 +50,10 @@ const UserSettings = (props) => {
         onClose={closeDrawer}
       >
         <SettingsNav>
-          <div>options</div>
+          <UserSettingsOptions
+            openedTab={openedTab}
+            openNewOption={openNewOption}
+          />
         </SettingsNav>
       </UserOptionsDrawer>
 
@@ -40,12 +61,15 @@ const UserSettings = (props) => {
         <UserSettingsContainer>
           <ListContainer>
             <SettingsNav>
-              options nav
+              <UserSettingsOptions
+                openedTab={openedTab}
+                openNewOption={openNewOption}
+              />
             </SettingsNav>
           </ListContainer>
 
           <MainContent>
-            main content
+            <OptionContent openedTab={openedTab} />
           </MainContent>
 
           <AbsoluteIconsContainer>

@@ -11,8 +11,9 @@ import Menu, { menuClasses } from '@mui/material/Menu';
 
 export const IconAvatar = styled(Avatar)(({
   theme,
+  backgroundColor = '',
 }) => `
-    background-color: ${theme.palette.primary.main};
+    background-color: ${backgroundColor ?? theme.palette.primary.main};
     color: ${theme.palette.text.primary};
     width: inherit;
     height: inherit;
