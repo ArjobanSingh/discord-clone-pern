@@ -45,7 +45,7 @@ import { ServerApi } from '../utils/apiEndpoints';
 import { setNavigateState } from '../redux/actions/navigate';
 import { saveAllChannels } from '../redux/actions/channels';
 import socketClient from '../services/socket-client';
-import { getExploreServersList, getUser } from '../redux/reducers';
+import { getExploreServersList } from '../redux/reducers';
 
 async function fetchServerDetails(serverId, throwError = true) {
   try {

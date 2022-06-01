@@ -89,6 +89,7 @@ function* handleSocketEvents(socketEvent) {
         // if not this server, already deleted
         const { name } = serverToDelete;
         toast.info(`${name} server has been deleted`);
+        // TODO: disconnect server
 
         if (isSameServerOpened) {
           yield put(setNavigateState(['/', { replace: true }]));
@@ -131,6 +132,7 @@ function* handleSocketEvents(socketEvent) {
         // so add server in redux state
         yield put(saveAllChannels(server.id, server.channels ?? []));
         yield put(joinServerSucess(server.id, undefined, server));
+        socketHandler.connectSingleServer(server.id);
         break;
       }
       yield put(newServerMemberJoined(server.id, newMember));

@@ -6,12 +6,13 @@ import { createConnection } from 'typeorm';
 import { createServer } from 'http';
 import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
-import { Server as SocketIoServer } from 'socket.io';
+import { Server as SocketIoServer, Socket } from 'socket.io';
 import multer from 'multer';
 import apiRouter from './routes';
 import * as C from '../../common/socket-io-constants';
 import { isTokensValidForSocket } from './utils/helperFunctions';
 import isSocketAuthenticated from './middlewarres/isSocketAuthenticated';
+import ISocket from './types/ISocket';
 
 const corsOptions = {
   origin: 'http://localhost:3000',
@@ -70,12 +71,15 @@ createConnection()
 
     // if we want we can use userId to join room for personal notifications meant for user
     // or for private messaging in future
-    io.use(async (socket, next) => {
+    io.use(async (socket: ISocket, next) => {
       const { accessToken, refreshToken } = socket.handshake.auth;
 
       const [isTokenValid, userId] = await isTokensValidForSocket({ accessToken, refreshToken });
 
       if (isTokenValid) {
+        // eslint-disable-next-line no-param-reassign
+        socket.userId = userId;
+
         // make user join room of his/her userId
         socket.join(userId);
         next();
@@ -95,17 +99,14 @@ createConnection()
 
       socket.on(C.CONNECT_ALL_SERVERS, isSocketAuthenticated((_userId: string, data: string[]) => {
         socket.join(data);
-        console.log('joined rooms', socket.rooms);
       }));
 
       socket.on(C.CONNECT_SINGLE_SERVER, isSocketAuthenticated((_userId: string, serverId: string) => {
         socket.join(serverId);
-        console.log('joined another new room', socket.rooms);
       }));
 
       socket.on(C.DISCONNECT_SINGLE_SERVER, isSocketAuthenticated((_userId: string, serverId: string) => {
         socket.leave(serverId);
-        console.log('Left room: ', socket.rooms);
       }));
 
       socket.on('disconnect', () => {

@@ -18,6 +18,7 @@ import Channel from '../entity/Channel';
 import cloudinary from '../cloudinary';
 import * as C from '../../../common/socket-io-constants';
 import { getServerData, ServerData } from '../utils/typeormHelpers';
+import ISocket from '../types/ISocket';
 
 export const createServer = async (
   req: CustomRequest,
@@ -183,6 +184,20 @@ export const joinServer = async (
     io.to(server.id).emit(C.NEW_SERVER_MEMBER_JOINED, {
       server: restServerDetails,
       newMember: newMemberObj,
+    });
+
+    const allSockets = io.sockets.sockets;
+
+    const allSocketsArr = Array.from(allSockets.entries());
+    allSocketsArr.forEach((data) => {
+      const socketDetails: ISocket = data[1];
+      if (socketDetails.userId === newMemberObj.userId) {
+        console.log('emitting');
+        io.to(socketDetails.id).emit(C.NEW_SERVER_MEMBER_JOINED, {
+          server: restServerDetails,
+          newMember: newMemberObj,
+        });
+      }
     });
   } catch (err) {
     next(err);
