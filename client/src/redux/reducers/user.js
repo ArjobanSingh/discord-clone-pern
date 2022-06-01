@@ -12,7 +12,7 @@ export default (state = { isLoading: false, error: null, user: null }, action) =
       return {
         ...state,
         user: {
-          ...state.user,
+          ...(state.user || {}),
           ...action.payload.data,
         },
       };
