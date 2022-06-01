@@ -33,5 +33,6 @@ export const uploadServerMultipleFiles = uploadSingleImage.fields([{
 }]);
 
 export const uploadServerAvatar = uploadSingleImage.single('avatar');
+export const uploadUserProfilePic = uploadSingleImage.single('profilePicture');
 
 export default uploadFile;

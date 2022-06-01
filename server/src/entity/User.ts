@@ -40,6 +40,11 @@ export default class User extends BaseEntity {
   })
   profilePicture: string;
 
+  @Column({
+    nullable: true,
+  })
+  profilePicturePublicId: string;
+
   // all those servers, whose owner is this user
   @OneToMany((type) => Server, (server) => server.owner)
   ownedServers: Server[]

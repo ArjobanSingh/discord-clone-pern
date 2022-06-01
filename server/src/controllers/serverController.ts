@@ -68,8 +68,9 @@ export const createServer = async (
         base64String,
         { folder: 'discord_clone/api_uploads/server-files' },
       );
-      const { secure_url: secureUrl } = fileResponse;
+      const { secure_url: secureUrl, public_id: publicId } = fileResponse;
       newServer.avatar = secureUrl;
+      newServer.avatar = publicId;
     }
 
     await getConnection().transaction(async (transactionEntityManager) => {

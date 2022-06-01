@@ -7,6 +7,7 @@ export const AuthApi = {
 
 export const UserApi = {
   GET_CURRENT_USER: '/user',
+  PATCH_CURRENT_USER: '/user',
 };
 
 export const ServerApi = {

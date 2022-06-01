@@ -17,3 +17,10 @@ export const userFailed = (error) => ({
     error,
   },
 });
+
+export const updateUserDetails = (data) => ({
+  type: C.UPDATED_USER_SUCCESS,
+  payload: {
+    data,
+  },
+});
