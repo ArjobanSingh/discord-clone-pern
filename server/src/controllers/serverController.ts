@@ -75,11 +75,11 @@ export const createServer = async (
     }
 
     await getConnection().transaction(async (transactionEntityManager) => {
-      const serverSavePromise = transactionEntityManager.save(newServer);
+      // need to save server before following two promises
+      await transactionEntityManager.save(newServer);
       const saveMemberPromise = transactionEntityManager.save(serverMember);
       const saveChannelPromise = transactionEntityManager.save(generalChannel);
 
-      await serverSavePromise;
       await saveMemberPromise;
       await saveChannelPromise;
     });
@@ -597,21 +597,24 @@ export const transferOwnership = async (req: CustomRequest, res: Response, next:
     }
 
     await getConnection().transaction(async (transactionEntityManager) => {
-      const preOwnerPromise = transactionEntityManager.update(ServerMember, {
+      const prevOwnerPromise = transactionEntityManager.update(ServerMember, {
         userId: oldOwner.userId,
         serverId,
       }, {
         role: MemberRole.ADMIN,
       });
 
-      const newOwnerPromise = transactionEntityManager.update(ServerMember, { userId: newOwner.userId, serverId }, {
+      const newOwnerPromise = transactionEntityManager.update(ServerMember, {
+        userId: newOwner.userId,
+        serverId,
+      }, {
         role: MemberRole.OWNER,
       });
 
       const serverPromise = transactionEntityManager.update(Server, serverId, {
         ownerId: newOwner.userId,
       });
-      await preOwnerPromise;
+      await prevOwnerPromise;
       await newOwnerPromise;
       await serverPromise;
     });

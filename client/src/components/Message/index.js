@@ -22,7 +22,6 @@ import {
   TextContent,
 } from './styles';
 import Logo from '../../common/Logo';
-import useUser from '../../customHooks/useUser';
 import {
   downloadFile, formatDate, getTime, sameDay, stringToColor,
 } from '../../utils/helperFunctions';
