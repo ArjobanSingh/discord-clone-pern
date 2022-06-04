@@ -27,6 +27,10 @@ class SocketHandler {
   connectSingleServer(serverId) {
     this.emitEvent(C.CONNECT_SINGLE_SERVER, serverId);
   }
+
+  disconnectSingleServer(serverId) {
+    this.emitEvent(C.DISCONNECT_SINGLE_SERVER, serverId);
+  }
 }
 
 const socketHandler = new SocketHandler();

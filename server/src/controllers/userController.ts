@@ -83,7 +83,9 @@ export const updateUserDetails = async (req: CustomRequest, res: Response, next:
     const io: SocketServer = req.app.get('io');
 
     // after response has been sent, delete previous avatar/banner if present
-    if (prevProfilePublicId) cloudinary.uploader.destroy(prevProfilePublicId);
+    if (prevProfilePublicId !== user.profilePicturePublicId) {
+      cloudinary.uploader.destroy(prevProfilePublicId);
+    }
     io.emit(USER_DETAILS_UPDATED, responseObj);
   } catch (err) {
     next(err);

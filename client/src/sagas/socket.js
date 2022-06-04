@@ -9,6 +9,7 @@ import {
   addChannelSuccess, deleteChannelSuccess, saveAllChannels, sendChannelMessageSent,
 } from '../redux/actions/channels';
 import {
+  createServerSuccess,
   deleteServerSuccess,
   joinServerSucess,
   kickServerMemberSuccess,
@@ -60,6 +61,7 @@ function* handleSocketEvents(socketEvent) {
 
       if (isLoggedInUser) {
         const { name } = yield select((state) => getServerDetails(state, serverId));
+        socketHandler.disconnectSingleServer(serverId);
         toast.info(`You have been kicked out from ${name} server`);
 
         if (isSameServerOpened) {
@@ -75,8 +77,12 @@ function* handleSocketEvents(socketEvent) {
       const { serverId, userId } = payload;
       const isLoggedInUser = userId === loggedInUser.id;
       const isSameServerOpened = window.location.pathname.includes(`/channels/${serverId}`);
-      if (isLoggedInUser && isSameServerOpened) {
-        yield put(setNavigateState(['/', { replace: true }]));
+      if (isLoggedInUser) {
+        socketHandler.disconnectSingleServer(serverId);
+
+        if (isSameServerOpened) {
+          yield put(setNavigateState(['/', { replace: true }]));
+        }
       }
       yield put(leaveServerMemberSuccess(serverId, userId, isLoggedInUser));
       break;
@@ -86,6 +92,7 @@ function* handleSocketEvents(socketEvent) {
       const isSameServerOpened = window.location.pathname.includes(`/channels/${serverId}`);
       const serverToDelete = yield select((state) => getServerDetails(state, serverId));
       if (serverToDelete) {
+        socketHandler.disconnectSingleServer(serverId);
         // if not this server, already deleted
         const { name } = serverToDelete;
         toast.info(`${name} server has been deleted`);
@@ -136,6 +143,13 @@ function* handleSocketEvents(socketEvent) {
         break;
       }
       yield put(newServerMemberJoined(server.id, newMember));
+      break;
+    }
+    case C.SERVER_CREATED: {
+      const { id, channels } = payload;
+      yield put(saveAllChannels(id, channels ?? []));
+      yield put(createServerSuccess(id, payload));
+      socketHandler.connectSingleServer(id);
       break;
     }
     default:

@@ -14,7 +14,6 @@ import {
   KICK_SERVER_MEMBER_REQUESTED,
   LEAVE_SERVER_MEMBER_REQUESTED,
   DELETE_SERVER_REQUESTED,
-  ServerMemberRoles,
   EXPLORE_MORE_SERVERS_REQUESTED,
 } from '../constants/servers';
 import {
@@ -302,6 +301,7 @@ function* leaveServer(actionData) {
       yield put(setNavigateState(['/', { replace: true }]));
     }
     yield put(leaveServerMemberSuccess(serverId, user.userId, true));
+    socketClient.disconnectSingleServer(serverId);
   } catch (err) {
     yield put(handleError(err, (error) => {
       toast.error(`Error leaving server: ${error.message}`);
@@ -320,6 +320,7 @@ function* deleteServer(actionData) {
       yield put(setNavigateState(['/', { replace: true }]));
     }
     yield put(deleteServerSuccess(serverId));
+    socketClient.disconnectSingleServer(serverId);
   } catch (err) {
     yield put(handleError(err, (error) => {
       toast.error(`Error Deleting server: ${error.message}`);

@@ -133,6 +133,8 @@ const channelsChat = (state = {}, action) => {
       const {
         serverId, channelId, messageData, localMessageKey,
       } = action.payload;
+      if (!state[serverId]?.[channelId]) return state;
+
       const currentChannelData = state[serverId][channelId].data;
       const data = localMessageKey
         ? currentChannelData.map((message) => (message.id === localMessageKey ? messageData : message))

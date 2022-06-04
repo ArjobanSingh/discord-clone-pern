@@ -75,26 +75,41 @@ export const createServer = async (
     }
 
     await getConnection().transaction(async (transactionEntityManager) => {
-      await transactionEntityManager.save(newServer);
-      await transactionEntityManager.save(serverMember);
-      await transactionEntityManager.save(generalChannel);
+      const serverSavePromise = transactionEntityManager.save(newServer);
+      const saveMemberPromise = transactionEntityManager.save(serverMember);
+      const saveChannelPromise = transactionEntityManager.save(generalChannel);
+
+      await serverSavePromise;
+      await saveMemberPromise;
+      await saveChannelPromise;
     });
 
     const { owner: _, ...otherSeverProps } = newServer;
     const { server: _s, serverId: _sId, ...restChannelData } = generalChannel;
 
-    res.status(201).json({
+    const reponseObj = {
       ...otherSeverProps,
-      members: [
-        {
-          userName: user.name,
-          userId: user.id,
-          // email: user.email,
-          profilePicture: user.profilePicture,
-          role: MemberRole.OWNER,
-        },
-      ],
+      members: [{
+        userId: user.id,
+        userName: user.name,
+        profilePicture: user.profilePicture,
+        role: MemberRole.OWNER,
+      }],
       channels: [restChannelData],
+    };
+
+    res.status(201).json(reponseObj);
+    const io: SocketServer = req.app.get('io');
+
+    // find all socket client connections of owner and send new server notification to them
+    const allSockets = io.sockets.sockets;
+
+    const allSocketsArr = Array.from(allSockets.entries());
+    allSocketsArr.forEach((socket: [string, ISocket]) => {
+      const [, socketDetails] = socket;
+      if (socketDetails.userId === req.userId) {
+        io.to(socketDetails.id).emit(C.SERVER_CREATED, reponseObj);
+      }
     });
   } catch (err) {
     next(err);
@@ -192,7 +207,6 @@ export const joinServer = async (
     allSocketsArr.forEach((data) => {
       const socketDetails: ISocket = data[1];
       if (socketDetails.userId === newMemberObj.userId) {
-        console.log('emitting');
         io.to(socketDetails.id).emit(C.NEW_SERVER_MEMBER_JOINED, {
           server: restServerDetails,
           newMember: newMemberObj,

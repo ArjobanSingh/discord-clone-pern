@@ -15,7 +15,6 @@ import useUser from '../../customHooks/useUser';
 // import { scrollToBottom } from '../../utils/helperFunctions';
 import useDidUpdate from '../../customHooks/useDidUpdate';
 import ChatLoader from './ChatLoader';
-import ChatError from './ChatError';
 import EmptyChat from './EmptyChat';
 import ApiError from '../../common/ApiError';
 
