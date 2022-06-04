@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import debounce from 'lodash.debounce';
 import { toast } from 'react-toastify';
 import Typography from '@mui/material/Typography';
 import MenuItem from '@mui/material/MenuItem';
@@ -35,7 +36,7 @@ import { getUpdateServerData } from '../../../redux/reducers';
 import StyledImage from '../../../common/StyledImage';
 import { MAX_FILE_SIZE } from '../../../constants/Message';
 
-const isValueChanged = (prevValue, newValue) => {
+const isValueChanged = (newValue, prevValue) => {
   // check if prevValue and newValue are both falsy then nothing changed
   if (!prevValue && !newValue) return false;
   return prevValue !== newValue;
@@ -75,6 +76,18 @@ const ServerOverview = () => {
     banner: { fileUrl: banner ?? null },
   });
 
+  // explicitly added this ref to store the initial redux state
+  // when this component was mounted, to compare against user changes
+  // to show unsaved changes bar, and also not using direct redux
+  // state to compare, in case socket updates state, while user editing this
+  const serverReduxStateRef = useRef({
+    name,
+    avatar,
+    type,
+    description,
+    banner,
+  });
+
   useDidUpdate(() => {
     if (!isLoading && !error) {
       // did update runs after any update to deps, and not on first mount/render
@@ -98,39 +111,39 @@ const ServerOverview = () => {
         });
         return { banner: { fileUrl: banner }, avatar: { fileUrl: avatar } };
       });
+      setIsSnackbarOpen(false);
+
+      // now is the good time to update ref state with the redux state
+      serverReduxStateRef.current = {
+        name,
+        avatar,
+        type,
+        description,
+        banner,
+      };
     }
   }, [reset, name, type, description, banner, avatar]);
 
   useDidUpdate(() => {
-    // TODO: Handle socket update notification, or preserve saved server
-    // details till this edit screen is open with useMemo hack
-    // maybe will debounce if face any problems
-    const debouncedFunc = () => {
-      if (serverName !== name
-        || serverType !== type
-        || isValueChanged(description, serverDescription)
-        || isValueChanged(filesObj.banner.fileUrl, banner)
-        || isValueChanged(filesObj.avatar.fileUrl, avatar)
+    // whenever user edit changes, compare with initial redux saved
+    // state retrived when this component mounted, to see if anything changed
+    const debouncedFunc = debounce(() => {
+      const savedState = serverReduxStateRef.current;
+      if (serverName !== savedState.name
+        || serverType !== savedState.type
+        || isValueChanged(serverDescription, savedState.description)
+        || isValueChanged(filesObj.banner.fileUrl, savedState.banner)
+        || isValueChanged(filesObj.avatar.fileUrl, savedState.avatar)
       ) {
         setIsSnackbarOpen(true);
         return;
       }
       setIsSnackbarOpen(false);
-    };
+    }, 0); // debouncing till next tick
     debouncedFunc();
 
     return debouncedFunc.cancel;
-  }, [
-    serverName,
-    serverType,
-    serverDescription,
-    name,
-    type,
-    description,
-    filesObj,
-    banner,
-    avatar,
-  ]);
+  }, [serverName, serverType, serverDescription, filesObj]);
 
   const handleImageUpload = (e) => {
     const [currentFile] = e.target.files || e.nativeEvent?.target?.files;
@@ -195,6 +208,7 @@ const ServerOverview = () => {
       if (!serverDescription?.trim()) {
         newErrorObj.serverDescription = 'Cannot be only whitespace';
       } else if (serverDescription.length > serverValidation.SERVER_DESCRIPTION_MAX_LENGTH) {
+        // eslint-disable-next-line max-len
         newErrorObj.serverDescription = `Must be smaller than or equal to ${serverValidation.SERVER_DESCRIPTION_MAX_LENGTH} characters`;
       }
     }
@@ -321,7 +335,7 @@ const ServerOverview = () => {
                 minLength={serverValidation.SERVER_NAME_MIN_LENGTH}
                 maxLength={serverValidation.SERVER_NAME_MAX_LENGTH}
                 injectCss={(theme) => `margin-top: ${theme.spacing(1)};`}
-                onKeyDown={stopPropagation} // to prevent weired error of losing focus on typing s
+                onKeyDown={stopPropagation} // to prevent weird error of losing focus on typing s
                 autoComplete="off"
                 value={serverName}
                 onChange={({ target: { value } }) => {

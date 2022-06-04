@@ -5,7 +5,7 @@ import {
 import { Server as SocketServer } from 'socket.io';
 import sharp from 'sharp';
 import {
-  FindManyOptions, getConnection, getRepository, In, LessThan,
+  FindManyOptions, getConnection, In, LessThan,
 } from 'typeorm';
 import Server, { ServerTypeEnum } from '../entity/Server';
 import CustomRequest from '../interfaces/CustomRequest';

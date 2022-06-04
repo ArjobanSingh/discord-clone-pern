@@ -17,10 +17,10 @@ const data = {
     component: ServerMembers,
     title: 'Server Members',
   },
-  [BANS]: {
-    component: () => <div>BANS</div>,
-    title: 'Server Bans',
-  },
+  // [BANS]: {
+  //   component: () => <div>BANS</div>,
+  //   title: 'Server Bans',
+  // },
 };
 
 const OptionContent = (props) => {
