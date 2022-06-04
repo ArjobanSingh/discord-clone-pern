@@ -61,7 +61,7 @@ class RouteErrorBoundary extends Component {
       return;
     }
 
-    window.location.reloadChunk();
+    window.location.reload();
   }
 
   render() {

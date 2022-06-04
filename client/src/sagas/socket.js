@@ -17,6 +17,7 @@ import {
   newServerMemberJoined,
   updateOwnershipSuccess,
   updateServerRoleSuccess,
+  updateServerSuccess,
 } from '../redux/actions/servers';
 import { setNavigateState } from '../redux/actions/navigate';
 import { getAllServers, getServerDetails } from '../redux/reducers';
@@ -150,6 +151,11 @@ function* handleSocketEvents(socketEvent) {
       yield put(saveAllChannels(id, channels ?? []));
       yield put(createServerSuccess(id, payload));
       socketHandler.connectSingleServer(id);
+      break;
+    }
+    case C.SERVER_UPDATED: {
+      const { id } = payload;
+      yield put(updateServerSuccess(id, payload));
       break;
     }
     default:

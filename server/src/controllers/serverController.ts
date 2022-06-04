@@ -420,6 +420,9 @@ export const updateServer = async (
 
     res.json(server);
 
+    const io: SocketServer = req.app.get('io');
+    io.to(serverId).emit(C.SERVER_UPDATED, server);
+
     // after response has been sent, delete previous avatar/banner if present
     if (prevAvatarPublicId) cloudinary.uploader.destroy(prevAvatarPublicId);
     if (prevBannerPublicId) cloudinary.uploader.destroy(prevBannerPublicId);
