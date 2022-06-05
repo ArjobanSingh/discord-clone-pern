@@ -12,6 +12,8 @@ import { getServerData, ServerData } from './typeormHelpers';
 
 const jwt = require('jsonwebtoken');
 
+export const MAX_REFRESH_TOKENS_LIMIT_PER_USER = 20;
+
 const {
   ACCESS_TOKEN_SECRET,
   REFRESH_TOKEN_SECRET,
@@ -153,6 +155,44 @@ const updateServerFile = async (
     : [serverObj[fileColumnKey], serverObj[publicIdKey]];
 };
 
+const secondsToMillseconds = (seconds: number) => seconds * 1000;
+
+// NOTE: just using this to prevent redis hitting max memory
+// for my hosted plan, just small hack
+const findAndDeleteTokensIfLimitExceeded = async (userId: string, newRefreshToken: string) => {
+  const { uniqueCreationId: uniqueCreationIdOfLatestToken } = decodeJWT(newRefreshToken);
+
+  const refreshTokensObj = await redisClient.hgetall(userId);
+  const allRefreshTokensOfUser = Object.entries(refreshTokensObj);
+
+  if (allRefreshTokensOfUser.length >= MAX_REFRESH_TOKENS_LIMIT_PER_USER) {
+    let nonExpiredTokensCount = 0;
+    const expiredTokens = [];
+    const allTokensExceptTheLatest = [];
+
+    allRefreshTokensOfUser.forEach(([refereshTokenUniqueKey, expiration]) => {
+      const expInMs = secondsToMillseconds(parseInt(expiration, 10));
+
+      if (new Date() < new Date(expInMs)) {
+        // if not expired yet
+        nonExpiredTokensCount += 1;
+      } else expiredTokens.push(refereshTokenUniqueKey);
+
+      if (refereshTokenUniqueKey !== uniqueCreationIdOfLatestToken) {
+        allTokensExceptTheLatest.push(refereshTokenUniqueKey);
+      }
+    });
+
+    if (nonExpiredTokensCount >= MAX_REFRESH_TOKENS_LIMIT_PER_USER) {
+      // if non expired refresh tokens has length still greater than limit
+      // delete all tokens except the latest one
+      await redisClient.hdel(userId, ...allTokensExceptTheLatest);
+    } else {
+      redisClient.hdel(userId, ...expiredTokens);
+    }
+  }
+};
+
 export {
   createAccessToken,
   createRefreshToken,
@@ -165,4 +205,6 @@ export {
   getFileName,
   calculateAspectRatioFit,
   updateServerFile,
+  secondsToMillseconds,
+  findAndDeleteTokensIfLimitExceeded,
 };

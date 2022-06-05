@@ -6,6 +6,7 @@ import { createValidationError, createValidationErrorObject, CustomError } from 
 import {
   createAccessToken,
   createLoginData,
+  findAndDeleteTokensIfLimitExceeded,
 } from '../utils/helperFunctions';
 import redisClient from '../redisConfig';
 import CustomRequest from '../interfaces/CustomRequest';
@@ -92,13 +93,12 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       next(new CustomError('Invalid credentials', 401));
       return;
     }
-    const { accessToken, refreshToken } = await createLoginData(otherUserProps.id);
 
-    // if (otherUserProps.servers)
-
-    // TODO: add logic for a lot of login redis sessions
+    const { accessToken, refreshToken } = await createLoginData(user.id);
 
     res.json({ user: otherUserProps, accessToken, refreshToken });
+
+    findAndDeleteTokensIfLimitExceeded(user.id, refreshToken);
   } catch (err) {
     next(err);
   }
