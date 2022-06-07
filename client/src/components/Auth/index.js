@@ -1,6 +1,5 @@
 import { useState } from 'react';
 // import PropTypes from 'prop-types';
-import { useLocation, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import StyledImage from '../../common/StyledImage';
@@ -8,14 +7,8 @@ import { MAIN_BACKGROUND } from '../../constants/images';
 import { LOGIN_SCREEN, SIGNUP_SCREEN } from '../../constants/auth';
 import Login from './Login';
 import Signup from './Signup';
-import useDidUpdate from '../../customHooks/useDidUpdate';
-import useIsAuthenticated from '../../customHooks/useIsAuthenticated';
 
 const Auth = () => {
-  const isAuthenticated = useIsAuthenticated();
-  const location = useLocation();
-  const navigate = useNavigate();
-
   const [currentScreen, setCurrentScreen] = useState(LOGIN_SCREEN);
 
   const switchScreen = () => {
@@ -23,12 +16,6 @@ const Auth = () => {
   };
 
   const Component = currentScreen === LOGIN_SCREEN ? Login : Signup;
-
-  const from = location.state?.from?.pathname || '/';
-
-  useDidUpdate(() => {
-    if (isAuthenticated) navigate(from, { replace: true });
-  }, [isAuthenticated, from]);
 
   return (
     <>

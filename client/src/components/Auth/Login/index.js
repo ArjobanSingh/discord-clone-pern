@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -15,6 +16,7 @@ import { getLoginAuthState } from '../../../redux/reducers';
 const Login = (props) => {
   const { switchScreen } = props;
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const { isLoading, errors, setErrors } = useAuthState((state) => getLoginAuthState(state));
 
@@ -40,7 +42,8 @@ const Login = (props) => {
     }
 
     setErrors({});
-    dispatch(signInRequested({ email, password }));
+    const from = location.state?.from?.pathname || '/';
+    dispatch(signInRequested({ email, password }, from));
   };
 
   const openRegistration = (e) => {

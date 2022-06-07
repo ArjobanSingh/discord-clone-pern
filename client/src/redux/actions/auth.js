@@ -1,9 +1,12 @@
 import * as C from '../../constants/auth';
 
-export function signInRequested(payload) {
+export function signInRequested(credentials, fromLocation) {
   return {
     type: C.AUTH_SIGN_IN_REQUESTED,
-    payload,
+    payload: {
+      credentials,
+      fromLocation,
+    },
   };
 }
 
@@ -22,10 +25,13 @@ export function signInFailed(error) {
   };
 }
 
-export function registrationRequested(payload) {
+export function registrationRequested(credentials, fromLocation) {
   return {
     type: C.AUTH_REGISTER_REQUESTED,
-    payload,
+    payload: {
+      credentials,
+      fromLocation,
+    },
   };
 }
 

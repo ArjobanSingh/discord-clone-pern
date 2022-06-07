@@ -6,7 +6,7 @@ import {
   logoutSuccess,
   registrationFailed, registrationSuccess, signInFailed, signInSuccess,
 } from '../redux/actions/auth';
-// import { setNavigateState } from '../redux/actions/navigate';
+import { setNavigateState } from '../redux/actions/navigate';
 import { saveAllServers } from '../redux/actions/servers';
 import { userSuccess } from '../redux/actions/user';
 import { AuthApi } from '../utils/apiEndpoints';
@@ -14,9 +14,9 @@ import axiosInstance, { getAuthTokens, removeTokens, setTokens } from '../utils/
 import socketClient from '../services/socket-client';
 
 function* loginUser(actionData) {
-  const { payload } = actionData;
+  const { credentials, fromLocation } = actionData.payload;
   try {
-    const response = yield call(axiosInstance.post, AuthApi.LOGIN, payload);
+    const response = yield call(axiosInstance.post, AuthApi.LOGIN, credentials);
     const { accessToken, refreshToken, user } = response.data;
     setTokens(accessToken, refreshToken);
     yield put(signInSuccess());
@@ -24,6 +24,7 @@ function* loginUser(actionData) {
     const { servers, ...restUserData } = user;
     yield put(saveAllServers(servers));
     yield put(userSuccess(restUserData));
+    yield put(setNavigateState([fromLocation, { replace: true }]));
     socketClient.connectAllServers(servers.map((server) => server.serverId));
   } catch (err) {
     console.log('Login error', err.response, err.message);
@@ -56,9 +57,9 @@ function* logoutUser() {
 }
 
 function* registerUser(actionData) {
-  const { payload } = actionData;
+  const { credentials, fromLocation } = actionData.payload;
   try {
-    const response = yield call(axiosInstance.post, AuthApi.REGISTER, payload);
+    const response = yield call(axiosInstance.post, AuthApi.REGISTER, credentials);
     const { accessToken, refreshToken, user } = response.data;
     setTokens(accessToken, refreshToken);
     yield put(registrationSuccess());
@@ -66,6 +67,7 @@ function* registerUser(actionData) {
     const { servers, ...restUserData } = user;
     yield put(saveAllServers(servers));
     yield put(userSuccess(restUserData));
+    yield put(setNavigateState([fromLocation, { replace: true }]));
   } catch (err) {
     console.log('register error', err.response, err.message);
     if (err.response?.data) {

@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import { useLocation } from 'react-router-dom';
 import StyledTextfield from '../../../common/StyledTextfield';
 import { Anchor, InputWrapper } from '../styles';
 import { isEmailValid, isEmpty, isEmptyString } from '../../../utils/validators';
@@ -15,6 +16,7 @@ import { getRegisterAuthState } from '../../../redux/reducers';
 const Signup = (props) => {
   const { switchScreen } = props;
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const { isLoading, errors, setErrors } = useAuthState((state) => getRegisterAuthState(state));
 
@@ -43,7 +45,9 @@ const Signup = (props) => {
     }
 
     setErrors({});
-    dispatch(registrationRequested({ email, password, name }));
+
+    const from = location.state?.from?.pathname || '/';
+    dispatch(registrationRequested({ email, password, name }, from));
   };
 
   const openLogin = (e) => {
