@@ -23,6 +23,8 @@ export const createValidationError = (errors: ValidationError[]) => {
 export class CustomError extends Error {
   public status: number;
 
+  public data: unknown | undefined;
+
   constructor(message: string, code: number) {
     super(message);
     this.message = message;

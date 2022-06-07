@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 import useIsAuthenticated from '../../customHooks/useIsAuthenticated';
 import socketClient from '../../services/socket-client';
 import { getAuthTokens } from '../../utils/axiosConfig';
@@ -24,9 +25,9 @@ const SocketHandler = () => {
     });
 
     socket.on('connect_error', (err) => {
-      console.log('Connect error', err.message);
-      if (err.message === 'Not authenticated') {
+      if (err.data?.status === 401) {
         console.log('Not authenticated');
+        toast.error('Session expired, Please log in again');
         dispatch(logoutSuccess());
       }
     });

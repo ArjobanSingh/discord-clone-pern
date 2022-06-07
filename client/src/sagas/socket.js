@@ -23,6 +23,7 @@ import { setNavigateState } from '../redux/actions/navigate';
 import { getAllServers, getServerDetails } from '../redux/reducers';
 import { INTERNET_RECONNECTED } from '../constants';
 import { updateUserDetails } from '../redux/actions/user';
+import { logoutSuccess } from '../redux/actions/auth';
 
 function createSocketChannel(socket) {
   return eventChannel((emit) => {
@@ -43,8 +44,13 @@ function* handleSocketEvents(socketEvent) {
   const { event, args } = socketEvent;
   const [payload] = args;
 
-  console.log('socket', event, payload);
+  // console.log('socket', event, payload);
   switch (event) {
+    case C.SESSION_EXPIRED: {
+      toast.error('Session expired, Please log in again');
+      yield put(logoutSuccess());
+      break;
+    }
     case C.NEW_CHANNEL_MESSAGE: {
       const { serverId, channelId } = payload;
       yield put(sendChannelMessageSent(serverId, channelId, undefined, payload));

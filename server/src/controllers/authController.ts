@@ -106,7 +106,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 export const logout = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { userId, uniqueCreationId } = req;
+    // console.time('redis delete');
     await redisClient.hdel(userId, uniqueCreationId);
+    // console.timeEnd('redis delete');
     res.status(204).json();
   } catch (err) {
     next(err);
@@ -118,7 +120,9 @@ export const refreshToken = async (req: CustomRequest, res: Response, next: Next
     // validate refresh token with redis
     const refresh = req.header('refresh-token');
     const { userId, uniqueCreationId } = req;
+    // console.time('redis hget');
     const refreshTokenInRedis = await redisClient.hget(userId, uniqueCreationId);
+    // console.timeEnd('redis hget');
     if (!refreshTokenInRedis) {
       next(new CustomError('Session expired, Please log in again', 401));
       return;

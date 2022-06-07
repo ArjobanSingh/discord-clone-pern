@@ -39,7 +39,6 @@ const createRefreshToken = (userId: string) => (
 const verfifyToken = async (token: string, isAccessToken = true): Promise<any> => {
   const secret = isAccessToken ? ACCESS_TOKEN_SECRET : REFRESH_TOKEN_SECRET;
   const payload = await verifyWithPromise(token, secret);
-  // console.log('isAccessToken', isAccessToken, 'payload', payload);
   return payload;
 };
 
@@ -53,8 +52,10 @@ const createLoginData = async (userId: string): Promise<LoginDataType> => {
 
   // save refresh token's uniqueCreationId in redis for this user, as it will unique
   // and we would not need to store whole refresh token in redis
+  // console.time('redis hset');
   redisClient.hset(userId, uniqueCreationId, exp);
   await redisClient.expireat(userId, exp);
+  // console.timeEnd('redis hset');
 
   return { accessToken, refreshToken };
 };
