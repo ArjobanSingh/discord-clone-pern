@@ -7,10 +7,14 @@ const isAuthenticated = async (req: CustomRequest, res: Response, next: NextFunc
   const bearerAccessToken = req.header('access-token');
 
   if (!bearerAccessToken) {
-    return next(new CustomError('Not authorized', 401));
+    next(new CustomError('Not authorized', 401));
+    return;
   }
   const [, accessToken] = bearerAccessToken.split(' ');
-  if (!accessToken) return next(new CustomError('Not authorized', 401));
+  if (!accessToken) {
+    next(new CustomError('Not authorized', 401));
+    return;
+  }
 
   try {
     const { userId } = await verfifyToken(accessToken);
@@ -20,7 +24,7 @@ const isAuthenticated = async (req: CustomRequest, res: Response, next: NextFunc
     const errorMessage = err.name === 'TokenExpiredError'
       ? 'Session expired, Please log in again'
       : 'Not authorized';
-    return next(new CustomError(errorMessage, 401));
+    next(new CustomError(errorMessage, 401));
   }
 };
 

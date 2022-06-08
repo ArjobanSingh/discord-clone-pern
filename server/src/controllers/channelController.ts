@@ -232,8 +232,10 @@ export const getChannelMessages = async (req: CustomRequest, res: Response, next
     `, [serverId, channelId]);
 
     const serverMemberPromise = ServerMember.findOne({
-      serverId,
-      userId: req.userId,
+      where: {
+        serverId,
+        userId: req.userId,
+      },
     });
 
     const [[server], serverMember, messages] = await Promise.all(
@@ -264,7 +266,7 @@ export const createChannel = async (req: CustomRequest, res: Response, next: Nex
       next(new CustomError('Invalid serverId', 400));
       return;
     }
-    const serverMember = await ServerMember.findOne({ serverId, userId: req.userId });
+    const serverMember = await ServerMember.findOne({ where: { serverId, userId: req.userId } });
     if (!serverMember) {
       next(new CustomError('You are not part of this server', 403));
       return;
@@ -311,7 +313,7 @@ export const deleteChannel = async (req: CustomRequest, res: Response, next: Nex
   try {
     const { serverId, channelId } = req.params;
 
-    const serverMember = await ServerMember.findOne({ serverId, userId: req.userId });
+    const serverMember = await ServerMember.findOne({ where: { serverId, userId: req.userId } });
     if (!serverMember) {
       next(new CustomError('You are not part of this server', 403));
       return;

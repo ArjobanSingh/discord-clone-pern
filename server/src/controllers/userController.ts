@@ -28,7 +28,7 @@ export const getCurrentUser = async (req: CustomRequest, res: Response, next: Ne
 export const updateUserDetails = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { userId } = req;
-    const user = await User.findOne(userId);
+    const user = await User.findOneBy({ id: userId });
 
     const {
       name,

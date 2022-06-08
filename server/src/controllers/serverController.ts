@@ -29,7 +29,7 @@ export const createServer = async (
   try {
     const { userId, body } = req;
 
-    const user = await User.findOne(userId);
+    const user = await User.findOneBy({ id: userId });
     const { avatar, description } = body;
 
     const newServer = new Server();
@@ -166,7 +166,7 @@ export const joinServer = async (
       return;
     }
 
-    const user = await User.findOne(userId);
+    const user = await User.findOneBy({ id: userId });
 
     const serverMember = new ServerMember();
     serverMember.user = user;
@@ -231,7 +231,7 @@ export const leaveServer = async (
       return;
     }
 
-    const server = await Server.findOne(serverId);
+    const server = await Server.findOneBy({ id: serverId });
 
     if (!server) {
       // no corresponding server, nothing to do
@@ -292,11 +292,12 @@ export const getAllServers = async (
     if (cursor && typeof cursor === 'string') {
       queryObj.where = {
         type: ServerTypeEnum.PUBLIC,
-        createdAt: LessThan(decodeURIComponent(cursor)),
+        // createdAt: LessThan(decodeURIComponent(cursor)),
+        createdAt: LessThan(new Date(decodeURIComponent(cursor))),
       };
     }
 
-    console.log('Query obj', queryObj);
+    // console.log('Query obj', queryObj);
 
     const servers = await Server.find(queryObj);
     res.json(servers);
@@ -446,7 +447,7 @@ export const deleteServer = async (
       return;
     }
 
-    const server = await Server.findOne(serverId);
+    const server = await Server.findOneBy({ id: serverId });
 
     if (!server) {
       next(new CustomError('No server found', 404));
