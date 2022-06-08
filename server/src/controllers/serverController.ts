@@ -5,7 +5,7 @@ import {
 import { Server as SocketServer } from 'socket.io';
 import sharp from 'sharp';
 import {
-  FindManyOptions, getConnection, In, LessThan,
+  FindManyOptions, In, LessThan, // getConnection,
 } from 'typeorm';
 import Server, { ServerTypeEnum } from '../entity/Server';
 import CustomRequest from '../interfaces/CustomRequest';
@@ -16,9 +16,10 @@ import { AllServersQuery } from '../types/ServerTypes';
 import { getServerForJoinLink, updateServerFile } from '../utils/helperFunctions';
 import Channel from '../entity/Channel';
 import cloudinary from '../cloudinary';
-import * as C from '../../../common/socket-io-constants';
+import * as C from '../utils/socket-io-constants';
 import { getServerData, ServerData } from '../utils/typeormHelpers';
 import ISocket from '../types/ISocket';
+import AppDataSource from '../data-source';
 
 export const createServer = async (
   req: CustomRequest,
@@ -74,7 +75,7 @@ export const createServer = async (
       newServer.avatar = publicId;
     }
 
-    await getConnection().transaction(async (transactionEntityManager) => {
+    await AppDataSource.transaction(async (transactionEntityManager) => {
       // need to save server before following two promises
       await transactionEntityManager.save(newServer);
       const saveMemberPromise = transactionEntityManager.save(serverMember);
@@ -172,7 +173,7 @@ export const joinServer = async (
     serverMember.server = server;
 
     // either save or fail both
-    await getConnection().transaction(async (transactionEntityManager) => {
+    await AppDataSource.transaction(async (transactionEntityManager) => {
       const addMemberPromise = transactionEntityManager.insert(ServerMember, serverMember);
       const updateServerPromise = transactionEntityManager.update(Server, server.id, {
         memberCount: () => '"memberCount" + 1',
@@ -244,7 +245,7 @@ export const leaveServer = async (
       return;
     }
 
-    await getConnection().transaction(async (transactionEntityManager) => {
+    await AppDataSource.transaction(async (transactionEntityManager) => {
       const deleteMemberPromise = transactionEntityManager.delete(ServerMember, {
         serverId,
         userId: req.userId,
@@ -599,7 +600,7 @@ export const transferOwnership = async (req: CustomRequest, res: Response, next:
       return;
     }
 
-    await getConnection().transaction(async (transactionEntityManager) => {
+    await AppDataSource.transaction(async (transactionEntityManager) => {
       const prevOwnerPromise = transactionEntityManager.update(ServerMember, {
         userId: oldOwner.userId,
         serverId,
@@ -672,7 +673,7 @@ export const kickUser = async (req: CustomRequest, res: Response, next: NextFunc
       return;
     }
 
-    await getConnection().transaction(async (transactionEntityManager) => {
+    await AppDataSource.transaction(async (transactionEntityManager) => {
       const removeUserPromise = transactionEntityManager.delete(ServerMember, {
         serverId,
         userId,

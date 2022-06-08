@@ -1,5 +1,6 @@
 /* eslint-disable no-throw-literal */
-import { getConnection } from 'typeorm';
+// import { getConnection } from 'typeorm';
+import AppDataSource from '../data-source';
 import Channel from '../entity/Channel';
 import Server from '../entity/Server';
 import { UserType } from '../types/UserTypes';
@@ -13,7 +14,7 @@ export const getUserData = async (
   // const condition = userId ? `u.id = '${userId}'` : `u.email = '${email}'`;
   const condition = userId ? 'u.id =' : 'u.email =';
   const conditionValue = userId || email;
-  const response: UserType[] = await getConnection().query(`
+  const response: UserType[] = await AppDataSource.query(`
     SELECT u.id, u.name, u.email, u.status, u."profilePicture", u.password,
     json_agg(json_build_object(
       'serverName', s.name, 'serverId', s.id, 'ownerId', s."ownerId", 'avatar', s.avatar
@@ -60,7 +61,7 @@ const removeDuplicatesAndEmpty = (objectArr: Array<unknown>, uniqueKey: string) 
 };
 
 export const getServerData = async (serverId: String): Promise<ServerData | undefined> => {
-  const [server] = await getConnection().query(`
+  const [server] = await AppDataSource.query(`
   SELECT s.*,
     json_agg(json_build_object(
       'userName', u.name, 'userId', u.id, 'profilePicture', u."profilePicture", 'role', sm.role
@@ -89,7 +90,7 @@ export const getServerData = async (serverId: String): Promise<ServerData | unde
 };
 
 // two apis for getting server and its channels approach
-// const serverDetailsPromise = getConnection().query(
+// const serverDetailsPromise = AppDataSource.query(
 //   `
 //   SELECT s.*,
 //   json_agg(json_build_object(

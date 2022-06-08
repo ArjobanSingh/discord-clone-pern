@@ -2,8 +2,10 @@
 import axios from 'axios';
 import { AuthApi } from './apiEndpoints';
 
-const BASE_URL = 'http://localhost:5000/api';
-export const APP_URL = 'http://localhost:3000';
+const isProduction = process.env.NODE_ENV === 'production';
+
+const BASE_URL = isProduction ? '/api' : 'http://localhost:5000/api';
+export const APP_URL = window.location.origin; // 'http://localhost:3000';
 
 export const getAuthTokens = () => {
   const accessToken = localStorage.getItem('access-token');

@@ -2,18 +2,21 @@ import 'reflect-metadata';
 import './config';
 import './cloudinary';
 
-import { createConnection } from 'typeorm';
 import { createServer } from 'http';
 import express, { NextFunction, Request, Response } from 'express';
+import path from 'path';
 import cors from 'cors';
-import { Server as SocketIoServer, Socket } from 'socket.io';
+import { Server as SocketIoServer } from 'socket.io';
 import multer from 'multer';
+import AppDataSource from './data-source';
 import apiRouter from './routes';
-import * as C from '../../common/socket-io-constants';
+import * as C from './utils/socket-io-constants';
 import { isTokensValidForSocket } from './utils/helperFunctions';
 import ISocket from './types/ISocket';
 import { CustomError } from './utils/errors';
 import extractAuth from './middlewarres/extractAuth';
+
+const isProductionEnv = process.env.NODE_ENV === 'production';
 
 const corsOptions = {
   origin: 'http://localhost:3000',
@@ -22,7 +25,7 @@ const corsOptions = {
 
 const app = express();
 const httpServer = createServer(app);
-const io = new SocketIoServer(httpServer, { cors: corsOptions });
+const io = new SocketIoServer(httpServer, isProductionEnv ? undefined : { cors: corsOptions });
 
 const PORT = process.env.PORT || 5000;
 
@@ -35,14 +38,22 @@ interface ICustomError {
   };
 }
 
-createConnection()
+AppDataSource.initialize()
   .then(async (connection) => {
-    app.use(cors(corsOptions));
+    app.use(cors(isProductionEnv ? undefined : corsOptions));
     app.use(express.json());
+
+    if (isProductionEnv) {
+      app.use(express.static(path.join(__dirname, '../../client/build')));
+    }
     //   const timeInMicroseconds = hrtime.bigint();
 
     app.use('/api', apiRouter);
     app.set('io', io);
+
+    app.get('*', (req: Request, res: Response) => {
+      res.sendFile(path.join(__dirname, '../../client/build/index.html'));
+    });
 
     app.use(
       (err: ICustomError, req: Request, res: Response, next: NextFunction) => {

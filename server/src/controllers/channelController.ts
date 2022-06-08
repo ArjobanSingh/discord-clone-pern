@@ -1,14 +1,11 @@
-import { isUUID, validate } from 'class-validator';
+import { isUUID, validate, isString } from 'class-validator';
 import { NextFunction, Response } from 'express';
 import { Server as SocketServer } from 'socket.io';
 import sharp from 'sharp';
-import {
-  getConnection, getRepository,
-} from 'typeorm';
-import { isString } from 'util';
+// import { getConnection, getRepository } from 'typeorm';
 import { UploadApiOptions } from 'cloudinary';
 import cloudinary from '../cloudinary';
-import * as C from '../../../common/socket-io-constants';
+import * as C from '../utils/socket-io-constants';
 import Channel from '../entity/Channel';
 import Message, { MessageTypeEnum } from '../entity/Message';
 import CustomRequest from '../interfaces/CustomRequest';
@@ -17,6 +14,7 @@ import MessageData from '../types/ChannelMessageInput';
 import Server, { ServerTypeEnum } from '../entity/Server';
 import ServerMember, { enumScore, MemberRole } from '../entity/ServerMember';
 import { getFileName, getMessageType } from '../utils/helperFunctions';
+import AppDataSource from '../data-source';
 
 export const sendChannelMessage = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
@@ -62,7 +60,7 @@ export const sendChannelMessage = async (req: CustomRequest, res: Response, next
 
     const promisesArray = [];
 
-    const serverMemberPromise = getConnection().query(`
+    const serverMemberPromise = AppDataSource.query(`
       SELECT u.name, u.id, u."profilePicture"
       FROM users "u"
       INNER JOIN server_member "sm" ON u.id = sm."userId"
@@ -80,7 +78,7 @@ export const sendChannelMessage = async (req: CustomRequest, res: Response, next
     promisesArray.push(channelPromise);
 
     if (messageData.referenceMessageId) {
-      const referenceMessagePromise = getRepository(Message)
+      const referenceMessagePromise = AppDataSource.getRepository(Message)
         .createQueryBuilder('refMsg')
         .select(['refMsg', 'user.name', 'user.id', 'user.profilePicture'])
         .innerJoin('refMsg.user', 'user')
@@ -210,7 +208,7 @@ export const getChannelMessages = async (req: CustomRequest, res: Response, next
     const { cursor } = req.query;
     const { serverId, channelId } = req.params;
 
-    const messagesPromise = getRepository(Message)
+    const messagesPromise = AppDataSource.getRepository(Message)
       .createQueryBuilder('message')
       .select(['message', 'user.name', 'user.id', 'user.profilePicture',
         'refMsg', 'refMsgUser.name', 'refMsgUser.id', 'refMsgUser.profilePicture'])
@@ -224,7 +222,7 @@ export const getChannelMessages = async (req: CustomRequest, res: Response, next
       .limit(50)
       .getMany();
 
-    const serverPromise = getConnection().query(`
+    const serverPromise = AppDataSource.query(`
       SELECT s.type, s.id as "serverId", ch.id as "channelId"
       FROM server "s"
       INNER JOIN channel "ch"
@@ -291,7 +289,7 @@ export const createChannel = async (req: CustomRequest, res: Response, next: Nex
     }
 
     // either save or fail both
-    await getConnection().transaction(async (transactionEntityManager) => {
+    await AppDataSource.transaction(async (transactionEntityManager) => {
       const addChannelPromise = transactionEntityManager.save(channel);
       const updateServerPromise = transactionEntityManager.update(Server, serverId, {
         channelCount: () => '"channelCount" + 1',
@@ -325,7 +323,7 @@ export const deleteChannel = async (req: CustomRequest, res: Response, next: Nex
       return;
     }
 
-    await getConnection().transaction(async (transactionEntityManager) => {
+    await AppDataSource.transaction(async (transactionEntityManager) => {
       const removeChannelPromise = transactionEntityManager.delete(Channel, {
         id: channelId,
         serverId,

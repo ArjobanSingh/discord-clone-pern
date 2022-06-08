@@ -1,7 +1,8 @@
 import { isUUID } from 'class-validator';
 import { NextFunction, Response } from 'express';
 import { nanoid } from 'nanoid';
-import { getConnection, LessThan } from 'typeorm';
+import { LessThan } from 'typeorm';
+import AppDataSource from '../data-source';
 import InviteLink, { MAX_MINUTE_LIMIT, MIN_MINUTE_LIMIT } from '../entity/InviteLink';
 import { ServerTypeEnum } from '../entity/Server';
 import { enumScore, MemberRole } from '../entity/ServerMember';
@@ -24,7 +25,7 @@ export const createInvite = async (req: CustomRequest, res: Response, next: Next
       return;
     }
 
-    const [serverDetails] = await getConnection().query(`
+    const [serverDetails] = await AppDataSource.query(`
       Select s.id as "serverId", s.type, sm.role
       from server "s"
       join server_member "sm"

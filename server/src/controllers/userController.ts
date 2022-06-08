@@ -7,7 +7,7 @@ import User from '../entity/User';
 import CustomRequest from '../interfaces/CustomRequest';
 import { createValidationError, CustomError } from '../utils/errors';
 import { getUserData } from '../utils/typeormHelpers';
-import { USER_DETAILS_UPDATED } from '../../../common/socket-io-constants';
+import { USER_DETAILS_UPDATED } from '../utils/socket-io-constants';
 
 export const getCurrentUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {

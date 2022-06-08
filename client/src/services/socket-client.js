@@ -2,7 +2,9 @@ import { io } from 'socket.io-client';
 import { getAuthTokens } from '../utils/axiosConfig';
 import * as C from '../constants/socket-io';
 
-const URL = 'http://localhost:5000';
+const isProduction = process.env.NODE_ENV === 'production';
+
+const URL = isProduction ? '/' : 'http://localhost:5000';
 const socket = io(URL, { autoConnect: false });
 
 class SocketHandler {
