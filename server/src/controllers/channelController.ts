@@ -281,7 +281,10 @@ export const createChannel = async (req: CustomRequest, res: Response, next: Nex
     const channel = new Channel();
     channel.name = name;
     channel.serverId = serverId;
-    if (type) channel.type = type;
+
+    // TODO: uncomment when audio channels are available
+    // as by default channel type would be TEXT
+    // if (type) channel.type = type;
 
     const errors = await validate(channel);
 

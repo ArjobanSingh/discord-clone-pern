@@ -39,8 +39,10 @@ const radios = [{
 }, {
   value: ChannelType.AUDIO,
   icon: <VolumeUpIcon />,
-  title: 'Voice',
-  description: 'Hang out together with voice, video and screen share',
+  title: 'Coming Soon: Voice Channels....',
+  // description: 'Hang out together with voice, video and screen share',
+  description: 'You would be able to voice, video and screen share',
+  disabled: true,
 }];
 
 const CreateChannelModal = (props) => {

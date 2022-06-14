@@ -102,10 +102,11 @@ const ChannelList = (props) => {
         title: 'Text Channels',
         channels: textChannels,
       },
-      audio: {
-        title: 'Audio Channels',
-        channels: audioChannels,
-      },
+      // TODO: when audio channels would be available
+      // audio: {
+      //   title: 'Audio Channels',
+      //   channels: audioChannels,
+      // },
     };
   }, [serverDetails?.channels]);
 
@@ -114,10 +115,11 @@ const ChannelList = (props) => {
       isExpanded: isTextChannelExpanded,
       onChange: () => setIsTextChannelExpanded((prev) => !prev),
     },
-    audio: {
-      isExpanded: isAudioChannelExpanded,
-      onChange: () => setIsAudioChannelExpanded((prev) => !prev),
-    },
+    // TODO: when audio channels would be available
+    // audio: {
+    //   isExpanded: isAudioChannelExpanded,
+    //   onChange: () => setIsAudioChannelExpanded((prev) => !prev),
+    // },
   };
 
   const openInviteModal = () => {

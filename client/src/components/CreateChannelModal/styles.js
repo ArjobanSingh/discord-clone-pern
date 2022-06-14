@@ -50,23 +50,29 @@ export const ModalFooter = styled.footer`
   gap: 10px;
 `;
 
-export const RadioLabel = styled(FormControlLabel)`
+export const RadioLabel = styled(FormControlLabel)(({
+  theme,
+  selected,
+  disabled,
+}) => `
   width: 100%;
   margin: 0;
-  background-color: ${({ theme, selected }) => (selected
+  background-color: ${selected
     ? theme.palette.background.darker
-    : theme.palette.background.paper)};
-  border-radius: ${({ theme }) => theme.shape.borderRadius}px;
+    : theme.palette.background.paper};
+  border-radius: ${theme.shape.borderRadius}px;
+  pointer-events: ${disabled ? 'none' : ''};
+  opacity: ${disabled ? '0.5' : '1'};
 
   &:hover {
-    background-color: ${({ theme }) => theme.palette.background.darker};
+    background-color: ${theme.palette.background.darker};
   }
 
   .${formControlLabelClasses.label} {
     flex: 1;
-    padding: ${({ theme }) => theme.spacing(1.5)};
+    padding: ${theme.spacing(1.5)};
   }
-`;
+`);
 
 const LabelBody = styled.div`
   width: 100%;

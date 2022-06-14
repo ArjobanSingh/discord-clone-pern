@@ -15,6 +15,7 @@ import { isTokensValidForSocket } from './utils/helperFunctions';
 import ISocket from './types/ISocket';
 import { CustomError } from './utils/errors';
 import extractAuth from './middlewarres/extractAuth';
+import User from './entity/User';
 
 const isProductionEnv = process.env.NODE_ENV === 'production';
 
@@ -47,13 +48,14 @@ AppDataSource.initialize()
       app.use(express.static(path.join(__dirname, '../../client/build')));
     }
     //   const timeInMicroseconds = hrtime.bigint();
-
     app.use('/api', apiRouter);
     app.set('io', io);
 
-    app.get('*', (req: Request, res: Response) => {
-      res.sendFile(path.join(__dirname, '../../client/build/index.html'));
-    });
+    if (isProductionEnv) {
+      app.get('*', (req: Request, res: Response) => {
+        res.sendFile(path.join(__dirname, '../../client/build/index.html'));
+      });
+    }
 
     app.use(
       (err: ICustomError, req: Request, res: Response, next: NextFunction) => {

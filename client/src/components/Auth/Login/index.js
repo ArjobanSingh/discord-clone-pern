@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import { useState } from 'react';
 import StyledTextfield from '../../../common/StyledTextfield';
 import { Anchor, InputWrapper } from '../styles';
 import { isEmailValid, isEmpty, isEmptyString } from '../../../utils/validators';
@@ -13,21 +14,38 @@ import Error from '../../../common/Error';
 import useAuthState from '../../../customHooks/useAuthState';
 import { getLoginAuthState } from '../../../redux/reducers';
 
+const guestButtonsSX = { flex: '1' };
+const guestCredentials = {
+  guest1: {
+    email: 'guest1@mail.com',
+    password: 'guest1test',
+  },
+  guest2: {
+    email: 'guest2@mail.com',
+    password: 'guest2test',
+  },
+};
+
 const Login = (props) => {
   const { switchScreen } = props;
   const dispatch = useDispatch();
   const location = useLocation();
 
+  const [loginCreds, setLoginCreds] = useState({
+    email: '',
+    password: '',
+  });
+
   const { isLoading, errors, setErrors } = useAuthState((state) => getLoginAuthState(state));
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // for this use case, controlled input in not required
-    // as email and password are only needed in this function only
-    // so using FormData to get email and password
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get('email');
-    const password = formData.get('password');
+    // previous logic when i did not need controlled inputs
+    // const formData = new FormData(e.currentTarget);
+    // const email = formData.get('email');
+    // const password = formData.get('password');
+
+    const { email, password } = loginCreds;
 
     const newErrors = {};
 
@@ -49,6 +67,21 @@ const Login = (props) => {
   const openRegistration = (e) => {
     e.preventDefault();
     switchScreen();
+  };
+
+  const onChangeInput = (e) => {
+    const { name, value } = e.target;
+    setLoginCreds((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleGuestCredentials = (e) => {
+    if (isLoading) return;
+    const { guest } = e.target?.closest?.('button').dataset;
+    const guestCreds = guestCredentials[guest];
+    setLoginCreds({ ...guestCreds });
   };
 
   return (
@@ -96,6 +129,8 @@ const Login = (props) => {
             isError={!!errors.email || !!errors.message}
             errorMessage={errors.email}
             autoComplete="email"
+            value={loginCreds.email}
+            onChange={onChangeInput}
           />
         </InputWrapper>
 
@@ -116,6 +151,8 @@ const Login = (props) => {
             isError={!!errors.password || !!errors.message}
             errorMessage={errors.password}
             autoComplete="current-password"
+            value={loginCreds.password}
+            onChange={onChangeInput}
           />
         </InputWrapper>
 
@@ -125,6 +162,32 @@ const Login = (props) => {
           <Typography variant="body2" visibility={isLoading ? 'hidden' : ''}>Login</Typography>
           {isLoading && <DotLoader />}
         </Button>
+
+        <Box display="flex" gap="1rem">
+          <Button
+            color="secondary"
+            variant="contained"
+            onClick={handleGuestCredentials}
+            data-guest="guest1"
+            sx={guestButtonsSX}
+          >
+            <Typography variant="body2">
+              Use Guest 1 Credentials
+            </Typography>
+          </Button>
+
+          <Button
+            color="secondary"
+            variant="contained"
+            onClick={handleGuestCredentials}
+            data-guest="guest2"
+            sx={guestButtonsSX}
+          >
+            <Typography variant="body2">
+              Use Guest 2 Credentials
+            </Typography>
+          </Button>
+        </Box>
       </Box>
       <Typography
         variant="body2"
