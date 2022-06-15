@@ -231,7 +231,14 @@ export const leaveServer = async (
       return;
     }
 
-    const server = await Server.findOneBy({ id: serverId });
+    const [server] = await AppDataSource.query(`
+      SELECT s.id, s."ownerId", u.name as "userName"
+      FROM server s
+      INNER JOIN server_member sm ON sm."serverId" = s.id
+      INNER JOIN users u ON u.id = sm."userId"
+      WHERE s.id = $1 AND sm."userId" = $2
+      LIMIT 1;
+    `, [serverId, req.userId]);
 
     if (!server) {
       // no corresponding server, nothing to do
@@ -258,8 +265,11 @@ export const leaveServer = async (
       await serverUpdatePromise;
     });
 
+    const { userName } = server;
+
     const responseObj = {
       userId: req.userId,
+      userName,
       serverId,
     };
 
@@ -433,7 +443,6 @@ export const updateServer = async (
   }
 };
 
-// TODO: delete avatar and banner on delete
 export const deleteServer = async (
   req: CustomRequest,
   res: Response,
@@ -647,10 +656,14 @@ export const kickUser = async (req: CustomRequest, res: Response, next: NextFunc
     // this will find the members of current server,
     // if there will be no server with serverId, or members not part of this
     // server it will return empty array, so checking all things
-    const serverMembers = await ServerMember.find({
-      where: { userId: In([req.userId, userId]), serverId },
-      take: 2,
-    });
+    const serverMembers = await AppDataSource.query(`
+      SELECT sm.role, u.id as "userId", u.name as "userName"
+      FROM users u
+      INNER JOIN server_member sm
+      ON u.id = sm."userId"
+      WHERE (sm."userId" IN ($1, $2) AND sm."serverId" = $3)
+      LIMIT 2;
+    `, [req.userId, userId, serverId]);
 
     if (!serverMembers?.length) {
       next(new CustomError('Server not found', 404));
@@ -662,10 +675,10 @@ export const kickUser = async (req: CustomRequest, res: Response, next: NextFunc
       return;
     }
 
-    // requesting user: the one making this api request to update user role
+    // requesting user: the one making this api request to kick other user
     const requestingUser = serverMembers.find((u) => u.userId === req.userId);
 
-    // requested user: the user, whose roles have to be updated
+    // requested user: the user, who will be kicked
     const requestedUser = serverMembers.find((u) => u.userId === userId);
 
     // eg: mod cannot kick any other user with equal or higher role
@@ -689,6 +702,7 @@ export const kickUser = async (req: CustomRequest, res: Response, next: NextFunc
 
     const responseObj = {
       userId,
+      userName: requestedUser.userName,
       serverId,
     };
 

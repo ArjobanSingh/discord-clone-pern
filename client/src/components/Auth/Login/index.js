@@ -165,7 +165,7 @@ const Login = (props) => {
 
         <Box display="flex" gap="1rem">
           <Button
-            color="secondary"
+            color="info"
             variant="contained"
             onClick={handleGuestCredentials}
             data-guest="guest1"
@@ -177,7 +177,7 @@ const Login = (props) => {
           </Button>
 
           <Button
-            color="secondary"
+            color="info"
             variant="contained"
             onClick={handleGuestCredentials}
             data-guest="guest2"

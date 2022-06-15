@@ -62,26 +62,29 @@ function* handleSocketEvents(socketEvent) {
       break;
     }
     case C.SERVER_USER_KICKED_OUT: {
-      const { serverId, userId } = payload;
+      const { serverId, userId, userName } = payload;
+
+      const { name } = yield select((state) => getServerDetails(state, serverId));
       const isLoggedInUser = userId === loggedInUser.id;
       const isSameServerOpened = window.location.pathname.includes(`/channels/${serverId}`);
 
       if (isLoggedInUser) {
-        const { name } = yield select((state) => getServerDetails(state, serverId));
         socketHandler.disconnectSingleServer(serverId);
-        toast.info(`You have been kicked out from ${name} server`);
+        toast.info(`You have been kicked out from "${name}" server`);
 
         if (isSameServerOpened) {
           // if current user kicked out from server, and current opened
           // server is the same one, navigate user to index route
           yield put(setNavigateState(['/', { replace: true }]));
         }
+      } else {
+        toast.info(`"${userName}" has been kicked out from "${name}" server`);
       }
       yield put(kickServerMemberSuccess(serverId, userId, isLoggedInUser));
       break;
     }
     case C.SERVER_MEMBER_LEFT: {
-      const { serverId, userId } = payload;
+      const { serverId, userId, userName } = payload;
       const isLoggedInUser = userId === loggedInUser.id;
       const isSameServerOpened = window.location.pathname.includes(`/channels/${serverId}`);
       if (isLoggedInUser) {
@@ -90,7 +93,11 @@ function* handleSocketEvents(socketEvent) {
         if (isSameServerOpened) {
           yield put(setNavigateState(['/', { replace: true }]));
         }
+      } else {
+        const server = yield select((state) => getServerDetails(state, serverId));
+        toast.info(`"${userName}" has left "${server.name}" server`);
       }
+      // toast.info(`${name} server has been deleted`);
       yield put(leaveServerMemberSuccess(serverId, userId, isLoggedInUser));
       break;
     }
@@ -102,7 +109,7 @@ function* handleSocketEvents(socketEvent) {
         socketHandler.disconnectSingleServer(serverId);
         // if not this server, already deleted
         const { name } = serverToDelete;
-        toast.info(`${name} server has been deleted`);
+        toast.info(`"${name}" server has been deleted`);
         // TODO: disconnect server
 
         if (isSameServerOpened) {
@@ -136,7 +143,12 @@ function* handleSocketEvents(socketEvent) {
     }
     case C.SERVER_MEMBER_ROLE_UPDATED: {
       const { serverId, userId, role } = payload;
+      const server = yield select((state) => getServerDetails(state, serverId));
       yield put(updateServerRoleSuccess(serverId, { userId, role }));
+
+      if (userId === loggedInUser.id && server) {
+        toast.info(`Your role updated to "${role}" role in "${server.name}" server`);
+      }
       break;
     }
     case C.NEW_SERVER_MEMBER_JOINED: {
@@ -150,6 +162,7 @@ function* handleSocketEvents(socketEvent) {
         break;
       }
       yield put(newServerMemberJoined(server.id, newMember));
+      toast.info(`New member added to "${server.name}" server`);
       break;
     }
     case C.SERVER_CREATED: {
