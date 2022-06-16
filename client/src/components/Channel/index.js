@@ -23,6 +23,7 @@ import { getFileDimensions } from '../../utils/helperFunctions';
 import MessageProvider from '../../providers/MessageProvider';
 import NotFound from '../NotFound';
 import MembersDrawer from './MembersDrawer';
+import { removeChannelNotifications } from '../../redux/actions/notifications';
 
 const emptyChannel = {
   error: null,
@@ -57,8 +58,9 @@ const Channel = (props) => {
 
   useEffect(() => {
     if (serverId && channel?.id) {
-      // whenever these change, fetch messages
+      // whenever these change, fetch messages and remove notifications
       fetchChannelMessages();
+      dispatch(removeChannelNotifications(serverId, channel.id));
     }
   }, [serverId, channel?.id]);
 

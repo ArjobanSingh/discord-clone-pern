@@ -1,7 +1,5 @@
 import PropTypes from 'prop-types';
-import {
-  NavLink, useParams,
-} from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import {
   AvatarWrapper,
@@ -18,22 +16,14 @@ import { getAllExploreServersData, getAllServers } from '../../redux/reducers';
 import Explore from '../../common/Explore';
 import ServersList from './ServersList';
 import Add from '../../common/AddIcon';
-import useDidUpdate from '../../customHooks/useDidUpdate';
 import { isEmpty } from '../../utils/validators';
 
 const AllServersDrawer = ({
   isDiscoveryPage,
   openCreateModal,
-  closeCreateModal,
 }) => {
   const servers = useSelector(getAllServers);
   const exploreServers = useSelector(getAllExploreServersData);
-
-  const { serverId } = useParams();
-
-  // useDidUpdate(() => {
-  //   closeCreateModal();
-  // }, [serverId]);
 
   return (
     <>
@@ -97,7 +87,6 @@ const AllServersDrawer = ({
 AllServersDrawer.propTypes = {
   isDiscoveryPage: PropTypes.bool.isRequired,
   openCreateModal: PropTypes.func.isRequired,
-  closeCreateModal: PropTypes.func.isRequired,
 };
 
 export default AllServersDrawer;

@@ -144,6 +144,7 @@ export const ChannelItem = styled.div(({ theme, isChannelOpened }) => `
   gap: ${theme.spacing(1)};
   background-color: ${isChannelOpened ? theme.palette.background.default : 'transparent'};
   border-radius: ${theme.shape.borderRadius}px;
+  height: 42px;
 
   &:hover {
     background-color: ${theme.palette.background.default};

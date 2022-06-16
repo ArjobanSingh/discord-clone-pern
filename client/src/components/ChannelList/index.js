@@ -42,7 +42,6 @@ import Tag from '../../common/Tag';
 import { ChannelType } from '../../constants/channels';
 import CreateChannelModal from '../CreateChannelModal';
 import StyledTooltip from '../../common/StyledToolTip';
-// import useDidUpdate from '../../customHooks/useDidUpdate';
 import ConfirmationModal from '../../common/ConfirmationModal';
 import { handleError } from '../../utils/helperFunctions';
 import { ChannelApi } from '../../utils/apiEndpoints';
@@ -52,6 +51,7 @@ import ChannelListLoader from './ChannelListLoader';
 import Logo from '../../common/Logo';
 import ThemeToggler from '../../common/ThemeToggler';
 import { useUserSettings } from '../../providers/UserSettingsProvider';
+import CustomNotificationsBadge from './CustomNotificationsBadge';
 
 const anchorOrigin = {
   vertical: 'bottom',
@@ -71,6 +71,7 @@ const ModalTypes = {
 const ChannelList = (props) => {
   const params = useParams();
   const { serverDetails, noServerFound } = useServerData(params.serverId);
+
   const { user } = useUser();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -79,7 +80,7 @@ const ChannelList = (props) => {
   const [modalState, setModalState] = useState(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
   const [isTextChannelExpanded, setIsTextChannelExpanded] = useState(true);
-  const [isAudioChannelExpanded, setIsAudioChannelExpanded] = useState(true);
+  // const [isAudioChannelExpanded, setIsAudioChannelExpanded] = useState(true);
   const [deleteChannelModalData, setDeleteChannelModalData] = useState(null);
   const [isDeletingChannel, setIsDeletingChannel] = useState(false);
 
@@ -300,34 +301,50 @@ const ChannelList = (props) => {
 
                 <Collapse in={channelsState[key].isExpanded} timeout="auto" unmountOnExit>
                   {data.channels.map((channel) => (
-                    <Link to={`${params.serverId}/${channel.id}`} key={channel.id}>
+                    <Link
+                      to={`${params.serverId}/${channel.id}`}
+                      key={channel.id}
+                    >
                       <ChannelItem isChannelOpened={channel.id === params.channelId}>
                         <Tag />
                         <Typography
                           flex="1"
                           component="div"
-                          maxWidth={canDeleteChannel ? 'calc(100% - 48px)' : 'calc(100% - 24px)'}
+                          position="relative"
                         >
-                          <SimpleEllipsis>
-                            {channel.name}
-                          </SimpleEllipsis>
+                          <Typography
+                            position="absolute"
+                            width="100%"
+                            height="100%"
+                            component="div"
+                            display="flex"
+                            alignItems="center"
+                          >
+                            <SimpleEllipsis>
+                              {channel.name}
+                            </SimpleEllipsis>
+                          </Typography>
                         </Typography>
+                        <CustomNotificationsBadge
+                          serverId={params.serverId}
+                          channelId={channel.id}
+                        />
                         {canDeleteChannel
-                      && (
-                      <StyledTooltip
-                        placement="top"
-                        title="Delete Channel"
-                      >
-                        <IconButton
-                          onClick={openDeleteChannelModal}
-                          data-id={channel.id}
-                          data-name={channel.name}
-                          size="small"
-                        >
-                          <DeleteIcon sx={{ fontSize: '1rem' }} />
-                        </IconButton>
-                      </StyledTooltip>
-                      )}
+                          && (
+                          <StyledTooltip
+                            placement="top"
+                            title="Delete Channel"
+                          >
+                            <IconButton
+                              onClick={openDeleteChannelModal}
+                              data-id={channel.id}
+                              data-name={channel.name}
+                              size="small"
+                            >
+                              <DeleteIcon sx={{ fontSize: '1rem' }} />
+                            </IconButton>
+                          </StyledTooltip>
+                          )}
                       </ChannelItem>
                     </Link>
                   ))}

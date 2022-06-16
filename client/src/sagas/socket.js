@@ -24,6 +24,7 @@ import { getAllServers, getServerDetails } from '../redux/reducers';
 import { INTERNET_RECONNECTED } from '../constants';
 import { updateUserDetails } from '../redux/actions/user';
 import { logoutSuccess } from '../redux/actions/auth';
+import { appendChannelNotifications } from '../redux/actions/notifications';
 
 function createSocketChannel(socket) {
   return eventChannel((emit) => {
@@ -54,6 +55,10 @@ function* handleSocketEvents(socketEvent) {
     case C.NEW_CHANNEL_MESSAGE: {
       const { serverId, channelId } = payload;
       yield put(sendChannelMessageSent(serverId, channelId, undefined, payload));
+      const isSameChannelOpened = window.location.pathname.includes(`/channels/${serverId}/${channelId}`);
+      if (!isSameChannelOpened) {
+        yield put(appendChannelNotifications(serverId, channelId));
+      }
       break;
     }
     case C.SERVER_OWNER_TRANSFERRED: {

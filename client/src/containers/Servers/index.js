@@ -112,7 +112,6 @@ const Servers = () => {
               <AllServersDrawer
                 isDiscoveryPage={isDiscoveryPage}
                 openCreateModal={openCreateModal}
-                closeCreateModal={closeCreateModal}
               />
             )}
         </ResponsiveDrawer>

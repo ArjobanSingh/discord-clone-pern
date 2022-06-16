@@ -1,27 +1,58 @@
-import React from 'react';
+import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { NavLink } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import Badge from '@mui/material/Badge';
 import {
   AvatarWrapper, ServerListTooltip, StyledAvatar, VerticalBar,
 } from './styles';
 import { getCharacterName } from '../../utils/helperFunctions';
+import { getServerNotificationsData } from '../../redux/reducers';
+
+const ServerNotification = ({ server }) => {
+  const serverNotifications = useSelector((state) => getServerNotificationsData(state, server.id));
+
+  const notificationCount = useMemo(() => {
+    let total = 0;
+    if (!serverNotifications) return total;
+    Object.values(serverNotifications).forEach((channelNotifications) => {
+      total += channelNotifications.count ?? 0;
+    });
+    return total;
+  }, [serverNotifications]);
+
+  return (
+    <NavLink to={`/channels/${server.id}`}>
+      {({ isActive }) => (
+        <AvatarWrapper>
+          <ServerListTooltip title={server.name} placement="right">
+            <Badge
+              color="secondary"
+              overlap="circular"
+              badgeContent={notificationCount}
+              max={999}
+            >
+              <StyledAvatar
+                src={server.avatar}
+                selected={isActive}
+              >
+                {getCharacterName(server.name)}
+              </StyledAvatar>
+            </Badge>
+          </ServerListTooltip>
+          <VerticalBar selected={isActive} />
+        </AvatarWrapper>
+      )}
+    </NavLink>
+  );
+};
+
+ServerNotification.propTypes = {
+  server: PropTypes.objectOf(PropTypes.any).isRequired,
+};
 
 const ServersList = ({ servers }) => Object.values(servers).map((server) => (
-  <NavLink to={`/channels/${server.id}`} key={server.id}>
-    {({ isActive }) => (
-      <AvatarWrapper>
-        <ServerListTooltip title={server.name} placement="right">
-          <StyledAvatar
-            src={server.avatar}
-            selected={isActive}
-          >
-            {getCharacterName(server.name)}
-          </StyledAvatar>
-        </ServerListTooltip>
-        <VerticalBar selected={isActive} />
-      </AvatarWrapper>
-    )}
-  </NavLink>
+  <ServerNotification key={server.id} server={server} />
 ));
 
 ServersList.propTypes = {
