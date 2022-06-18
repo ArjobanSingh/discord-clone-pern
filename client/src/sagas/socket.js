@@ -54,10 +54,13 @@ function* handleSocketEvents(socketEvent) {
       break;
     }
     case C.NEW_CHANNEL_MESSAGE: {
-      const { serverId, channelId } = payload;
+      const { serverId, channelId, userId } = payload;
       yield put(sendChannelMessageSent(serverId, channelId, undefined, payload));
       const isSameChannelOpened = window.location.pathname.includes(`/channels/${serverId}/${channelId}`);
-      if (!isSameChannelOpened) {
+
+      // only show notifications, if that channel already not opened
+      // and also if sender is some other user
+      if (!isSameChannelOpened && userId !== loggedInUser.id) {
         yield put(appendChannelNotifications(serverId, channelId));
       }
       break;
@@ -141,8 +144,8 @@ function* handleSocketEvents(socketEvent) {
       break;
     }
     case C.USER_DETAILS_UPDATED: {
-      const { userId } = payload;
-      if (userId === loggedInUser.id) {
+      const { id } = payload;
+      if (id === loggedInUser.id) {
         yield put(updateUserDetails(payload));
       }
       break;
