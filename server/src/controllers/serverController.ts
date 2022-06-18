@@ -205,6 +205,8 @@ export const joinServer = async (
     const allSockets = io.sockets.sockets;
 
     const allSocketsArr = Array.from(allSockets.entries());
+    // send joined server notification to every socket client
+    // of the current joined user
     allSocketsArr.forEach((data) => {
       const socketDetails: ISocket = data[1];
       if (socketDetails.userId === newMemberObj.userId) {

@@ -161,7 +161,6 @@ function* handleSocketEvents(socketEvent) {
       if (newMember.userId === loggedInUser.id) {
         // we joined some new server, might be from some other device
         // so add server in redux state
-        yield put(saveAllChannels(server.id, server.channels ?? []));
         yield put(joinServerSucess(server.id, undefined, server));
         socketHandler.connectSingleServer(server.id);
         break;

@@ -103,6 +103,7 @@ const Server = (props) => {
   }
 
   if (isEmpty(channels)) {
+    console.log('how', channels, serverDetails);
     return (
       <InnerServerContainer>
         {renderPreviewBar()}

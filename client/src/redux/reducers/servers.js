@@ -21,17 +21,24 @@ const allServers = (state = {}, action) => {
       }, {});
     case C.JOIN_SERVER_SUCCESS:
     case C.CREATE_SERVER_SUCCESS: {
-      if (state[action.payload.serverId]) return state;
-
-      return {
+      const newState = {
         [action.payload.serverId]: {
           ...action.payload.data,
           isFetchingData: false,
           error: null,
           inviteUrls: {},
         },
-        ...state,
       };
+
+      // filter out the server data if already present
+      // for the serverId provided in action payload
+      Object.entries(state).forEach(([serverId, serverDetails]) => {
+        if (serverId !== action.payload.serverId) {
+          newState[serverId] = serverDetails;
+        }
+      });
+
+      return newState;
     }
     case C.REMOVE_SERVER: {
       const newState = { ...state };
