@@ -3,7 +3,6 @@ import { nanoid } from 'nanoid';
 import {
   useRef, useState,
 } from 'react';
-import { toast } from 'react-toastify';
 import {
   ChatContainer, InputContainer, MessagesContainer,
 } from './styles';
@@ -42,7 +41,6 @@ const Chat = (props) => {
     moreError,
   } = messagesData;
 
-  const isAlertShownAlready = useRef(false);
   const { user } = useUser();
   const messagesRef = useRef();
 
@@ -50,7 +48,7 @@ const Chat = (props) => {
   const [files, setFiles] = useState([]);
 
   useDidUpdate(() => {
-    if (!isEmpty(files)) messagesRef.current.scrollToPreviousPosition();
+    if (!isEmpty(files)) messagesRef.current.scrollToCorrectPosition();
   }, [files], false);
 
   // nanoid and createdAt will work as temporary id and
@@ -93,13 +91,7 @@ const Chat = (props) => {
   };
 
   const getMoreMessages = () => {
-    if (!hasMore) {
-      if (!isAlertShownAlready.current) {
-        toast('No more messages to load');
-        isAlertShownAlready.current = true;
-      }
-      return;
-    }
+    if (!hasMore) return;
     if (isLoadingMore) return;
     loadMoreMessages();
   };
@@ -130,6 +122,7 @@ const Chat = (props) => {
                 getMoreMessages={getMoreMessages}
                 setReplyMessage={setReplyMessage}
                 chatBoxId={chatBoxId}
+                chatName={chatName}
               />
             )}
         </MessagesContainer>

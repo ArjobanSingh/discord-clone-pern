@@ -15,6 +15,7 @@ import {
   kickServerMemberSuccess,
   leaveServerMemberSuccess,
   newServerMemberJoined,
+  removePrivateServerFromExplore,
   updateOwnershipSuccess,
   updateServerRoleSuccess,
   updateServerSuccess,
@@ -179,6 +180,11 @@ function* handleSocketEvents(socketEvent) {
     case C.SERVER_UPDATED: {
       const { id } = payload;
       yield put(updateServerSuccess(id, payload));
+      break;
+    }
+    case C.SERVER_UPDATED_TO_PRIVATE: {
+      const { serverId } = payload;
+      yield put(removePrivateServerFromExplore(serverId));
       break;
     }
     default:

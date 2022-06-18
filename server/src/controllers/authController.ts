@@ -78,7 +78,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       return;
     }
 
-    // const user = await User.findOne({ email });
     const [user] = await getUserData(undefined, email);
     if (!user) {
       next(new CustomError('No user found', 404));

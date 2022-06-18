@@ -54,6 +54,13 @@ const publicServersList = (state = initialState, action) => {
         ...state,
         isLoadingMore: false,
       };
+    case C.REMOVE_PRIVATE_SERVER_FROM_EXPLORE: {
+      const { serverId } = action.payload;
+      return {
+        ...state,
+        data: (state.data || []).filter((expServer) => expServer.id !== serverId),
+      };
+    }
     default:
       return state;
   }

@@ -13,6 +13,7 @@ import {
 import useDidUpdate from '../../customHooks/useDidUpdate';
 import TransitionModal from '../../common/TransitionModal';
 import ModalImage from './ModalImage';
+import ChatInitialMessage from './ChatInitialMessage';
 
 const Messages = forwardRef((props, ref) => {
   const {
@@ -22,7 +23,9 @@ const Messages = forwardRef((props, ref) => {
     isLoadingMore,
     replyMessage,
     setReplyMessage,
+    hasMoreMessages,
     chatBoxId,
+    chatName,
   } = props;
 
   const containerRef = useRef();
@@ -35,7 +38,7 @@ const Messages = forwardRef((props, ref) => {
   const scrollToContainerBottom = useCallback(() => scrollToBottom(containerRef.current), []);
 
   useImperativeHandle(ref, () => ({
-    scrollToPreviousPosition: () => {
+    scrollToCorrectPosition: () => {
       if (reachedThresholdBottom(lastScrollPositions.current, 10)) {
         scrollToContainerBottom();
       }
@@ -100,6 +103,10 @@ const Messages = forwardRef((props, ref) => {
       {isLoadingMore && <AbsoluteLoader />}
       <Container id="messages-container" ref={containerRef} onScroll={handleScroll}>
         <MessagesWrapper>
+          <ChatInitialMessage
+            chatName={chatName}
+            hasMoreMessages={hasMoreMessages}
+          />
           {messages.map((currentMessage, index) => {
             const previousMessage = messages[index - 1];
 
@@ -152,6 +159,8 @@ Messages.propTypes = {
   replyMessage: PropTypes.shape({}).isRequired,
   setReplyMessage: PropTypes.func.isRequired,
   chatBoxId: PropTypes.string.isRequired,
+  hasMoreMessages: PropTypes.bool.isRequired,
+  chatName: PropTypes.string.isRequired,
 };
 
 export default Messages;

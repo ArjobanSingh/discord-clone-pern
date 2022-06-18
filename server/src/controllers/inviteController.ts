@@ -39,10 +39,6 @@ export const createInvite = async (req: CustomRequest, res: Response, next: Next
       next(new CustomError('Not found', 404));
       return;
     }
-    // const server = await Server.findOne(serverId);
-    // const serverMember = await ServerMember.findOne({
-    //   where: { userId: req.userId, serverId },
-    // });
 
     // only people with role of MOD and above can generate invite link
     if (serverDetails.type === ServerTypeEnum.PRIVATE

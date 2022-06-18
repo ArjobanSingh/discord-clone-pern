@@ -157,9 +157,6 @@ export const joinServer = async (
     }
 
     const isServerMemberAlreadyPresent = server.members.find((mem) => mem.userId === userId);
-    // let serverMember = await ServerMember.findOne({
-    //   where: { userId, serverId: server.id },
-    // });
     if (isServerMemberAlreadyPresent) {
       // user already in this group
       next(new CustomError('You are already part of this server', 400));
@@ -384,20 +381,23 @@ export const updateServer = async (
       return;
     }
 
-    const server = await Server.findOne(serverId);
+    let server = await Server.findOneBy({
+      id: serverId,
+    });
+
     if (!server) {
       next(new CustomError('Server not found', 404));
       return;
     }
 
-    const serverMember = await ServerMember.findOne({
-      where: { userId: req.userId, serverId },
-    });
+    const serverMember = await ServerMember.findOneBy({ userId: req.userId, serverId });
 
     if (!serverMember || enumScore[serverMember.role] < enumScore[MemberRole.ADMIN]) {
       next(new CustomError('You do not have required permission for this action', 403));
       return;
     }
+
+    const previousServerType = server.type;
 
     server.type = type;
     server.name = name;
@@ -430,13 +430,38 @@ export const updateServer = async (
       return;
     }
 
-    await server.save();
+    // this executes select query again, so not using this while updating
+    // await server.save();
+
+    const resp = await AppDataSource.getRepository(Server)
+      .createQueryBuilder()
+      .update({
+        type,
+        name,
+        description,
+        avatar: newAvatarUrl,
+        avatarPublicId: newAvatarPublicId,
+        banner: newBannerUrl,
+        bannerPublicId: newBannerPublicId,
+      })
+      .where({
+        id: server.id,
+      })
+      .returning('*')
+      .execute();
+
+    [server] = resp.raw;
 
     res.json(server);
 
     const io: SocketServer = req.app.get('io');
     io.to(serverId).emit(C.SERVER_UPDATED, server);
 
+    if (server.type === ServerTypeEnum.PRIVATE
+      && previousServerType === ServerTypeEnum.PUBLIC) {
+      // server updated to private
+      io.emit(C.SERVER_UPDATED_TO_PRIVATE, { serverId });
+    }
     // after response has been sent, delete previous avatar/banner if present
     if (prevAvatarPublicId) cloudinary.uploader.destroy(prevAvatarPublicId);
     if (prevBannerPublicId) cloudinary.uploader.destroy(prevBannerPublicId);

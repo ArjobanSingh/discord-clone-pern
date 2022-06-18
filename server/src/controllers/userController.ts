@@ -8,6 +8,7 @@ import CustomRequest from '../interfaces/CustomRequest';
 import { createValidationError, CustomError } from '../utils/errors';
 import { getUserData } from '../utils/typeormHelpers';
 import { USER_DETAILS_UPDATED } from '../utils/socket-io-constants';
+import AppDataSource from '../data-source';
 
 export const getCurrentUser = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
@@ -28,7 +29,7 @@ export const getCurrentUser = async (req: CustomRequest, res: Response, next: Ne
 export const updateUserDetails = async (req: CustomRequest, res: Response, next: NextFunction) => {
   try {
     const { userId } = req;
-    const user = await User.findOneBy({ id: userId });
+    let user = await User.findOneBy({ id: userId });
 
     const {
       name,
@@ -61,6 +62,10 @@ export const updateUserDetails = async (req: CustomRequest, res: Response, next:
       const { secure_url: secureUrl, public_id: publicId } = fileResponse;
       user.profilePicture = secureUrl;
       user.profilePicturePublicId = publicId;
+    } else if (!profilePicture) {
+      // most probably user removed profilePicture, if already was present
+      user.profilePicture = null;
+      user.profilePicturePublicId = null;
     }
 
     const errors = await validate(user);
@@ -70,7 +75,21 @@ export const updateUserDetails = async (req: CustomRequest, res: Response, next:
       return;
     }
 
-    await user.save();
+    const response = await AppDataSource.getRepository(User)
+      .createQueryBuilder()
+      .update({
+        name,
+        email,
+        profilePicture: user.profilePicture,
+        profilePicturePublicId: user.profilePicturePublicId,
+      })
+      .where({
+        id: user.id,
+      })
+      .returning('*')
+      .execute();
+
+    [user] = response.raw;
 
     const responseObj = {
       id: user.id,
@@ -82,11 +101,11 @@ export const updateUserDetails = async (req: CustomRequest, res: Response, next:
 
     const io: SocketServer = req.app.get('io');
 
-    // after response has been sent, delete previous avatar/banner if present
+    // after response has been sent, delete previous profile pic if present
     if (prevProfilePublicId !== user.profilePicturePublicId) {
       cloudinary.uploader.destroy(prevProfilePublicId);
     }
-    io.emit(USER_DETAILS_UPDATED, responseObj);
+    io.to(user.id).emit(USER_DETAILS_UPDATED, responseObj);
   } catch (err) {
     next(err);
   }

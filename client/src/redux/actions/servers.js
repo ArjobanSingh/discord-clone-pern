@@ -250,6 +250,13 @@ export const newServerMemberJoined = (serverId, newMember) => ({
   },
 });
 
+export const removePrivateServerFromExplore = (serverId) => ({
+  type: C.REMOVE_PRIVATE_SERVER_FROM_EXPLORE,
+  payload: {
+    serverId,
+  },
+});
+
 // export const updateServerRoleFailed = (serverId, error) => ({
 //   type: C.UPDATE_SERVER_ROLE_FAILED,
 //   payload: {
