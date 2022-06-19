@@ -1,7 +1,8 @@
 {
-  "name": "server",
-  "version": "0.0.1",
-  "description": "Awesome project developed with TypeORM.",
+  "name": "discord-clone",
+  "version": "1.0.0",
+  "author": "Arjoban Singh",
+  "description": "Discord clone built using PERN technologies",
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.12",
@@ -19,6 +20,10 @@
     "nodemon": "^2.0.12",
     "ts-node": "10.7.0",
     "typescript": "^4.5.2"
+  },
+  "engines": {
+    "node": "16.14.0",
+    "npm": "8.3.1"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
@@ -40,8 +45,8 @@
   "scripts": {
     "typeorm": "typeorm-ts-node-commonjs",
     "serve": "nodemon --exec ts-node server/src/index.ts",
-    "tsc": "tsc",
-    "start": "node build/index.js",
+    "build": "tsc",
+    "start": "node build/server/index.js",
     "start:dev": "ts-node server/src/index.ts"
   }
 }

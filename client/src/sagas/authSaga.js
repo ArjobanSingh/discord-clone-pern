@@ -49,8 +49,8 @@ function* logoutUser() {
     // instantly after non-blocking fork function
     yield fork(axiosInstance.delete, AuthApi.LOGOUT, { headers: authHeaders });
     removeTokens();
+    yield put(setNavigateState(['/login', { replace: true }]));
     yield put(logoutSuccess());
-    // yield put(setNavigateState(['/login', { replace: true }]));
   } catch (err) {
     // console.log(err.message);
   }
