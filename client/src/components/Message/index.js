@@ -246,7 +246,8 @@ const Message = (props) => {
           <ReplyIcon onClick={handleReply} />
         </StyledTooltip>
       </div>
-      <div>
+      {/* TODO: add this feature when completed */}
+      {/* <div>
         <StyledTooltip
           fontSize={appTheme.typography.subtitle1.fontSize}
           placement="top"
@@ -254,7 +255,7 @@ const Message = (props) => {
         >
           <MoreHorizIcon />
         </StyledTooltip>
-      </div>
+      </div> */}
     </>
   );
 

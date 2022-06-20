@@ -81,7 +81,7 @@ const Messages = forwardRef((props, ref) => {
       scrollTop,
       clientHeight,
     };
-    if (reachedThresholdTop(e, 50)) {
+    if (hasMoreMessages && reachedThresholdTop(e, 50)) {
       lastScrollHeight.current = scrollHeight;
       getMoreMessages();
     }
