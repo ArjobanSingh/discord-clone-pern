@@ -5,15 +5,18 @@ import {
   useState,
 } from 'react';
 import PropTypes from 'prop-types';
+import SendIcon from '@mui/icons-material/Send';
 import { toast } from 'react-toastify';
 import debounce from 'lodash.debounce';
 import CancelIcon from '@mui/icons-material/Cancel';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { nanoid } from 'nanoid';
+import Button from '@mui/material/Button';
 import ChatInputField, {
   FileInput,
   FilesContainer,
   ReplyInputContainer,
+  SendButtonWrapper,
   TextWrapper,
   UploadIconWrapper,
 } from './styles';
@@ -38,6 +41,7 @@ const InputEditor = (props) => {
   const selectedFile = currentFileIndex !== undefined
     ? files[currentFileIndex]
     : undefined;
+  const isValidForSubmit = !isEmpty(files) || !!value.trim();
 
   useDidUpdate(() => {
     if (selectedFile) setValue(selectedFile.caption);
@@ -53,7 +57,7 @@ const InputEditor = (props) => {
   }, [files, currentFileIndex]);
 
   const onSubmit = () => {
-    if (isEmpty(files) && !value.trim()) return;
+    if (!isValidForSubmit) return;
     prepareMessage(value);
     setValue('');
   };
@@ -173,6 +177,18 @@ const InputEditor = (props) => {
           value={value}
           placeholder={isEmpty(files) ? 'Send Message' : 'Add Caption to selected file'}
         />
+        {isValidForSubmit && (
+          <SendButtonWrapper>
+            <Button
+              variant="contained"
+              size="small"
+              endIcon={<SendIcon fontSize="inherit" />}
+              onClick={onSubmit}
+            >
+              Send
+            </Button>
+          </SendButtonWrapper>
+        )}
       </TextWrapper>
     </>
   );

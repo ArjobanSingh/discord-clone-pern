@@ -12,7 +12,7 @@ export const ChatContainer = styled.div`
 export const MessagesContainer = styled.div`
   flex: 1 1 auto;
   position: relative;
-  margin-bottom: ${({ hideInput, theme }) => (hideInput ? theme.spacing(2) : '')}
+  margin-bottom: ${({ hideInput, theme }) => (hideInput ? theme.spacing(2) : '')};
 `;
 
 // 36 for reply box, 250 for files if selected and 80 maximum for text field

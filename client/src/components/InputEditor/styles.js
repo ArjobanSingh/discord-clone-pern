@@ -28,6 +28,7 @@ import { forwardRef } from 'react';
 // eslint-disable-next-line react/prop-types
 
 const iconDivWidth = '40px';
+const sendButtonWidth = '90px';
 
 // eslint-disable-next-line react/prop-types
 const TextAreaWrapper = forwardRef(({ isReply, isFiles, ...rest }, ref) => (
@@ -46,7 +47,7 @@ const ChatInputField = styled(TextAreaWrapper)(({ theme, isReply, isFiles }) => 
   border: none;
   background-color: inherit;
   border-radius: inherit;
-  padding-left: ${iconDivWidth};
+  padding-inline: ${iconDivWidth} ${sendButtonWidth};
   line-height: 1.5;
 `);
 
@@ -73,6 +74,16 @@ export const UploadIconWrapper = styled.div`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+`;
+
+export const SendButtonWrapper = styled.div`
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  right: 0;
+  padding: ${({ theme }) => theme.spacing(1)};
 `;
 
 export const FileInput = styled.input`
