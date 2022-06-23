@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Avatar from '@mui/material/Avatar';
+import { forwardRef } from 'react';
 import StyledTooltip, { tooltipClasses } from '../../common/StyledToolTip';
 
 export const SidebarContainer = styled('aside')`
@@ -7,6 +8,7 @@ export const SidebarContainer = styled('aside')`
   height: 100%;
   overflow: hidden;
   display: flex;
+  position: ${({ position }) => position || ''};
   border-right: ${({ borderRight }) => borderRight || ''};
 
   ${({ theme }) => theme.breakpoints.down('sm')} {
@@ -19,7 +21,7 @@ export const ServerIconList = styled('div')(({ theme }) => `
   height: 100%;
   overflow: hidden auto;
   background-color: ${theme.palette.background.darker};
-  padding-block: ${theme.spacing(1.5)};
+  padding-block: ${`${theme.spacing(1.5)} ${theme.spacing(10.5)}`};
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -56,7 +58,10 @@ const getColor = ({ theme, selected, explore }) => {
   return theme.palette.text.primary;
 };
 
-export const StyledAvatar = styled(Avatar)(({
+// eslint-disable-next-line react/prop-types
+const ExtractAvatarProps = forwardRef(({ explore, ...rest }, ref) => <Avatar {...rest} ref={ref} />);
+
+export const StyledAvatar = styled(ExtractAvatarProps)(({
   theme, selected, fontSize, explore,
 }) => `
   background-color: ${getBackgroundColor({ theme, selected, explore })};
@@ -108,4 +113,12 @@ export const ServerListTooltip = styled(StyledTooltip)(({ theme }) => `
   .${tooltipClasses.tooltip} {
     font-size: ${theme.typography.subtitle1.fontSize};
   }
+`);
+
+export const UserAvatarWrapper = styled.div(({ theme }) => `
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding-block: ${theme.spacing(1.5)};
+  background-color: ${theme.palette.background.darker};
 `);

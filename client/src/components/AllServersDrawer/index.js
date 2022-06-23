@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import {
   AvatarWrapper,
   Bar,
@@ -9,6 +10,7 @@ import {
   SidebarContainer,
   StyledAvatar,
   VerticalBar,
+  UserAvatarWrapper,
 } from './styles';
 // import Logo from '../../common/Logo';
 import ChannelList from '../ChannelList';
@@ -17,6 +19,7 @@ import Explore from '../../common/Explore';
 import ServersList from './ServersList';
 import Add from '../../common/AddIcon';
 import { isEmpty } from '../../utils/validators';
+import { useUserSettings } from '../../providers/UserSettingsProvider';
 
 const AllServersDrawer = ({
   isDiscoveryPage,
@@ -24,10 +27,11 @@ const AllServersDrawer = ({
 }) => {
   const servers = useSelector(getAllServers);
   const exploreServers = useSelector(getAllExploreServersData);
+  const { openUserSettingsDialog } = useUserSettings();
 
   return (
     <>
-      <SidebarContainer>
+      <SidebarContainer position="relative">
         <ServerIconList>
           {/* <NavLink to="/channels/@me">
             {({ isActive }) => (
@@ -53,7 +57,7 @@ const AllServersDrawer = ({
             <ServerListTooltip title="Add a server" placement="right">
               <StyledAvatar
                 onClick={openCreateModal}
-                explore="true" // to prevent bool attribute being passed to dom element
+                explore
                 fontSize="1.7rem"
               >
                 <Add />
@@ -66,7 +70,7 @@ const AllServersDrawer = ({
               <AvatarWrapper>
                 <ServerListTooltip title="Explore Public servers" placement="right">
                   <StyledAvatar
-                    explore="true" // to prevent bool attribute being passed to dom element
+                    explore
                     selected={isActive}
                     fontSize="1.7rem"
                   >
@@ -77,6 +81,20 @@ const AllServersDrawer = ({
               </AvatarWrapper>
             )}
           </NavLink>
+
+          <UserAvatarWrapper>
+            <AvatarWrapper>
+              <ServerListTooltip title="User settings" placement="right">
+                <StyledAvatar
+                  onClick={openUserSettingsDialog}
+                  explore
+                  fontSize="1.7rem"
+                >
+                  <ManageAccountsIcon />
+                </StyledAvatar>
+              </ServerListTooltip>
+            </AvatarWrapper>
+          </UserAvatarWrapper>
         </ServerIconList>
         {!isDiscoveryPage && <ChannelList />}
       </SidebarContainer>

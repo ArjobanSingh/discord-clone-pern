@@ -5,7 +5,6 @@ import {
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
-import SettingsIcon from '@mui/icons-material/Settings';
 import Collapse from '@mui/material/Collapse';
 import Box from '@mui/material/Box';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -50,7 +49,6 @@ import { AbsoluteProgress, ConfirmationButton } from '../ServerSettings/Options/
 import ChannelListLoader from './ChannelListLoader';
 import Logo from '../../common/Logo';
 import ThemeToggler from '../../common/ThemeToggler';
-import { useUserSettings } from '../../providers/UserSettingsProvider';
 import CustomNotificationsBadge from './CustomNotificationsBadge';
 
 const anchorOrigin = {
@@ -75,7 +73,6 @@ const ChannelList = (props) => {
   const { user } = useUser();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { openUserSettingsDialog } = useUserSettings();
 
   const [modalState, setModalState] = useState(null);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
@@ -372,9 +369,9 @@ const ChannelList = (props) => {
           </Typography>
 
           <ThemeToggler />
-          <IconButton size="small" onClick={openUserSettingsDialog}>
+          {/* <IconButton size="small" onClick={openUserSettingsDialog}>
             <SettingsIcon />
-          </IconButton>
+          </IconButton> */}
         </ListFooter>
       </ChannelListContainer>
       <TransitionModal

@@ -7,7 +7,13 @@ import ChannelListLoader from '../../components/ChannelList/ChannelListLoader';
 export const ServersAvatarLoader = () => (
   <ServerIconList>
     {[1, 2, 3, 4, 5, 6, 7].map((it) => (
-      <Skeleton variant="circular" key={it} width="50px" height="50px" />
+      <Skeleton
+        variant="circular"
+        key={it}
+        sx={{ minHeight: '50px' }}
+        width="50px"
+        height="50px"
+      />
     ))}
   </ServerIconList>
 );
