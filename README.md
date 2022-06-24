@@ -9,6 +9,7 @@
 
 ## Features
 
+- Fully responsive app with client side code splitting
 - Login/ Register
 - Create Public or Private Servers
 - Join public servers either while exploring or with INVITE URL's
@@ -36,6 +37,7 @@
 - [React Router DOM V6](https://reactrouter.com/): For nested routing for servers and channels
 - [Redux](https://redux.js.org/): For Client Global state management
 - [Axios](https://axios-http.com/): For Data fetching on client
+- [Socket-io-client](https://socket.io/docs/v4/client-api/): Socket io client to connect with server for realtine chat and notifications
 - [Material Ui V5](https://mui.com/material-ui/getting-started/overview/): Ui library
 - [Styled Components](https://styled-components.com/): For styling the app
 
