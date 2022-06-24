@@ -43,7 +43,7 @@
 
 - Install [postgreSQL](https://www.postgresql.org/) if you don't have it already and create a database named discord_clone.
 - Install redis if not already, or can use Redis cloud instance like [Redis labs](https://redis.com/) or [Upstash](https://upstash.com/)
-- Create an empty `.env` file in root folder, copy `.env.example` contents into it, and fill in your values.
+- Create an empty `.env` file in root folder, copy [.env.example](.env.example) contents into it, and fill in your values.
 - `npm run install-dependencies`
 - `npm run serve` on root folder
 - `cd client && npm start`
@@ -53,10 +53,10 @@
 ## To Run production version on your device
 
 - In root folder execute `npm run build`
-- cd client execute `npm run build`
-- In .env folder add NODE_ENV with value of `production`.
-- Do not forget to delete NODE_ENV variable from .env file to run development server correctly afterwards.
-- Go to root folder, execute command `npm start`
+- Then execute `cd client && npm run build`
+- In .env folder add `NODE_ENV` with value of `production`.
+- Do not forget to delete `NODE_ENV` variable from .env file to run development server correctly afterwards.
+- From your root folder, execute command `npm start`
 - Now your Production version of app should be running at `http://localhost:5000`
 
 ## Work In progress
@@ -67,8 +67,22 @@
 ## What's Missing?
 
 - User to User relationships and personal chat
-- Ban Server Members
+- Ban Users from servers
 - Private Channels
 - Dynamic server member roles
 - Message reactions
 - Message threads
+
+## UI Snapshots
+
+### Create/Join Server Modal
+
+![Create/Join Server Modal](https://res.cloudinary.com/arjoban-main-cloud/image/upload/v1656081715/discord_clone/create-or-join-server_yc11fu.png)
+
+### Update Server Settings
+
+![Update Server Settings](https://res.cloudinary.com/arjoban-main-cloud/image/upload/v1656081727/discord_clone/update-server-settings_l4ah5o.png)
+
+### Join Server with Invite URL
+
+![Join server with invite url](https://res.cloudinary.com/arjoban-main-cloud/image/upload/v1656081736/discord_clone/jon-server-with-url_kh3otz.png)
