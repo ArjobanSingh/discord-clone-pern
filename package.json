@@ -2,7 +2,6 @@
   "name": "discord-clone",
   "version": "1.0.0",
   "author": "Arjoban Singh",
-  "license": "MIT",
   "description": "Discord clone built using PERN technologies",
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
