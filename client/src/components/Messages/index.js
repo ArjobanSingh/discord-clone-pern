@@ -14,6 +14,7 @@ import useDidUpdate from '../../customHooks/useDidUpdate';
 import TransitionModal from '../../common/TransitionModal';
 import ModalImage from './ModalImage';
 import ChatInitialMessage from './ChatInitialMessage';
+import useLayoutDidUpdate from '../../customHooks/useLayoutDidUpdate';
 
 const Messages = forwardRef((props, ref) => {
   const {
@@ -24,7 +25,6 @@ const Messages = forwardRef((props, ref) => {
     replyMessage,
     setReplyMessage,
     hasMoreMessages,
-    chatBoxId,
     chatName,
   } = props;
 
@@ -46,15 +46,10 @@ const Messages = forwardRef((props, ref) => {
   }));
 
   useEffect(() => {
-    // on chat box change, reset lastScrollHeight for case
-    // if previous chat box's(previous channel) more api was
-    // in progress and user changed chatBox(channel)
     scrollToContainerBottom();
-    lastScrollHeight.current = undefined;
-    lastScrollPositions.current = {};
-  }, [chatBoxId]);
+  }, []);
 
-  useDidUpdate(() => {
+  useLayoutDidUpdate(() => {
     // basically when we have completed loading more messages
     if (lastScrollHeight.current && !isLoadingMore) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight - lastScrollHeight.current;
@@ -68,7 +63,7 @@ const Messages = forwardRef((props, ref) => {
     if (reachedThresholdBottom(lastScrollPositions.current, 10)) {
       scrollToContainerBottom();
     }
-  }, [messages.length], false);
+  }, [messages.length]);
 
   useDidUpdate(() => {
     if (moreError) lastScrollHeight.current = undefined;
@@ -158,7 +153,6 @@ Messages.propTypes = {
   moreError: PropTypes.bool.isRequired,
   replyMessage: PropTypes.shape({}).isRequired,
   setReplyMessage: PropTypes.func.isRequired,
-  chatBoxId: PropTypes.string.isRequired,
   hasMoreMessages: PropTypes.bool.isRequired,
   chatName: PropTypes.string.isRequired,
 };

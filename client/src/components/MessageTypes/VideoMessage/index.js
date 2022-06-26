@@ -8,7 +8,6 @@ import {
 } from '../commonMessageStyles';
 import { useMessageData } from '../../../providers/MessageProvider';
 import Video from './styles';
-import useDidUpdate from '../../../customHooks/useDidUpdate';
 import useLazyLoad from '../../../customHooks/useLazyLoad';
 import { MessageStatus } from '../../../constants/Message';
 import { calculateAspectRatioFit } from '../../../utils/helperFunctions';
@@ -34,16 +33,17 @@ const VideoMessage = (props) => {
     return calculateAspectRatioFit(srcWidth, srcHeight);
   }, [fileDimensions]);
 
-  useDidUpdate(() => {
-    if (isVideoReady && blobUrl) {
-      URL.revokeObjectURL(blobUrl);
-      removeObjectUrl(id);
-    }
-  }, [isVideoReady, blobUrl, id, removeObjectUrl]);
-
   const showBlobVideo = blobUrl && !isVideoReady;
   const isLoading = status === MessageStatus.SENDING;
   const isFailed = status === MessageStatus.FAILED;
+
+  const handleCanPlayVideo = () => {
+    setIsVideoReady(true);
+    if (blobUrl) {
+      URL.revokeObjectURL(blobUrl);
+      removeObjectUrl(id);
+    }
+  };
 
   const getStatusUi = () => {
     if (isLoading) return <ImageVideoLoader />;
@@ -58,9 +58,7 @@ const VideoMessage = (props) => {
         <Video
           controls
           src={isIntersecting ? fileUrl : ''}
-          onCanPlay={() => {
-            setIsVideoReady(true);
-          }}
+          onCanPlay={handleCanPlayVideo}
           position={showBlobVideo ? 'absolute' : ''}
           opacity={showBlobVideo ? '0' : '1'}
         />

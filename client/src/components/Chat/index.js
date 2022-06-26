@@ -12,10 +12,10 @@ import { isEmpty } from '../../utils/validators';
 import Messages from '../Messages';
 import useUser from '../../customHooks/useUser';
 // import { scrollToBottom } from '../../utils/helperFunctions';
-import useDidUpdate from '../../customHooks/useDidUpdate';
 import ChatLoader from './ChatLoader';
 import EmptyChat from './EmptyChat';
 import ApiError from '../../common/ApiError';
+import useLayoutDidUpdate from '../../customHooks/useLayoutDidUpdate';
 
 // chat component should be independent of channel/server logic
 // to support personal messages in future
@@ -47,9 +47,9 @@ const Chat = (props) => {
   const [replyMessage, setReplyMessage] = useState({});
   const [files, setFiles] = useState([]);
 
-  useDidUpdate(() => {
+  useLayoutDidUpdate(() => {
     if (!isEmpty(files)) messagesRef.current.scrollToCorrectPosition();
-  }, [files], false);
+  }, [files]);
 
   // nanoid and createdAt will work as temporary id and
   // temporart createdAt, till message is sent
@@ -113,6 +113,7 @@ const Chat = (props) => {
           {isEmpty(data) ? <EmptyChat chatName={chatName} />
             : (
               <Messages
+                key={chatBoxId}
                 ref={messagesRef}
                 hasMoreMessages={hasMore}
                 messages={data}
@@ -121,7 +122,6 @@ const Chat = (props) => {
                 replyMessage={replyMessage}
                 getMoreMessages={getMoreMessages}
                 setReplyMessage={setReplyMessage}
-                chatBoxId={chatBoxId}
                 chatName={chatName}
               />
             )}

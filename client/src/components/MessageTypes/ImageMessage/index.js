@@ -2,11 +2,9 @@ import { memo, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { DownloadIconWrapper, StyledImage } from './styles';
 import { useMessageData } from '../../../providers/MessageProvider';
-import useDidUpdate from '../../../customHooks/useDidUpdate';
 import { calculateAspectRatioFit, transformCloudinaryUrl } from '../../../utils/helperFunctions';
 import useLazyLoad from '../../../customHooks/useLazyLoad';
 import {
-  ErrorWrapper,
   ImageVideoError,
   ImageVideoLoader, MediaContainer, MediaMessageContainer, StyledDownloadIcon,
 } from '../commonMessageStyles';
@@ -38,15 +36,12 @@ const ImageMessage = (props) => {
     return calculateAspectRatioFit(srcWidth, srcHeight);
   }, [fileDimensions]);
 
-  useDidUpdate(() => {
-    if (isImageLoaded && blobUrl) {
+  const onImageLoad = () => {
+    setIsImageLoaded(true);
+    if (blobUrl) {
       URL.revokeObjectURL(blobUrl);
       removeObjectUrl(id);
     }
-  }, [isImageLoaded, blobUrl, id, removeObjectUrl]);
-
-  const onImageLoad = () => {
-    setIsImageLoaded(true);
   };
 
   // did not used react-cloudinary because:

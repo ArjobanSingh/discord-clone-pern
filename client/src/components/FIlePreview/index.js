@@ -10,6 +10,7 @@ import {
 } from '../../constants/images';
 import { OptionsContainer } from '../Message/styles';
 import { SimpleEllipsis } from '../../common/StyledComponents';
+import { handleEnter } from '../../utils/helperFunctions';
 
 const FilePreview = ({
   file, index, removeFile, selectFile, selectedIndex,
@@ -42,7 +43,13 @@ const FilePreview = ({
   };
 
   return (
-    <Wrapper onClick={selectHandler} isSelected={selectedIndex === index}>
+    <Wrapper
+      role="button"
+      tabIndex={0}
+      onKeyDown={handleEnter(selectHandler)}
+      onClick={selectHandler}
+      isSelected={selectedIndex === index}
+    >
       <OptionsContainer display="block" right="-10px">
         <div>
           <DeleteIcon onClick={removeHandler} />

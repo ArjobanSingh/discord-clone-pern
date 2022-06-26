@@ -22,7 +22,6 @@ import ChatInputField, {
 } from './styles';
 import { MAX_FILE_SIZE } from '../../constants/Message';
 import { getMessageType } from '../../utils/helperFunctions';
-import useDidUpdate from '../../customHooks/useDidUpdate';
 import { isEmpty } from '../../utils/validators';
 import FilePreview from '../FIlePreview';
 
@@ -38,23 +37,11 @@ const InputEditor = (props) => {
   const [currentFileIndex, setCurrentFileIndex] = useState();
 
   const inputRef = useRef();
-  const selectedFile = currentFileIndex !== undefined
-    ? files[currentFileIndex]
-    : undefined;
   const isValidForSubmit = !isEmpty(files) || !!value.trim();
-
-  useDidUpdate(() => {
-    if (selectedFile) setValue(selectedFile.caption);
-  }, [selectedFile]);
 
   useEffect(() => {
     if (replyMessage.id) inputRef.current.focus();
   }, [replyMessage.id]);
-
-  useDidUpdate(() => {
-    if (isEmpty(files)) setCurrentFileIndex(undefined);
-    else if (currentFileIndex >= files.length) setCurrentFileIndex(files.length - 1);
-  }, [files, currentFileIndex]);
 
   const onSubmit = () => {
     if (!isValidForSubmit) return;
@@ -135,7 +122,21 @@ const InputEditor = (props) => {
   const removeFile = (index) => {
     setFiles((prev) => prev.filter((_, idx) => idx !== index));
   };
-  const selectFile = (index) => setCurrentFileIndex(index);
+  const selectFile = (index) => {
+    const nextSelectedFile = index !== undefined
+      ? files[index]
+      : undefined;
+
+    setCurrentFileIndex(index);
+    setValue(nextSelectedFile?.caption ?? '');
+  };
+
+  if (currentFileIndex !== undefined && currentFileIndex >= files.length) {
+    if (files.length === 0) {
+      setCurrentFileIndex(undefined);
+    } else setCurrentFileIndex(files.length - 1);
+    return null;
+  }
 
   return (
     <>

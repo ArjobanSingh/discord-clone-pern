@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 
-const useDidUpdate = (callback, deps) => {
+const useLayoutDidUpdate = (callback, deps) => {
   const firstUpdate = useRef(true);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     let returnFunc;
     if (firstUpdate.current) {
       firstUpdate.current = false;
@@ -14,4 +14,4 @@ const useDidUpdate = (callback, deps) => {
   }, deps);
 };
 
-export default useDidUpdate;
+export default useLayoutDidUpdate;
