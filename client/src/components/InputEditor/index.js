@@ -131,6 +131,9 @@ const InputEditor = (props) => {
     setValue(nextSelectedFile?.caption ?? '');
   };
 
+  // new pattern learnt from React beta docs, to update while rendering
+  // instead of using useEffects, TO read more about this go to url
+  // https://beta.reactjs.org/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
   if (currentFileIndex !== undefined && currentFileIndex >= files.length) {
     if (files.length === 0) {
       setCurrentFileIndex(undefined);
