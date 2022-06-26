@@ -61,7 +61,7 @@
 - From your root folder, execute command `npm start`
 - Now your Production version of app should be running at `http://localhost:5000`
 
-## Work In progress
+## Following features would be added in future
 
 - [ ] Audio/Video Channel Support
 - [ ] Edit Messages
@@ -88,3 +88,7 @@
 ### Join Server with Invite URL
 
 ![Join server with invite url](https://res.cloudinary.com/arjoban-main-cloud/image/upload/v1656081736/discord_clone/jon-server-with-url_kh3otz.png)
+
+### Explore Public Servers
+
+![Explore Public Servers](https://res.cloudinary.com/arjoban-main-cloud/image/upload/v1656265431/discord_clone/Screenshot_2022-06-26_230447_fyybal.png)
