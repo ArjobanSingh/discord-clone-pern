@@ -121,7 +121,14 @@ const InputEditor = (props) => {
 
   const removeFile = (index) => {
     setFiles((prev) => prev.filter((_, idx) => idx !== index));
+
+    if (index !== files.length - 1) {
+      // meaning the item to delete is not the last one
+      const nextItemAtThisIndex = files[index + 1];
+      setValue(nextItemAtThisIndex.caption ?? '');
+    }
   };
+
   const selectFile = (index) => {
     const nextSelectedFile = index !== undefined
       ? files[index]
@@ -132,12 +139,17 @@ const InputEditor = (props) => {
   };
 
   // new pattern learnt from React beta docs, to update while rendering
-  // instead of using useEffects, TO read more about this go to url
+  // instead of using useEffect, TO read more about this go to url
   // https://beta.reactjs.org/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
   if (currentFileIndex !== undefined && currentFileIndex >= files.length) {
     if (files.length === 0) {
       setCurrentFileIndex(undefined);
-    } else setCurrentFileIndex(files.length - 1);
+      setValue('');
+    } else {
+      const newIndex = files.length - 1;
+      setCurrentFileIndex(newIndex);
+      setValue(files[newIndex]?.caption ?? '');
+    }
     return null;
   }
 
