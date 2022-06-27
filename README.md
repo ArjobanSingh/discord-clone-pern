@@ -65,12 +65,13 @@
 
 - [ ] Audio/Video Channel Support
 - [ ] Edit Messages
+- [ ] Search Public Servers
 
 ## What's Missing?
 
-- User to User relationships and personal chat
+- User to User relationships, personal chat and search users
 - Ban Users from servers
-- Private Channels
+- Private Channels and channel permissions
 - Dynamic server member roles
 - Message reactions
 - Message threads

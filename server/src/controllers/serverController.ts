@@ -246,7 +246,6 @@ export const leaveServer = async (
     }
 
     if (server.ownerId === req.userId) {
-      // TODO: owner cannot leave server for now
       next(new CustomError("Owner cannot leave it's own server", 403));
       return;
     }
@@ -355,7 +354,6 @@ export const getServerDetails = async (
   }
 };
 
-// TODO: add update raw query, to prevent extra get query on save
 export const updateServer = async (
   req: CustomRequest,
   res: Response,

@@ -119,7 +119,6 @@ function* handleSocketEvents(socketEvent) {
         // if not this server, already deleted
         const { name } = serverToDelete;
         toast.info(`"${name}" server has been deleted`);
-        // TODO: disconnect server
 
         if (isSameServerOpened) {
           yield put(setNavigateState(['/', { replace: true }]));
