@@ -50,7 +50,7 @@ const FilePreview = ({
       onClick={selectHandler}
       isSelected={selectedIndex === index}
     >
-      <OptionsContainer display="block" right="-10px">
+      <OptionsContainer opacity="1" right="-10px">
         <div>
           <DeleteIcon onClick={removeHandler} />
         </div>

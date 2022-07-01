@@ -69,7 +69,7 @@ export default class Message extends BaseEntity {
   @Column('uuid')
   serverId: string;
 
-  @OneToOne(() => Message)
+  @ManyToOne(() => Message)
   @JoinColumn()
   referenceMessage: Message
 

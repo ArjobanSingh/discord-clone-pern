@@ -1,11 +1,13 @@
 import styled from 'styled-components';
 import Avatar from '@mui/material/Avatar';
-import { blue, blueGrey, grey } from '@mui/material/colors';
+import { blueGrey, grey } from '@mui/material/colors';
 import Typography from '@mui/material/Typography';
 import { darken } from '@mui/material';
 
-export const OptionsContainer = styled.div(({ theme, display, right }) => `
-  display: ${display || 'none'};
+/* display: ${display || 'none'}; */
+export const OptionsContainer = styled.div(({ theme, opacity, right }) => `
+  display: flex;
+  opacity: ${opacity || '0'};
   position: absolute;
   right: ${right || '20px'};
   top: -20px;
@@ -49,7 +51,7 @@ export const MessageContainer = styled.div`
     ? blueGrey[800] : theme.palette.background.paper)};
 
     ${OptionsContainer} {
-      display: flex;
+      opacity: 1;
     }
   }
 `;
@@ -63,11 +65,11 @@ export const AvatarMessageContainer = styled.div`
 export const StyledAvatar = styled(Avatar)(({
   theme,
 }) => `
-    width: 40px;
-    height: 40px;
-    background-color: ${theme.palette.primary.main};
-    color: ${theme.palette.text.primary};
-    font-size: ${theme.typography.h5.fontSize};
+  width: 40px;
+  height: 40px;
+  background-color: ${theme.palette.primary.main};
+  color: ${theme.palette.text.primary};
+  font-size: ${theme.typography.h5.fontSize};
 `);
 
 export const HoverableTime = styled.div`
