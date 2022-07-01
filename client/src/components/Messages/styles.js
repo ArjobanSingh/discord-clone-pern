@@ -33,3 +33,7 @@ export const ImageModalWrapper = styled(Backdrop)`
   overflow: hidden;
   padding: ${({ theme }) => theme.spacing(5)};
 `;
+
+// export const SingleMessageWrapper = styled.div`
+//   width: 100%;
+// `;
