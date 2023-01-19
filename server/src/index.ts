@@ -26,7 +26,10 @@ const corsOptions = {
 
 const app = express();
 const httpServer = createServer(app);
-const io = new SocketIoServer(httpServer, isProductionEnv ? undefined : { cors: corsOptions });
+const io = new SocketIoServer(
+  httpServer,
+  isProductionEnv ? undefined : { cors: corsOptions },
+);
 
 const PORT = process.env.PORT || 5000;
 
@@ -66,7 +69,9 @@ AppDataSource.initialize()
 
         if (err instanceof multer.MulterError) {
           status = 418;
-          if (err.code === 'LIMIT_FILE_SIZE') message = 'File is Too large, Maximum file size supported is 3mb';
+          if (err.code === 'LIMIT_FILE_SIZE') {
+            message = 'File is Too large, Maximum file size supported is 3mb';
+          }
         }
 
         if (res.headersSent) {
@@ -85,7 +90,10 @@ AppDataSource.initialize()
     io.use(async (socket: ISocket, next) => {
       const { accessToken, refreshToken } = socket.handshake.auth;
 
-      const [isTokenValid, userId] = await isTokensValidForSocket({ accessToken, refreshToken });
+      const [isTokenValid, userId] = await isTokensValidForSocket({
+        accessToken,
+        refreshToken,
+      });
 
       if (isTokenValid) {
         // eslint-disable-next-line no-param-reassign
@@ -109,7 +117,10 @@ AppDataSource.initialize()
       socket.use(async (event, next) => {
         const [_eventKey, auth] = event;
         const { accessToken, refreshToken } = auth || {};
-        const [isTokenValid] = await isTokensValidForSocket({ accessToken, refreshToken });
+        const [isTokenValid] = await isTokensValidForSocket({
+          accessToken,
+          refreshToken,
+        });
 
         if (isTokenValid) {
           next();
@@ -120,17 +131,26 @@ AppDataSource.initialize()
         next(new CustomError('Session Expired', 401));
       });
 
-      socket.on(C.CONNECT_ALL_SERVERS, extractAuth((data: string[]) => {
-        socket.join(data);
-      }));
+      socket.on(
+        C.CONNECT_ALL_SERVERS,
+        extractAuth((data: string[]) => {
+          socket.join(data);
+        }),
+      );
 
-      socket.on(C.CONNECT_SINGLE_SERVER, extractAuth((serverId: string) => {
-        socket.join(serverId);
-      }));
+      socket.on(
+        C.CONNECT_SINGLE_SERVER,
+        extractAuth((serverId: string) => {
+          socket.join(serverId);
+        }),
+      );
 
-      socket.on(C.DISCONNECT_SINGLE_SERVER, extractAuth((serverId: string) => {
-        socket.leave(serverId);
-      }));
+      socket.on(
+        C.DISCONNECT_SINGLE_SERVER,
+        extractAuth((serverId: string) => {
+          socket.leave(serverId);
+        }),
+      );
 
       // socket.on(C.CONNECT_ALL_SERVERS, isSocketAuthenticated((_userId: string, data: string[]) => {
       //   socket.join(data);

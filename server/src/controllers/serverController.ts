@@ -72,7 +72,7 @@ export const createServer = async (
       );
       const { secure_url: secureUrl, public_id: publicId } = fileResponse;
       newServer.avatar = secureUrl;
-      newServer.avatar = publicId;
+      newServer.avatarPublicId = publicId;
     }
 
     await AppDataSource.transaction(async (transactionEntityManager) => {
