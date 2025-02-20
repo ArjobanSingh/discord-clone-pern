@@ -15,7 +15,9 @@ export default (state = initialState, action) => {
         uniqueIdentifier: action.payload.uniqueIdentifier,
       };
     case C.CREATE_SERVER_FAILED:
-      if (action.payload.uniqueIdentifier !== state.uniqueIdentifier) return state;
+      if (action.payload.uniqueIdentifier !== state.uniqueIdentifier) {
+        return state;
+      }
       return {
         ...state,
         isLoading: false,

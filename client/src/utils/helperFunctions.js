@@ -26,14 +26,6 @@ export function capitalize(str) {
   return `${str[0].toUpperCase()}${str.slice(1)?.toLowerCase()}`;
 }
 
-export function getCharacterName(name) {
-  if (!name) return '';
-  const [firstName, lastName] = name.split(' ');
-  const [firstChar] = firstName;
-  const secondChar = lastName ? lastName[0] : firstName[1];
-  return `${firstChar.toUpperCase()}${secondChar.toLowerCase()}`;
-}
-
 export function handleError(err, callback) {
   if (!err.response) return callback({ message: err.message }, err);
 
@@ -70,17 +62,22 @@ export const formatDate = (date) => {
 export const sameDay = (date1, date2) => {
   const d1 = new Date(date1);
   const d2 = new Date(date2);
-  return d1.getFullYear() === d2.getFullYear()
-    && d1.getMonth() === d2.getMonth()
-    && d1.getDate() === d2.getDate();
+  return (
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate()
+  );
 };
 
 export const formatDateWithMonth = (date) => {
-  const formattedDate = new Date(date)
-    .toLocaleDateString({},
-      {
-        month: 'long', day: '2-digit', year: 'numeric', // timeZone: 'UTC',
-      });
+  const formattedDate = new Date(date).toLocaleDateString(
+    {},
+    {
+      month: 'long',
+      day: '2-digit',
+      year: 'numeric', // timeZone: 'UTC',
+    }
+  );
   return formattedDate;
 };
 
@@ -113,7 +110,8 @@ export const reachedThresholdBottom = (scrollPositionData, threshold = 3) => {
 export const getCaret = (el) => {
   if (el.selectionStart) {
     return el.selectionStart;
-  } if (document.selection) {
+  }
+  if (document.selection) {
     el.focus();
     const r = document.selection.createRange();
     if (r === null) {
@@ -139,38 +137,47 @@ export const getMessageType = (file) => {
   return MessageType.FILE;
 };
 
-export const calculateAspectRatioFit = (srcWidth, srcHeight, maxWidth = 400, maxHeight = 300) => {
+export const calculateAspectRatioFit = (
+  srcWidth,
+  srcHeight,
+  maxWidth = 400,
+  maxHeight = 300
+) => {
   const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
 
-  return { width: Math.floor(srcWidth * ratio), height: Math.floor(srcHeight * ratio) };
+  return {
+    width: Math.floor(srcWidth * ratio),
+    height: Math.floor(srcHeight * ratio),
+  };
 };
 
 // will set original dimensions
-export const getFileDimensions = (file) => new Promise((resolve) => {
-  const isImage = MessageType.IMAGE === file.type;
-  let obj = isImage ? new Image() : document.createElement('video');
+export const getFileDimensions = (file) =>
+  new Promise((resolve) => {
+    const isImage = MessageType.IMAGE === file.type;
+    let obj = isImage ? new Image() : document.createElement('video');
 
-  if (isImage) {
-    obj.onload = () => {
-      const { naturalWidth: width, naturalHeight: height } = obj;
-      // const { width, height } = calculateAspectRatioFit(naturalWidth, naturalHeight);
-      resolve(`${width} ${height}`);
+    if (isImage) {
+      obj.onload = () => {
+        const { naturalWidth: width, naturalHeight: height } = obj;
+        // const { width, height } = calculateAspectRatioFit(naturalWidth, naturalHeight);
+        resolve(`${width} ${height}`);
+        obj = null;
+      };
+    } else {
+      obj.onloadedmetadata = () => {
+        const { videoWidth: width, videoHeight: height } = obj;
+        // const { width, height } = calculateAspectRatioFit(videoWidth, videoHeight);
+        resolve(`${width} ${height}`);
+        obj = null;
+      };
+    }
+    obj.onerror = () => {
+      resolve('400 300');
       obj = null;
     };
-  } else {
-    obj.onloadedmetadata = () => {
-      const { videoWidth: width, videoHeight: height } = obj;
-      // const { width, height } = calculateAspectRatioFit(videoWidth, videoHeight);
-      resolve(`${width} ${height}`);
-      obj = null;
-    };
-  }
-  obj.onerror = () => {
-    resolve('400 300');
-    obj = null;
-  };
-  obj.src = file.blobUrl;
-});
+    obj.src = file.blobUrl;
+  });
 
 export const isHostedUrl = (url) => !url.startsWith('blob:');
 export const transformCloudinaryUrl = (url, width, height) => {
@@ -179,7 +186,9 @@ export const transformCloudinaryUrl = (url, width, height) => {
   const indexOfDelType = url.indexOf(cloudinaryDeliveryType);
   const indexTillSlice = indexOfDelType + cloudinaryDeliveryType.length;
   const transformations = `c_scale,h_${height},w_${width}`;
-  return `${url.slice(0, indexTillSlice)}${transformations}/${url.slice(indexTillSlice)}`;
+  return `${url.slice(0, indexTillSlice)}${transformations}/${url.slice(
+    indexTillSlice
+  )}`;
 };
 
 export const downloadFile = async (url, name) => {

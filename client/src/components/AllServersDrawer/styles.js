@@ -17,7 +17,8 @@ export const SidebarContainer = styled('aside')`
   }
 `;
 
-export const ServerIconList = styled('div')(({ theme }) => `
+export const ServerIconList = styled('div')(
+  ({ theme }) => `
   height: 100%;
   overflow: hidden auto;
   background-color: ${theme.palette.background.darker};
@@ -34,9 +35,11 @@ export const ServerIconList = styled('div')(({ theme }) => `
   &::-webkit-scrollbar {
     display: none;
   }
-`);
+`
+);
 
-export const VerticalBar = styled('div')(({ theme, selected }) => `
+export const VerticalBar = styled('div')(
+  ({ theme, selected }) => `
   height: ${selected ? '80%' : '20%'};
   width: 5px;
   border-top-right-radius: 10px;
@@ -45,7 +48,8 @@ export const VerticalBar = styled('div')(({ theme, selected }) => `
   left: 0;
   background-color: ${theme.palette.text.primary};
   transition: height 0.2s;
-`);
+`
+);
 const getBackgroundColor = ({ theme, selected, explore }) => {
   if (!selected) return theme.palette.background.default;
   if (explore) return theme.palette.success.light;
@@ -59,11 +63,12 @@ const getColor = ({ theme, selected, explore }) => {
 };
 
 // eslint-disable-next-line react/prop-types
-const ExtractAvatarProps = forwardRef(({ explore, ...rest }, ref) => <Avatar {...rest} ref={ref} />);
+const ExtractAvatarProps = forwardRef(({ explore, ...rest }, ref) => (
+  <Avatar {...rest} ref={ref} />
+));
 
-export const StyledAvatar = styled(ExtractAvatarProps)(({
-  theme, selected, fontSize, explore,
-}) => `
+export const StyledAvatar = styled(ExtractAvatarProps)(
+  ({ theme, selected, fontSize, explore, capitalize }) => `
   background-color: ${getBackgroundColor({ theme, selected, explore })};
   color: ${getColor({ theme, selected, explore })};
   width: 50px;
@@ -72,11 +77,13 @@ export const StyledAvatar = styled(ExtractAvatarProps)(({
   font-size: ${fontSize || theme.typography.subtitle1.fontSize};
   border-radius: ${selected ? '30%' : '50%'};
   position: revert;
+  text-transform: ${capitalize ? 'capitalize' : 'none'};
 
   &:hover {
     border-radius: 30%;
-    background-color: ${explore
-    ? theme.palette.success.light : theme.palette.primary.main};
+    background-color: ${
+      explore ? theme.palette.success.light : theme.palette.primary.main
+    };
     color: ${theme.palette.text.primary};
     cursor: pointer;
   };
@@ -88,37 +95,46 @@ export const StyledAvatar = styled(ExtractAvatarProps)(({
   &:active {
     transform: translateY(4px);
   }
-`);
+`
+);
 
-export const Bar = styled('div')(({ theme }) => `
+export const Bar = styled('div')(
+  ({ theme }) => `
   width: 40px;
   height: 2px;
   min-height: 2px;
   background-color: ${theme.palette.background.default};
-`);
+`
+);
 
 export const barStyleCss = () => `
   flex-direction: column;
   gap: 5px;
 `;
 
-export const AvatarWrapper = styled('div')(({ theme }) => `
+export const AvatarWrapper = styled('div')(
+  ({ theme }) => `
   padding-inline: ${theme.spacing(1.5)};
   position: relative;
   display: flex;
   align-items: center;
-`);
+`
+);
 
-export const ServerListTooltip = styled(StyledTooltip)(({ theme }) => `
+export const ServerListTooltip = styled(StyledTooltip)(
+  ({ theme }) => `
   .${tooltipClasses.tooltip} {
     font-size: ${theme.typography.subtitle1.fontSize};
   }
-`);
+`
+);
 
-export const UserAvatarWrapper = styled.div(({ theme }) => `
+export const UserAvatarWrapper = styled.div(
+  ({ theme }) => `
   position: absolute;
   left: 0;
   bottom: 0;
   padding-block: ${theme.spacing(1.5)};
   background-color: ${theme.palette.background.darker};
-`);
+`
+);

@@ -5,7 +5,7 @@ export const Wrapper = styled.div`
   flex-direction: column;
   gap: ${({ gap }) => gap || '5px'};
   align-items: center;
-  width: 100%
+  width: 100%;
 `;
 
 export const logoSx = {
@@ -23,6 +23,7 @@ export const serverLogoSx = {
   borderRadius: '30%',
   width: '30px',
   height: '30px',
+  textTransform: 'capitalize',
 };
 
 export const skeletonButtonSx = {

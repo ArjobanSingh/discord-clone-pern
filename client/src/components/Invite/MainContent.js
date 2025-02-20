@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { FlexDiv } from '../../common/StyledComponents';
 import { logoSx, serverLogoSx } from './styles';
-import { getCharacterName } from '../../utils/helperFunctions';
 import { getJoinServerApi, getServerDetails } from '../../redux/reducers';
 import { joinServerRequested } from '../../redux/actions/servers';
 import DotLoader from '../../common/DotLoader';
@@ -16,8 +15,11 @@ import Logo from '../../common/Logo';
 const MainContent = (props) => {
   const { server, inviteId } = props;
 
-  const savedServer = useSelector((state) => getServerDetails(state, server.id));
-  const joinServerApi = useSelector((state) => getJoinServerApi(state, inviteId)) || {};
+  const savedServer = useSelector((state) =>
+    getServerDetails(state, server.id)
+  );
+  const joinServerApi =
+    useSelector((state) => getJoinServerApi(state, inviteId)) || {};
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -38,16 +40,11 @@ const MainContent = (props) => {
       <Avatar sx={logoSx}>
         <Logo />
       </Avatar>
-      <Typography
-        variant="subtitle2"
-        color="text.secondaryDark"
-      >
+      <Typography variant="subtitle2" color="text.secondaryDark">
         You have been invited to join
       </Typography>
       <FlexDiv injectCss="flex-direction: row; margin-bottom: 30px">
-        <Avatar sx={serverLogoSx}>
-          {getCharacterName(server.name)}
-        </Avatar>
+        <Avatar sx={serverLogoSx}>{server.name}</Avatar>
         <Typography
           variant="h5"
           fontWeight="fontWeightBold"
@@ -57,10 +54,19 @@ const MainContent = (props) => {
         </Typography>
       </FlexDiv>
       <Button variant="contained" fullWidth onClick={acceptInvite}>
-        <Typography variant="body2" visibility={isJoiningServer ? 'hidden' : ''}>Accept Invite</Typography>
+        <Typography
+          variant="body2"
+          visibility={isJoiningServer ? 'hidden' : ''}
+        >
+          Accept Invite
+        </Typography>
         {isJoiningServer && <DotLoader />}
       </Button>
-      {!!error && <Error>{error.message || 'Something went wrong in joining server'}</Error>}
+      {!!error && (
+        <Error>
+          {error.message || 'Something went wrong in joining server'}
+        </Error>
+      )}
     </>
   );
 };

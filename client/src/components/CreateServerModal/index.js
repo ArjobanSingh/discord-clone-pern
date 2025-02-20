@@ -33,7 +33,9 @@ import StyledImage from '../../common/StyledImage';
 const CreateServerModal = (props) => {
   const { closeModal, openServerModalOptionsScreen } = props;
   const dispatch = useDispatch();
-  const { error: apiErrors, isLoading: isCreatingServer } = useSelector(getServerCreationData);
+  const { error: apiErrors, isLoading: isCreatingServer } = useSelector(
+    getServerCreationData
+  );
 
   const [errors, setErrors] = useState({});
   const [newServerAvatar, setNewServerAvatar] = useState(null);
@@ -71,12 +73,12 @@ const CreateServerModal = (props) => {
     e.preventDefault();
     if (isCreatingServer) return;
     const formData = new FormData(e.currentTarget);
-    const name = formData.get('server-name');
+    const name = formData.get('server-name')?.trim();
     const description = formData.get('server-description');
     const isServerPublic = formData.get('server-type');
 
     const newErrorObj = {};
-    if (!name?.trim()) {
+    if (!name) {
       newErrorObj.name = 'Cannot be empty';
     } else if (name.length < serverValidation.SERVER_NAME_MIN_LENGTH) {
       newErrorObj.name = `Must be longer than or equal to ${serverValidation.SERVER_NAME_MIN_LENGTH} characters`;
@@ -84,7 +86,10 @@ const CreateServerModal = (props) => {
       newErrorObj.name = `Must be smaller than or equal to ${serverValidation.SERVER_NAME_MAX_LENGTH} characters`;
     }
 
-    if (description && description.length > serverValidation.SERVER_DESCRIPTION_MAX_LENGTH) {
+    if (
+      description &&
+      description.length > serverValidation.SERVER_DESCRIPTION_MAX_LENGTH
+    ) {
       newErrorObj.description = `Must be smaller than or equal to ${serverValidation.SERVER_DESCRIPTION_MAX_LENGTH} characters`;
     }
 
@@ -103,25 +108,28 @@ const CreateServerModal = (props) => {
     dispatch(createServerRequested(payload, Date.now()));
   };
 
-  const inputs = [{
-    id: 'server-name-input',
-    errorKey: 'name',
-    name: 'server-name',
-    label: 'Server name',
-    autoFocus: true,
-    minLength: serverValidation.SERVER_NAME_MIN_LENGTH,
-    maxLength: serverValidation.SERVER_NAME_MAX_LENGTH,
-    injectCss: 'margin-top: 5px;',
-  }, {
-    id: 'server-description-input',
-    errorKey: 'description',
-    name: 'server-description',
-    label: 'Server description',
-    maxLength: serverValidation.SERVER_DESCRIPTION_MAX_LENGTH,
-    as: 'textarea',
-    rows: 4,
-    injectCss: 'margin-top: 5px; textarea { resize: none; }',
-  }];
+  const inputs = [
+    {
+      id: 'server-name-input',
+      errorKey: 'name',
+      name: 'server-name',
+      label: 'Server name',
+      autoFocus: true,
+      minLength: serverValidation.SERVER_NAME_MIN_LENGTH,
+      maxLength: serverValidation.SERVER_NAME_MAX_LENGTH,
+      injectCss: 'margin-top: 5px;',
+    },
+    {
+      id: 'server-description-input',
+      errorKey: 'description',
+      name: 'server-description',
+      label: 'Server description',
+      maxLength: serverValidation.SERVER_DESCRIPTION_MAX_LENGTH,
+      as: 'textarea',
+      rows: 4,
+      injectCss: 'margin-top: 5px; textarea { resize: none; }',
+    },
+  ];
 
   return (
     <ModalContainer>
@@ -149,8 +157,8 @@ const CreateServerModal = (props) => {
             color="text.secondaryDark"
             width="90%"
           >
-            Give your new server a personality with a name and an icon.
-            You can always change it later.
+            Give your new server a personality with a name and an icon. You can
+            always change it later.
           </Typography>
 
           <Upload>
@@ -162,28 +170,33 @@ const CreateServerModal = (props) => {
               borderRadius={newServerAvatar?.fileUrl ? '50%' : ''}
               objectFit="cover"
             />
-            <FileInput multiple={false} type="file" accept="image/*" onChange={handleImageUpload} />
+            <FileInput
+              multiple={false}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+            />
           </Upload>
         </FlexDiv>
 
         <Form onSubmit={handleSubmit} id="create-server-form">
-          {inputs.map(({
-            errorKey, id, label, ...rest
-          }) => (
+          {inputs.map(({ errorKey, id, label, ...rest }) => (
             <div key={id}>
               <StyledTextfield
                 id={id}
-                label={(
+                label={
                   <Typography
                     variant="subtitle2"
                     lineHeight="normal"
-                    color={errors[errorKey] ? 'error.light' : 'text.secondaryDark'}
+                    color={
+                      errors[errorKey] ? 'error.light' : 'text.secondaryDark'
+                    }
                     fontWeight="fontWeightBold"
                     component="span"
                   >
                     {label}
                   </Typography>
-                )}
+                }
                 isError={!!errors[errorKey]}
                 errorMessage={errors[errorKey]}
                 {...rest}
@@ -194,7 +207,7 @@ const CreateServerModal = (props) => {
           <SwitchLabel
             name="server-type"
             control={<Switch defaultChecked size="small" />}
-            label={(
+            label={
               <Typography
                 variant="subtitle2"
                 lineHeight="normal"
@@ -203,7 +216,7 @@ const CreateServerModal = (props) => {
               >
                 Do you want to make your server Public?
               </Typography>
-            )}
+            }
             labelPlacement="start"
           />
         </Form>
@@ -223,9 +236,11 @@ const CreateServerModal = (props) => {
           type="submit"
           variant="contained"
         >
-          {isCreatingServer
-            ? <CircularProgress color="inherit" size={20} />
-            : 'Create'}
+          {isCreatingServer ? (
+            <CircularProgress color="inherit" size={20} />
+          ) : (
+            'Create'
+          )}
         </CreateServerButton>
       </ModalFooter>
     </ModalContainer>

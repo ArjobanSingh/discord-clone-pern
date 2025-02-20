@@ -7,15 +7,22 @@ import {
   StyledAvatar,
 } from './styles';
 import Logo from '../../../common/Logo';
-import { ServerMemberRoles, ServerMemberScores } from '../../../constants/servers';
+import {
+  ServerMemberRoles,
+  ServerMemberScores,
+} from '../../../constants/servers';
 import { capitalize, handleEnter } from '../../../utils/helperFunctions';
 import { SimpleEllipsis } from '../../../common/StyledComponents';
 
 const SingleMember = ({
-  loggedInMember, currentMember, setUpdateRoleMenuData, setMembersSettingsMenuData,
+  loggedInMember,
+  currentMember,
+  setUpdateRoleMenuData,
+  setMembersSettingsMenuData,
 }) => {
-  const isUserRoleSuperior = ServerMemberScores[loggedInMember.role]
-    > ServerMemberScores[currentMember.role];
+  const isUserRoleSuperior =
+    ServerMemberScores[loggedInMember.role] >
+    ServerMemberScores[currentMember.role];
 
   const openRoleMenu = (e) => {
     if (!isUserRoleSuperior) return;
@@ -68,7 +75,9 @@ const SingleMember = ({
             {capitalize(currentMember.role)}
           </Typography>
         </RoleChip>
-        {isUserRoleSuperior && <MemberSettingIcon onClick={openMemberSettingsMenu} />}
+        {isUserRoleSuperior && (
+          <MemberSettingIcon onClick={openMemberSettingsMenu} />
+        )}
       </MemberItem>
     </>
   );

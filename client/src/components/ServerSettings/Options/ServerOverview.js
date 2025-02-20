@@ -23,7 +23,9 @@ import {
 } from './styles';
 import useServerData from '../../../customHooks/useServerData';
 import {
-  getCharacterName, handleEnter, stopPropagation, transformCloudinaryUrl,
+  handleEnter,
+  stopPropagation,
+  transformCloudinaryUrl,
 } from '../../../utils/helperFunctions';
 import StyledTextField from '../../../common/StyledTextfield';
 import { ServerTypes, serverValidation } from '../../../constants/servers';
@@ -48,24 +50,17 @@ const mapHtmlNamesToValues = {
 };
 
 const ServerOverview = () => {
-  const {
-    reset, setReset, setIsSnackbarOpen, isSnackbarOpen,
-  } = useSnackbarValues();
+  const { reset, setReset, setIsSnackbarOpen, isSnackbarOpen } =
+    useSnackbarValues();
   const { serverId } = useParams();
   const dispatch = useDispatch();
 
-  const { isLoading, error } = useSelector(
-    (state) => getUpdateServerData(state, serverId),
+  const { isLoading, error } = useSelector((state) =>
+    getUpdateServerData(state, serverId)
   ) || { isLoading: false, error: null };
 
   const { serverDetails } = useServerData(serverId, false);
-  const {
-    name,
-    avatar,
-    type,
-    description,
-    banner,
-  } = serverDetails;
+  const { name, avatar, type, description, banner } = serverDetails;
 
   const [serverName, setServerName] = useState(name);
   const [serverType, setServerType] = useState(type);
@@ -129,11 +124,12 @@ const ServerOverview = () => {
     // state retrived when this component mounted, to see if anything changed
     const debouncedFunc = debounce(() => {
       const savedState = serverReduxStateRef.current;
-      if (serverName !== savedState.name
-        || serverType !== savedState.type
-        || isValueChanged(serverDescription, savedState.description)
-        || isValueChanged(filesObj.banner.fileUrl, savedState.banner)
-        || isValueChanged(filesObj.avatar.fileUrl, savedState.avatar)
+      if (
+        serverName !== savedState.name ||
+        serverType !== savedState.type ||
+        isValueChanged(serverDescription, savedState.description) ||
+        isValueChanged(filesObj.banner.fileUrl, savedState.banner) ||
+        isValueChanged(filesObj.avatar.fileUrl, savedState.avatar)
       ) {
         setIsSnackbarOpen(true);
         return;
@@ -207,7 +203,10 @@ const ServerOverview = () => {
     if (serverDescription) {
       if (!serverDescription?.trim()) {
         newErrorObj.serverDescription = 'Cannot be only whitespace';
-      } else if (serverDescription.length > serverValidation.SERVER_DESCRIPTION_MAX_LENGTH) {
+      } else if (
+        serverDescription.length >
+        serverValidation.SERVER_DESCRIPTION_MAX_LENGTH
+      ) {
         // eslint-disable-next-line max-len
         newErrorObj.serverDescription = `Must be smaller than or equal to ${serverValidation.SERVER_DESCRIPTION_MAX_LENGTH} characters`;
       }
@@ -237,33 +236,35 @@ const ServerOverview = () => {
   return (
     <>
       <OverviewContainer>
-        <Box
-          display="flex"
-          flexWrap="wrap"
-          gap={(theme) => theme.spacing(4)}
-        >
+        <Box display="flex" flexWrap="wrap" gap={(theme) => theme.spacing(4)}>
           <Box
             display="flex"
             minWidth="250px"
             gap={(theme) => theme.spacing(2)}
             flex="1"
           >
-            <Box display="flex" flexDirection="column" alignItems="center" gap="10px">
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              gap="10px"
+            >
               <AvatarContainer>
                 <IconAvatar src={avatarUrl}>
                   <Typography
                     variant="h6"
                     fontSize="2.5rem"
+                    sx={{ textTransform: 'capitalize' }}
                   >
-                    {getCharacterName(name)}
+                    {name}
                   </Typography>
                 </IconAvatar>
                 {!!avatarUrl && (
-                <Overlay>
-                  <Typography textAlign="center" color="text.primary">
-                    Update avatar
-                  </Typography>
-                </Overlay>
+                  <Overlay>
+                    <Typography textAlign="center" color="text.primary">
+                      Update avatar
+                    </Typography>
+                  </Overlay>
                 )}
                 <FileInput
                   name="new-server-avatar"
@@ -287,15 +288,10 @@ const ServerOverview = () => {
               )}
             </Box>
             <div>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-              >
+              <Typography variant="body2" color="text.secondary">
                 We recommend an image of at least 512x512 for the server.
               </Typography>
-              <UploadButton
-                variant="outlined"
-              >
+              <UploadButton variant="outlined">
                 <div>
                   Upload Image
                   <FileInput
@@ -319,7 +315,7 @@ const ServerOverview = () => {
           >
             <div>
               <StyledTextField
-                label={(
+                label={
                   <Typography
                     variant="caption"
                     color={errors.serverName ? 'error.light' : 'text.secondary'}
@@ -328,7 +324,7 @@ const ServerOverview = () => {
                   >
                     SERVER NAME
                   </Typography>
-                )}
+                }
                 id="edit-server-name"
                 isError={!!errors.serverName}
                 errorMessage={errors.serverName}
@@ -360,7 +356,9 @@ const ServerOverview = () => {
                 inputProps={{ 'aria-label': 'Server type' }}
               >
                 {Object.entries(ServerTypes).map(([title, value]) => (
-                  <MenuItem key={value} value={value}>{title}</MenuItem>
+                  <MenuItem key={value} value={value}>
+                    {title}
+                  </MenuItem>
                 ))}
               </TypeSelect>
             </div>
@@ -368,16 +366,20 @@ const ServerOverview = () => {
             <div>
               <StyledTextField
                 id="edit-server-description"
-                label={(
+                label={
                   <Typography
                     variant="caption"
-                    color={errors.serverDescription ? 'error.light' : 'text.secondary'}
+                    color={
+                      errors.serverDescription
+                        ? 'error.light'
+                        : 'text.secondary'
+                    }
                     component="span"
                     fontWeight="fontWeightBold"
                   >
                     SERVER DESCRIPTION
                   </Typography>
-                )}
+                }
                 value={serverDescription}
                 onChange={({ target }) => setServerDescription(target.value)}
                 isError={!!errors.serverDescription}
@@ -406,16 +408,32 @@ const ServerOverview = () => {
               Server banner background
             </Typography>
 
-            <Typography component="p" margin="0 0 10px" color="text.secondaryDark" variant="body2">
+            <Typography
+              component="p"
+              margin="0 0 10px"
+              color="text.secondaryDark"
+              variant="body2"
+            >
               This image will display at the top of your channels list.
             </Typography>
 
-            <Typography margin="0 0 10px" color="text.secondaryDark" variant="body2">
-              The recommended minimum size is 960x540 and recommended aspect ratio is 16:9
+            <Typography
+              margin="0 0 10px"
+              color="text.secondaryDark"
+              variant="body2"
+            >
+              The recommended minimum size is 960x540 and recommended aspect
+              ratio is 16:9
             </Typography>
           </Box>
 
-          <Box flex="1" display="flex" flexDirection="column" alignItems="center" gap="10px">
+          <Box
+            flex="1"
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            gap="10px"
+          >
             <EmptyBanner addShadow={!!bannerUrl}>
               {bannerUrl ? (
                 <>
@@ -435,9 +453,7 @@ const ServerOverview = () => {
               ) : (
                 <UploadBannerWrapper>
                   <StyledCloudIcon />
-                  <Typography color="text.secondary">
-                    Upload Banner
-                  </Typography>
+                  <Typography color="text.secondary">Upload Banner</Typography>
                 </UploadBannerWrapper>
               )}
               <FileInput
@@ -462,12 +478,14 @@ const ServerOverview = () => {
           </Box>
         </Box>
       </OverviewContainer>
-      <UnsavedSnackBar handleSubmit={updateServerDetails} isSubmitting={isLoading} />
+      <UnsavedSnackBar
+        handleSubmit={updateServerDetails}
+        isSubmitting={isLoading}
+      />
     </>
   );
 };
 
-ServerOverview.propTypes = {
-};
+ServerOverview.propTypes = {};
 
 export default ServerOverview;

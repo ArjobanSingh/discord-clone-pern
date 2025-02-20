@@ -4,13 +4,17 @@ import { NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Badge from '@mui/material/Badge';
 import {
-  AvatarWrapper, ServerListTooltip, StyledAvatar, VerticalBar,
+  AvatarWrapper,
+  ServerListTooltip,
+  StyledAvatar,
+  VerticalBar,
 } from './styles';
-import { getCharacterName } from '../../utils/helperFunctions';
 import { getServerNotificationsData } from '../../redux/reducers';
 
 const ServerNotification = ({ server }) => {
-  const serverNotifications = useSelector((state) => getServerNotificationsData(state, server.id));
+  const serverNotifications = useSelector((state) =>
+    getServerNotificationsData(state, server.id)
+  );
 
   const notificationCount = useMemo(() => {
     let total = 0;
@@ -35,8 +39,9 @@ const ServerNotification = ({ server }) => {
               <StyledAvatar
                 src={server.avatar}
                 selected={isActive}
+                capitalize={true.toString()}
               >
-                {getCharacterName(server.name)}
+                {server.name}
               </StyledAvatar>
             </Badge>
           </ServerListTooltip>
@@ -51,9 +56,10 @@ ServerNotification.propTypes = {
   server: PropTypes.objectOf(PropTypes.any).isRequired,
 };
 
-const ServersList = ({ servers }) => Object.values(servers).map((server) => (
-  <ServerNotification key={server.id} server={server} />
-));
+const ServersList = ({ servers }) =>
+  Object.values(servers).map((server) => (
+    <ServerNotification key={server.id} server={server} />
+  ));
 
 ServersList.propTypes = {
   servers: PropTypes.objectOf(PropTypes.object).isRequired,
