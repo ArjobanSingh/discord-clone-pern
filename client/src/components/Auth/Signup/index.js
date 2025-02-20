@@ -6,7 +6,11 @@ import Button from '@mui/material/Button';
 import { useLocation } from 'react-router-dom';
 import StyledTextfield from '../../../common/StyledTextfield';
 import { Anchor, InputWrapper } from '../styles';
-import { isEmailValid, isEmpty, isEmptyString } from '../../../utils/validators';
+import {
+  isEmailValid,
+  isEmpty,
+  isEmptyString,
+} from '../../../utils/validators';
 import Error from '../../../common/Error';
 import DotLoader from '../../../common/DotLoader';
 import useAuthState from '../../../customHooks/useAuthState';
@@ -18,7 +22,9 @@ const Signup = (props) => {
   const dispatch = useDispatch();
   const location = useLocation();
 
-  const { isLoading, errors, setErrors } = useAuthState((state) => getRegisterAuthState(state));
+  const { isLoading, errors, setErrors } = useAuthState((state) =>
+    getRegisterAuthState(state)
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -31,13 +37,16 @@ const Signup = (props) => {
     const newErrors = {};
 
     if (isEmptyString(email)) newErrors.email = 'This field is required';
-    else if (!isEmailValid(email)) newErrors.email = 'Please enter a valid email';
+    else if (!isEmailValid(email))
+      newErrors.email = 'Please enter a valid email';
 
     if (isEmptyString(password)) newErrors.password = 'This field is required';
-    else if (password.length <= 3) newErrors.password = 'Should be greater than 3 characters';
+    else if (password.length <= 3)
+      newErrors.password = 'Should be greater than 3 characters';
 
     if (isEmptyString(name)) newErrors.name = 'This field is required';
-    else if (name.length <= 3) newErrors.name = 'Should be greater than 3 characters';
+    else if (name.length <= 3)
+      newErrors.name = 'Should be greater than 3 characters';
 
     if (!isEmpty(newErrors)) {
       setErrors(newErrors);
@@ -47,7 +56,9 @@ const Signup = (props) => {
     setErrors({});
 
     const from = location.state?.from?.pathname || '/';
-    dispatch(registrationRequested({ email, password, name }, from));
+    dispatch(
+      registrationRequested({ email, password, name: name.trim() }, from)
+    );
   };
 
   const openLogin = (e) => {
@@ -77,15 +88,19 @@ const Signup = (props) => {
       >
         <InputWrapper>
           <StyledTextfield
-            label={(
+            label={
               <Typography
                 variant="body2"
-                color={!!errors.email || !!errors.message ? 'error.light' : 'text.secondary'}
+                color={
+                  !!errors.email || !!errors.message
+                    ? 'error.light'
+                    : 'text.secondary'
+                }
                 component="span"
               >
                 EMAIL
               </Typography>
-            )}
+            }
             id="signup email"
             type="email"
             name="email"
@@ -97,15 +112,19 @@ const Signup = (props) => {
 
         <InputWrapper>
           <StyledTextfield
-            label={(
+            label={
               <Typography
                 variant="body2"
-                color={!!errors.name || !!errors.message ? 'error.light' : 'text.secondary'}
+                color={
+                  !!errors.name || !!errors.message
+                    ? 'error.light'
+                    : 'text.secondary'
+                }
                 component="span"
               >
                 NAME
               </Typography>
-            )}
+            }
             id="signup name"
             type="text"
             name="name"
@@ -116,15 +135,19 @@ const Signup = (props) => {
 
         <InputWrapper>
           <StyledTextfield
-            label={(
+            label={
               <Typography
                 variant="body2"
-                color={!!errors.password || !!errors.message ? 'error.light' : 'text.secondary'}
+                color={
+                  !!errors.password || !!errors.message
+                    ? 'error.light'
+                    : 'text.secondary'
+                }
                 component="span"
               >
                 PASSWORD
               </Typography>
-            )}
+            }
             id="signup password"
             type="password"
             name="password"
@@ -137,7 +160,9 @@ const Signup = (props) => {
         {!!errors.message && <Error>{errors.message}</Error>}
 
         <Button type="submit" color="primary" variant="contained">
-          <Typography variant="body2" visibility={isLoading ? 'hidden' : ''}>Continue</Typography>
+          <Typography variant="body2" visibility={isLoading ? 'hidden' : ''}>
+            Continue
+          </Typography>
           {isLoading && <DotLoader />}
         </Button>
       </Box>

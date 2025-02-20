@@ -31,19 +31,22 @@ const inputNames = {
   channelName: 'channel-name',
 };
 
-const radios = [{
-  value: ChannelType.TEXT,
-  icon: <Tag fontSize="1.5rem" />,
-  title: 'Text',
-  description: 'Send messages, images, videos and more',
-}, {
-  value: ChannelType.AUDIO,
-  icon: <VolumeUpIcon />,
-  title: 'Coming Soon: Voice Channels....',
-  // description: 'Hang out together with voice, video and screen share',
-  description: 'You would be able to voice, video and screen share',
-  disabled: true,
-}];
+const radios = [
+  {
+    value: ChannelType.TEXT,
+    icon: <Tag fontSize="1.5rem" />,
+    title: 'Text',
+    description: 'Send messages, images, videos and more',
+  },
+  {
+    value: ChannelType.AUDIO,
+    icon: <VolumeUpIcon />,
+    title: 'Coming Soon: Voice Channels....',
+    // description: 'Hang out together with voice, video and screen share',
+    description: 'You would be able to voice, video and screen share',
+    disabled: true,
+  },
+];
 
 const CreateChannelModal = (props) => {
   const { closeModal, serverId } = props;
@@ -72,7 +75,7 @@ const CreateChannelModal = (props) => {
     try {
       setCreateChannelData({ isCreatingChannel: true, error: null });
       const url = ChannelApi.CREATE_CHANNEL;
-      const payload = { serverId, type: channelType, name: channelName };
+      const payload = { serverId, type: channelType, name: channelName.trim() };
       const response = await axiosInstance.post(url, payload);
       dispatch(addChannelSuccess(response.data.serverId, response.data));
       if (isMounted.current) {
@@ -86,8 +89,6 @@ const CreateChannelModal = (props) => {
             isCreatingChannel: false,
             error: error.message || 'Something went wrong',
           });
-          // explicitly undefined, just for readibility
-          return undefined;
         });
         if (sessionExpireError) dispatch(sessionExpireError);
       }
@@ -113,9 +114,7 @@ const CreateChannelModal = (props) => {
             >
               Create Channel
             </Typography>
-            <StyledCloseIcon
-              onClick={closeModal}
-            />
+            <StyledCloseIcon onClick={closeModal} />
           </Box>
 
           <RadioGroup
@@ -138,28 +137,29 @@ const CreateChannelModal = (props) => {
           <Box display="grid" gap="5px">
             <StyledTextfield
               id="create-channel-name-input"
-              label={(
+              label={
                 <Typography variant="caption" fontWeight="fontWeightBold">
                   CHANNEL NAME
                 </Typography>
-              )}
+              }
               placeholder="new-channel"
               name={inputNames.channelName}
               value={channelName}
               onChange={handleChange}
-              startIcon={channelType === ChannelType.TEXT
-                ? <Tag fontSize="1.25rem" /> : <VolumeUpIcon fontSize="small" />}
+              startIcon={
+                channelType === ChannelType.TEXT ? (
+                  <Tag fontSize="1.25rem" />
+                ) : (
+                  <VolumeUpIcon fontSize="small" />
+                )
+              }
             />
           </Box>
         </Form>
         {!!error && <Error>{error}</Error>}
       </ModalBody>
       <ModalFooter>
-        <Button
-          variant="info"
-          color="text.primary"
-          onClick={closeModal}
-        >
+        <Button variant="info" color="text.primary" onClick={closeModal}>
           Cancel
         </Button>
         <Button
@@ -169,9 +169,11 @@ const CreateChannelModal = (props) => {
           type="submit"
           sx={{ width: '131px', height: '36px' }}
         >
-          {isCreatingChannel
-            ? <CircularProgress color="inherit" size={20} />
-            : 'Create Channel'}
+          {isCreatingChannel ? (
+            <CircularProgress color="inherit" size={20} />
+          ) : (
+            'Create Channel'
+          )}
         </Button>
       </ModalFooter>
     </Container>
