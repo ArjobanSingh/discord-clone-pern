@@ -5,6 +5,6 @@ import Redis from 'ioredis';
 //   host: '127.0.0.1',
 // });
 
-const redisClient = new Redis(process.env.REDIS_URI);
+const redisClient = new Redis(process.env.REDIS_URI, { family: 0 });
 
 export default redisClient;
